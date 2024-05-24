@@ -8,9 +8,7 @@ import com.j256.ormlite.table.TableUtils;
 import gg.mew.slabby.SlabbyAPI;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Collection;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -36,49 +34,43 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         try {
             this.connectionSource.close();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             api.exceptionService().log(e);
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Shop.Builder shopBuilder() {
-        return SQLiteShop.builder();
-    }
+    public <T> T builder(final Class<?> builderType) {
+        if (builderType == Shop.Builder.class)
+            return (T) SQLiteShop.builder();
 
-    @Override
-    public ShopOwner.Builder shopOwnerBuilder() {
-        return SQLiteShopOwner.builder();
+        if (builderType == ShopOwner.Builder.class)
+            return (T) SQLiteShopOwner.builder();
+
+        throw new IllegalArgumentException();
     }
 
     @Override
     public void create(final Shop shop) {
         try {
             this.shopDao.create((SQLiteShop) shop);
-        } catch (SQLException e) {
+            this.shopDao.refresh((SQLiteShop) shop);
+        } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void refresh(final Shop shop) {
+    public void create(final ShopOwner shopOwner) {
         try {
-            this.shopDao.refresh((SQLiteShop) shop);
-        } catch (SQLException e) {
-            api.exceptionService().log(e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void create(final Collection<Shop> shops) {
-        try {
-            this.shopDao.create(shops.stream().map(it -> (SQLiteShop)it).toList());
-        } catch (SQLException e) {
+            this.shopOwnerDao.create((SQLiteShopOwner) shopOwner);
+        } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw new RuntimeException(e);
         }

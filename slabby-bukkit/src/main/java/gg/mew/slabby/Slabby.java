@@ -5,7 +5,9 @@ import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
+import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
+import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.economy.VaultEconomyWrapper;
 import lombok.Getter;
@@ -17,7 +19,6 @@ import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
-import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.spongepowered.configurate.ConfigurateException;
@@ -53,6 +54,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter //TODO: Implement better.
     private final ExceptionService exceptionService = Throwable::printStackTrace;
 
+    @Getter
+    private final ShopOperations operations = new BukkitShopOperations();
+
     private final PaperCommandManager commandManager = new PaperCommandManager(this);
 
     private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
@@ -71,7 +75,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             return;
         }
 
-        if (!setupShopRepository()) {
+        if (!setupRepository()) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -83,7 +87,14 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
         getServer().getServicesManager().register(SlabbyAPI.class, this, this, ServicePriority.Highest);
     }
 
-    private boolean setupShopRepository() {
+    @Override
+    public void onDisable() {
+        getServer().getServicesManager().unregister(this);
+
+        this.repository.close();
+    }
+
+    private boolean setupRepository() {
         try {
             this.repository = new SQLiteShopRepository(this);
             this.repository.initialize();
@@ -120,11 +131,6 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
         this.economy = new VaultEconomyWrapper(economyRegistration.getProvider());
 
         return true;
-    }
-
-    @Override
-    public void onDisable() {
-        getServer().getServicesManager().unregister(this);
     }
 
     @Override

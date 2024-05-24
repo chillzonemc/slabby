@@ -1,6 +1,8 @@
 package gg.mew.slabby.importer;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopOwner;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,12 +42,13 @@ public final class SlabboImporter implements Importer {
 
                 final var ownerId = (UUID) shopClass.getDeclaredField("ownerId").get(oldShop);
 
-                final var shop = api.repository().shopBuilder()
+                final var shop = api.repository()
+                        .<Shop.Builder>builder(Shop.Builder.class)
                         .item(item.getItemMeta().getAsString())
                         .x(location.getBlockX())
                         .y(location.getBlockY())
                         .z(location.getBlockZ())
-                        .dimension(location.getWorld().getName())
+                        .world(location.getWorld().getName())
                         .buyPrice(buyPrice)
                         .sellPrice(sellPrice)
                         .quantity(quantity)
@@ -55,18 +58,18 @@ public final class SlabboImporter implements Importer {
                         .build();
 
                 api.repository().create(shop);
-                api.repository().refresh(shop);
 
-                final var owner = api.repository().shopOwnerBuilder()
+                final var owner = api.repository()
+                        .<ShopOwner.Builder>builder(ShopOwner.Builder.class)
                         .uniqueId(ownerId)
                         .share(100)
                         .build();
 
                 shop.owners().add(owner);
             } catch (IllegalAccessException | NoSuchFieldException e) {
+                api.exceptionService().log(e);
                 throw new RuntimeException(e);
             }
-
         }
     }
 

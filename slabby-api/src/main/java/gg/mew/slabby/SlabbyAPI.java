@@ -2,6 +2,7 @@ package gg.mew.slabby;
 
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
+import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopRepository;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 
@@ -13,6 +14,8 @@ public interface SlabbyAPI {
     EconomyWrapper economy();
 
     ShopRepository repository();
+
+    ShopOperations operations();
 
     SlabbyConfig configuration();
 

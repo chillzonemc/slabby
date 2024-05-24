@@ -35,7 +35,7 @@ public final class SQLiteShop implements Shop {
     private int z;
 
     @DatabaseField(canBeNull = false)
-    private String dimension;
+    private String world;
 
     @DatabaseField
     private Double buyPrice;

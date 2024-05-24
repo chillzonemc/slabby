@@ -14,10 +14,6 @@ public interface SlabbyConfig {
 
     Restock restock();
 
-    //TODO: minimum pricing for items.
-    //TODO: permits
-    //TODO: deny-listed items
-
     interface Database {
 
         String url();
