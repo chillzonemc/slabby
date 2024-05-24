@@ -1,0 +1,45 @@
+package gg.mew.slabby.wrapper.economy;
+
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
+
+import java.util.UUID;
+
+public final class VaultEconomyWrapper implements EconomyWrapper {
+
+    private final Economy economy;
+
+    public VaultEconomyWrapper(final Economy economy) {
+        this.economy = economy;
+    }
+
+    @Override
+    public boolean hasAccount(final UUID uniqueId) {
+        return this.economy.hasAccount(Bukkit.getOfflinePlayer(uniqueId));
+    }
+
+    @Override
+    public double balance(final UUID uniqueId) {
+        return this.economy.getBalance(Bukkit.getOfflinePlayer(uniqueId));
+    }
+
+    @Override
+    public boolean hasAmount(final UUID uniqueId, final double amount) {
+        return this.economy.has(Bukkit.getOfflinePlayer(uniqueId), amount);
+    }
+
+    @Override
+    public ActionResult withdraw(final UUID uniqueId, final double amount) {
+        final var result = this.economy.withdrawPlayer(Bukkit.getOfflinePlayer(uniqueId), amount);
+
+        return new ActionResult(result.amount, result.balance, result.transactionSuccess());
+    }
+
+    @Override
+    public ActionResult deposit(final UUID uniqueId, final double amount) {
+        final var result = this.economy.depositPlayer(Bukkit.getOfflinePlayer(uniqueId), amount);
+
+        return new ActionResult(result.amount, result.balance, result.transactionSuccess());
+    }
+
+}

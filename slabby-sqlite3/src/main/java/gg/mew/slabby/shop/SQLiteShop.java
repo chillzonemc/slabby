@@ -1,0 +1,69 @@
+package gg.mew.slabby.shop;
+
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+import com.j256.ormlite.table.DatabaseTable;
+import gg.mew.slabby.audit.AuditDao;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
+import java.time.LocalDateTime;
+
+@DatabaseTable(tableName = "shops", daoClass = AuditDao.class)
+@Builder
+@Accessors(fluent = true)
+@Getter
+@Setter
+public final class SQLiteShop implements Shop {
+
+    @DatabaseField(generatedId = true)
+    private int id;
+
+    @DatabaseField(canBeNull = false)
+    private String item;
+
+    @DatabaseField(canBeNull = false)
+    private int x;
+
+    @DatabaseField(canBeNull = false)
+    private int y;
+
+    @DatabaseField(canBeNull = false)
+    private int z;
+
+    @DatabaseField(canBeNull = false)
+    private String dimension;
+
+    @DatabaseField
+    private Double buyPrice;
+
+    @DatabaseField
+    private Double sellPrice;
+
+    @DatabaseField(canBeNull = false)
+    private int quantity;
+
+    @DatabaseField(canBeNull = false)
+    private int stock;
+
+    @DatabaseField
+    private String note;
+
+    @DatabaseField
+    private String name;
+
+    @ForeignCollectionField(eager = false)
+    private ForeignCollection<SQLiteShopOwner> owners;
+
+    @DatabaseField(canBeNull = false)
+    private LocalDateTime createdOn;
+
+    @DatabaseField
+    private LocalDateTime lastModifiedOn;
+
+    public static final class SQLiteShopBuilder implements Shop.Builder {}
+
+}

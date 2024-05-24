@@ -1,0 +1,92 @@
+package gg.mew.slabby.config;
+
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Comment;
+
+@Accessors(fluent = true)
+@Getter
+@ConfigSerializable
+public final class BukkitSlabbyConfig implements SlabbyConfig {
+
+    @Comment("Rendering mode of items on shops. Can be: QUANTITY, STACK, SINGLE or NONE")
+    private DisplayMode displayMode;
+
+    @Comment("Maximum amount of items a shop can keep in stock at one time.")
+    private int maxStock;
+
+    @Comment("Item used for creating or deleting shops.")
+    private String item;
+
+    @Comment("Options for the database")
+    private Database database;
+
+    @Comment("Defaults for new shops.")
+    private BukkitDefaults defaults;
+
+    @Comment("Options for restocking shops.")
+    private BukkitRestock restock;
+
+    //TODO: Custom item models?
+
+    //TODO: checkUpdates, stairs, barriershops, sellOversized, withdrawOversized, disableShops, allowCents
+
+    @Accessors(fluent = true)
+    @Getter
+    final static class BukkitDatabase implements Database {
+
+        @Comment("SQLite3 connection url")
+        private String url;
+
+    }
+
+    @Accessors(fluent = true)
+    @Getter
+    final static class BukkitRestock implements Restock {
+
+        @Comment("Owners can punch their shop to restock items.")
+        private boolean canPunch;
+
+        @Comment("Owners can punch their shop while crouching to restock all items at once.")
+        private boolean bulk;
+
+        @Comment("Options for chest linking.")
+        private BukkitChests chests;
+
+        @Accessors(fluent = true)
+        @Getter
+        final static class BukkitChests implements Chests {
+
+            @Comment("Chests can be linked to a shop.")
+            private boolean enabled;
+
+            @Accessors(fluent = true)
+            @Getter
+            final static class BukkitHoppers implements Hoppers {
+
+                @Comment("Hoppers can refill a linked chest.")
+                private boolean enabled;
+
+            }
+
+        }
+
+    }
+
+    @Accessors(fluent = true)
+    @Getter
+    final static class BukkitDefaults implements Defaults {
+
+        @Comment("Default buy price for new shops.")
+        private double buyPrice;
+
+        @Comment("Default sell price for new shops.")
+        private double sellPrice;
+
+        @Comment("Default quantity for new shops.")
+        private int quantity;
+
+    }
+
+}
