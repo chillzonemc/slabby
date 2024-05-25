@@ -1,17 +1,15 @@
 package gg.mew.slabby.wrapper.economy;
 
+import lombok.RequiredArgsConstructor;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public final class VaultEconomyWrapper implements EconomyWrapper {
 
     private final Economy economy;
-
-    public VaultEconomyWrapper(final Economy economy) {
-        this.economy = economy;
-    }
 
     @Override
     public boolean hasAccount(final UUID uniqueId) {

@@ -9,6 +9,7 @@ import gg.mew.slabby.SlabbyAPI;
 
 import java.io.Closeable;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -29,6 +30,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     public void initialize() throws SQLException {
+
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShop.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
     }
@@ -73,6 +75,46 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void update(final Shop shop) {
+        try {
+            this.shopDao.update((SQLiteShop) shop);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void update(final ShopOwner shopOwner) {
+        try {
+            this.shopOwnerDao.update((SQLiteShopOwner) shopOwner);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) {
+        try {
+            final var result = this.shopDao.queryBuilder()
+                    .where()
+                    .eq("x", x)
+                    .and()
+                    .eq("y", y)
+                    .and()
+                    .eq("z", z)
+                    .and()
+                    .eq("world", world)
+                    .queryForFirst();
+            return Optional.of(result);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException();
         }
     }
 

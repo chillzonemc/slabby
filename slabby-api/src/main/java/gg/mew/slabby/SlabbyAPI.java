@@ -5,6 +5,7 @@ import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopRepository;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
+import gg.mew.slabby.wrapper.permission.PermissionWrapper;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -12,6 +13,8 @@ import java.time.LocalDateTime;
 public interface SlabbyAPI {
 
     EconomyWrapper economy();
+
+    PermissionWrapper permission();
 
     ShopRepository repository();
 

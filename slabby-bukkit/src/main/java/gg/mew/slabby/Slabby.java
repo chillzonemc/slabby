@@ -4,15 +4,19 @@ import co.aikar.commands.PaperCommandManager;
 import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
+import gg.mew.slabby.listener.SlabbyListener;
 import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
 import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.economy.VaultEconomyWrapper;
+import gg.mew.slabby.wrapper.permission.BukkitPermissionWrapper;
+import gg.mew.slabby.wrapper.permission.PermissionWrapper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -49,13 +53,16 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     private EconomyWrapper economy;
 
     @Getter
+    private final PermissionWrapper permission = new BukkitPermissionWrapper();
+
+    @Getter
     private SlabbyConfig configuration;
 
     @Getter //TODO: Implement better.
     private final ExceptionService exceptionService = Throwable::printStackTrace;
 
     @Getter
-    private final ShopOperations operations = new BukkitShopOperations();
+    private final ShopOperations operations = new BukkitShopOperations(this);
 
     private final PaperCommandManager commandManager = new PaperCommandManager(this);
 
@@ -82,6 +89,8 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
         SlabbyHelper.init(this);
 
+        getServer().getPluginManager().registerEvents(new SlabbyListener(this), this);
+
         commandManager.registerCommand(new SlabbyCommand(this));
 
         getServer().getServicesManager().register(SlabbyAPI.class, this, this, ServicePriority.Highest);
@@ -90,6 +99,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public void onDisable() {
         getServer().getServicesManager().unregister(this);
+        HandlerList.unregisterAll(this);
 
         this.repository.close();
     }
