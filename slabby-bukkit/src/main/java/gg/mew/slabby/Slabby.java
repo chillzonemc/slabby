@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -34,6 +35,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
+@ApiVersion(ApiVersion.Target.v1_20)
 @DependsOn(value = {
         @Dependency("Vault")
 })
@@ -64,7 +66,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private final ShopOperations operations = new BukkitShopOperations(this);
 
-    private final PaperCommandManager commandManager = new PaperCommandManager(this);
+    private PaperCommandManager commandManager;
 
     private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
@@ -73,25 +75,29 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public void onEnable() {
         if (!setupEconomy()) {
+            getLogger().warning("Error while setting up economy");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!setupConfig()) {
+            getLogger().warning("Error while setting up config");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!setupRepository()) {
+            getLogger().warning("Error while setting up repository");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
+        this.commandManager = new PaperCommandManager(this);
+        commandManager.registerCommand(new SlabbyCommand(this));
+
         SlabbyHelper.init(this);
 
         getServer().getPluginManager().registerEvents(new SlabbyListener(this), this);
-
-        commandManager.registerCommand(new SlabbyCommand(this));
 
         getServer().getServicesManager().register(SlabbyAPI.class, this, this, ServicePriority.Highest);
     }
@@ -100,8 +106,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     public void onDisable() {
         getServer().getServicesManager().unregister(this);
         HandlerList.unregisterAll(this);
-
-        this.repository.close();
+        if (this.repository != null) {
+            this.repository.close();
+        }
     }
 
     private boolean setupRepository() {
