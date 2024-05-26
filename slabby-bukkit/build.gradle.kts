@@ -4,7 +4,6 @@ plugins {
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://repo.xenondevs.xyz/releases")
 }

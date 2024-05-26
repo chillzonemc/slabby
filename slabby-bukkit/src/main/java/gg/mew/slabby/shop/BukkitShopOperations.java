@@ -14,6 +14,11 @@ public final class BukkitShopOperations implements ShopOperations {
     private final SlabbyAPI api;
 
     @Override
+    public ShopWizard wizard(final UUID uniqueId) {
+        return null;
+    }
+
+    @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 

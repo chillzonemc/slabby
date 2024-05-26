@@ -3,11 +3,16 @@ package gg.mew.slabby.listener;
 import gg.mew.slabby.SlabbyAPI;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import xyz.xenondevs.invui.gui.Gui;
+import xyz.xenondevs.invui.item.builder.ItemBuilder;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
+import xyz.xenondevs.invui.window.Window;
 
 @RequiredArgsConstructor
 public final class SlabbyListener implements Listener {
@@ -22,7 +27,20 @@ public final class SlabbyListener implements Listener {
             final var configurationItem = Bukkit.getItemFactory().createItemStack(api.configuration().item());
 
             if (itemInHand.isSimilar(configurationItem)) {
-                //TODO: start Wizard
+                final var gui = Gui.normal()
+                        .setStructure(
+                                "........."
+                        )
+                        .addIngredient('.', new SimpleItem(new ItemBuilder(Material.RED_STAINED_GLASS_PANE)))
+                        .build();
+
+                final var window = Window.single()
+                        .setViewer(event.getPlayer())
+                        .setTitle("[Slabby] New Shop")
+                        .setGui(gui)
+                        .build();
+
+                window.open();
             }
         }
 

@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Builder
 @DatabaseTable(tableName = "shop_owners", daoClass = AuditDao.class)
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = false)
 @Getter
 @Setter
 public final class SQLiteShopOwner implements ShopOwner {

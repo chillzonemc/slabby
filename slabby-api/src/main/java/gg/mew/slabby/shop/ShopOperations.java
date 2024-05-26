@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public interface ShopOperations {
 
-    // wizard(final UUID uniqueId);
+    ShopWizard wizard(final UUID uniqueId);
 
     ShopOperationResult buy(final UUID uniqueId, final Shop shop);
     ShopOperationResult sell(final UUID uniqueId, final Shop shop);

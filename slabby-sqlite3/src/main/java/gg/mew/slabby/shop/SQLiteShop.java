@@ -11,10 +11,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @DatabaseTable(tableName = "shops", daoClass = AuditDao.class)
 @Builder
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = false)
 @Getter
 @Setter
 public final class SQLiteShop implements Shop {
@@ -57,6 +58,12 @@ public final class SQLiteShop implements Shop {
 
     @ForeignCollectionField(eager = false)
     private ForeignCollection<SQLiteShopOwner> owners;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<ShopOwner> owners() {
+        return (Collection<ShopOwner>) (Collection<? extends ShopOwner>) this.owners;
+    }
 
     @DatabaseField(canBeNull = false)
     private LocalDateTime createdOn;
