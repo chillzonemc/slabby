@@ -1,0 +1,39 @@
+# Rendering mode of items on shops. Can be: QUANTITY, STACK, SINGLE or NONE
+displayMode: QUANTITY
+
+# Maximum amount of items a shop can keep in stock at one time.
+maxStock: 99999
+
+# Item used for creating or deleting shops.
+item: minecraft:stick
+
+# Options for the database
+database:
+  # SQLite3 connection url
+  url: "jdbc:sqlite:slabby.db"
+
+# Defaults for new shops.
+defaults:
+  # Default buy price for new shops.
+  buyPrice: 0
+  # Default sell price for new shops.
+  sellPrice: 0
+  # Default quantity for new shops.
+  quantity: 64
+
+# Options for restocking shops.
+restock:
+  # Options for shop punching.
+  punch:
+    # Owners can punch their shop to restock items.
+    enabled: true
+    # Owners can punch their shop while crouching to restock all items at once.
+    bulk: true
+  # Options for chest linking.
+  chests:
+    # Chests can be linked to a shop.
+    enabled: true
+    # Options for refilling linked chests
+    hoppers:
+      # Hoppers can refill a linked chest.
+      enabled: true

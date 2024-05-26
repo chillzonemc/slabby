@@ -32,15 +32,23 @@ public interface SlabbyConfig {
 
     interface Restock {
 
-        boolean canPunch();
-
-        boolean bulk();
+        Punch punch();
 
         Chests chests();
+
+        interface Punch {
+
+            boolean enabled();
+
+            boolean bulk();
+
+        }
 
         interface Chests {
 
             boolean enabled();
+
+            Hoppers hoppers();
 
             interface Hoppers {
                 boolean enabled();

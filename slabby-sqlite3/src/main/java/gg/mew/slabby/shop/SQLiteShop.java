@@ -5,9 +5,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 import gg.mew.slabby.audit.AuditDao;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
@@ -18,6 +16,8 @@ import java.util.Collection;
 @Accessors(fluent = true, chain = false)
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public final class SQLiteShop implements Shop {
 
     @DatabaseField(generatedId = true)

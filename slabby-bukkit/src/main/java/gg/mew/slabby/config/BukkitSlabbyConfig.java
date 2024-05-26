@@ -20,7 +20,7 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
     private String item;
 
     @Comment("Options for the database")
-    private Database database;
+    private BukkitDatabase database;
 
     @Comment("Defaults for new shops.")
     private BukkitDefaults defaults;
@@ -34,6 +34,7 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
 
     @Accessors(fluent = true)
     @Getter
+    @ConfigSerializable
     final static class BukkitDatabase implements Database {
 
         @Comment("SQLite3 connection url")
@@ -43,26 +44,42 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
 
     @Accessors(fluent = true)
     @Getter
+    @ConfigSerializable
     final static class BukkitRestock implements Restock {
 
-        @Comment("Owners can punch their shop to restock items.")
-        private boolean canPunch;
-
-        @Comment("Owners can punch their shop while crouching to restock all items at once.")
-        private boolean bulk;
+        @Comment("Options for shop punching.")
+        private BukkitPunch punch;
 
         @Comment("Options for chest linking.")
         private BukkitChests chests;
 
         @Accessors(fluent = true)
         @Getter
+        @ConfigSerializable
+        final static class BukkitPunch implements Punch {
+
+            @Comment("Owners can punch their shop to restock items.")
+            private boolean enabled;
+
+            @Comment("Owners can punch their shop while crouching to restock all items at once.")
+            private boolean bulk;
+
+        }
+
+        @Accessors(fluent = true)
+        @Getter
+        @ConfigSerializable
         final static class BukkitChests implements Chests {
 
             @Comment("Chests can be linked to a shop.")
             private boolean enabled;
 
+            @Comment("Options for refilling linked chests")
+            private BukkitHoppers hoppers;
+
             @Accessors(fluent = true)
             @Getter
+            @ConfigSerializable
             final static class BukkitHoppers implements Hoppers {
 
                 @Comment("Hoppers can refill a linked chest.")
@@ -76,6 +93,7 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
 
     @Accessors(fluent = true)
     @Getter
+    @ConfigSerializable
     final static class BukkitDefaults implements Defaults {
 
         @Comment("Default buy price for new shops.")

@@ -117,7 +117,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             this.repository.initialize();
         } catch (SQLException e) {
             exceptionService().log(e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         return true;
@@ -125,12 +125,15 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     private boolean setupConfig() {
         try {
+            //TODO: Temp
+            saveDefaultConfig();
+
             final var root = loader.load();
 
             this.configuration = root.get(BukkitSlabbyConfig.class);
         } catch (ConfigurateException e) {
             exceptionService().log(e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         return true;

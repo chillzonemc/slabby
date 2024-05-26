@@ -3,9 +3,7 @@ package gg.mew.slabby.shop;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import gg.mew.slabby.audit.AuditDao;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
@@ -16,6 +14,8 @@ import java.util.UUID;
 @Accessors(fluent = true, chain = false)
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public final class SQLiteShopOwner implements ShopOwner {
 
     @DatabaseField(generatedId = true)

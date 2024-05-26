@@ -1,6 +1,7 @@
 package gg.mew.slabby.audit;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
+import com.j256.ormlite.support.ConnectionSource;
 import gg.mew.slabby.SlabbyHelper;
 
 import java.sql.SQLException;
@@ -8,8 +9,8 @@ import java.util.Collection;
 
 public final class AuditDao<T extends Auditable> extends BaseDaoImpl<T, Integer> {
 
-    public AuditDao(final Class<T> dataClass) throws SQLException {
-        super(dataClass);
+    public AuditDao(final ConnectionSource connectionSource, final Class<T> dataClass) throws SQLException {
+        super(connectionSource, dataClass);
     }
 
     @Override
