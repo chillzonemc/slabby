@@ -8,8 +8,8 @@ import gg.mew.slabby.audit.AuditDao;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 @DatabaseTable(tableName = "shops", daoClass = AuditDao.class)
 @Builder
@@ -66,10 +66,10 @@ public final class SQLiteShop implements Shop {
     }
 
     @DatabaseField(canBeNull = false)
-    private LocalDateTime createdOn;
+    private Date createdOn;
 
     @DatabaseField
-    private LocalDateTime lastModifiedOn;
+    private Date lastModifiedOn;
 
     public static final class SQLiteShopBuilder implements Shop.Builder {}
 

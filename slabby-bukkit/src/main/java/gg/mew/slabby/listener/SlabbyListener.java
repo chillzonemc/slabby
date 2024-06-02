@@ -1,6 +1,7 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.shop.ShopWizard;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -8,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -36,11 +38,13 @@ public final class SlabbyListener implements Listener {
 
                 final var window = Window.single()
                         .setViewer(event.getPlayer())
-                        .setTitle("[Slabby] New Shop")
+                        .setTitle("[Slabby] New Shop")//TODO: translate
                         .setGui(gui)
                         .build();
 
                 window.open();
+
+                api.operations().wizard(event.getPlayer().getUniqueId()).state(ShopWizard.WizardState.SELECT_ITEM);
             }
         }
 
@@ -49,7 +53,12 @@ public final class SlabbyListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClick(final InventoryClickEvent event) {
- 
+        //TODO: cancel clicks while wizard is not confirmed
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onInventoryClose(final InventoryCloseEvent event) {
+        //TODO: destroy wizard if not confirmed.
     }
 
 }

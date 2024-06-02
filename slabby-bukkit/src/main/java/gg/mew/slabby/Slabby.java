@@ -33,6 +33,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
 @ApiVersion(ApiVersion.Target.v1_20)
@@ -156,6 +157,11 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public LocalDateTime now() {
         return LocalDateTime.now();
+    }
+
+    @Override
+    public Date legacyNow() {
+        return new Date();
     }
 
     @Override

@@ -9,6 +9,7 @@ import gg.mew.slabby.wrapper.permission.PermissionWrapper;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public interface SlabbyAPI {
 
@@ -23,6 +24,8 @@ public interface SlabbyAPI {
     SlabbyConfig configuration();
 
     LocalDateTime now();
+
+    Date legacyNow();
 
     File directory();
 

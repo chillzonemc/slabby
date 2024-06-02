@@ -5,17 +5,31 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 public final class BukkitShopOperations implements ShopOperations {
 
+    private final Map<UUID, BukkitShopWizard> wizards = new HashMap<>();
+
     private final SlabbyAPI api;
 
     @Override
-    public ShopWizard wizard(final UUID uniqueId) {
-        return null;
+    public BukkitShopWizard wizard(final UUID uniqueId) {
+        return wizards.computeIfAbsent(uniqueId, key -> new BukkitShopWizard(uniqueId, this));
+    }
+
+    //TODO: improve wizard api
+
+    public boolean wizardExists(final UUID uniqueId) {
+        return wizards.containsKey(uniqueId);
+    }
+
+    public void destroyWizard(final UUID uniqueId) {
+        wizards.remove(uniqueId);
     }
 
     @Override

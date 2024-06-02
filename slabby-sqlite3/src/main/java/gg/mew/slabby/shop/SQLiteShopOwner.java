@@ -6,7 +6,7 @@ import gg.mew.slabby.audit.AuditDao;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Builder
@@ -30,11 +30,11 @@ public final class SQLiteShopOwner implements ShopOwner {
     @DatabaseField
     private int share;
 
-    @DatabaseField
-    private LocalDateTime createdOn;
+    @DatabaseField(canBeNull = false)
+    private Date createdOn;
 
     @DatabaseField
-    private LocalDateTime lastModifiedOn;
+    private Date lastModifiedOn;
 
     public static final class SQLiteShopOwnerBuilder implements ShopOwner.Builder {}
 

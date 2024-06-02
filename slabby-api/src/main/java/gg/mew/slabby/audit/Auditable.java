@@ -1,15 +1,15 @@
 package gg.mew.slabby.audit;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public interface Auditable {
 
-    LocalDateTime createdOn();
+    Date createdOn();
 
-    void createdOn(final LocalDateTime createdOn);
+    void createdOn(final Date createdOn);
 
-    LocalDateTime lastModifiedOn();
+    Date lastModifiedOn();
 
-    void lastModifiedOn(final LocalDateTime lastModifiedOn);
+    void lastModifiedOn(final Date lastModifiedOn);
 
 }
