@@ -18,16 +18,16 @@ public final class BukkitShopOperations implements ShopOperations {
     private final SlabbyAPI api;
 
     @Override
-    public BukkitShopWizard wizard(final UUID uniqueId) {
+    public BukkitShopWizard wizardFor(final UUID uniqueId) {
         return wizards.computeIfAbsent(uniqueId, key -> new BukkitShopWizard(uniqueId, this));
     }
 
-    //TODO: improve wizard api
-
+    @Override
     public boolean wizardExists(final UUID uniqueId) {
         return wizards.containsKey(uniqueId);
     }
 
+    @Override
     public void destroyWizard(final UUID uniqueId) {
         wizards.remove(uniqueId);
     }

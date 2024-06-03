@@ -4,7 +4,9 @@ import java.util.UUID;
 
 public interface ShopOperations {
 
-    ShopWizard wizard(final UUID uniqueId);
+    ShopWizard wizardFor(final UUID uniqueId);
+    boolean wizardExists(final UUID uniqueId);
+    void destroyWizard(final UUID uniqueId);
 
     ShopOperationResult buy(final UUID uniqueId, final Shop shop);
     ShopOperationResult sell(final UUID uniqueId, final Shop shop);

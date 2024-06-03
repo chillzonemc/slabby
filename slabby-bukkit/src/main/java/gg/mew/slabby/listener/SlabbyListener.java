@@ -1,6 +1,7 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.ShopWizard;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -15,6 +16,8 @@ import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
+
+import java.util.Objects;
 
 @RequiredArgsConstructor
 public final class SlabbyListener implements Listener {
@@ -44,7 +47,7 @@ public final class SlabbyListener implements Listener {
 
                 window.open();
 
-                api.operations().wizard(event.getPlayer().getUniqueId()).state(ShopWizard.WizardState.SELECT_ITEM);
+                api.operations().wizardFor(event.getPlayer().getUniqueId()).state(ShopWizard.WizardState.SELECT_ITEM);
             }
         }
 
@@ -53,12 +56,18 @@ public final class SlabbyListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClick(final InventoryClickEvent event) {
-        //TODO: cancel clicks while wizard is not confirmed
+        if (api.operations().wizardExists(event.getWhoClicked().getUniqueId())) {
+            final var item = Objects.requireNonNull(event.getCurrentItem()).getItemMeta().getAsString();
+            api.operations().wizardFor(event.getWhoClicked().getUniqueId()).item(item);
+
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClose(final InventoryCloseEvent event) {
-        //TODO: destroy wizard if not confirmed.
+        //TODO: be sure this doesn't trigger
+        api.operations().destroyWizard(event.getPlayer().getUniqueId());
     }
 
 }
