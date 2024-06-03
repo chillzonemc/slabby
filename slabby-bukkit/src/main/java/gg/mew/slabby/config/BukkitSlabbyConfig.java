@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = false)
 @Getter
 @ConfigSerializable
 public final class BukkitSlabbyConfig implements SlabbyConfig {

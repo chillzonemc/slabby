@@ -44,7 +44,7 @@ public final class SQLiteShop implements Shop {
     @DatabaseField
     private Double sellPrice;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, defaultValue = "0")
     private int quantity;
 
     @DatabaseField(canBeNull = false)

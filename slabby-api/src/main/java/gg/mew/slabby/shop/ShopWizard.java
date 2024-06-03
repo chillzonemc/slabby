@@ -1,27 +1,50 @@
 package gg.mew.slabby.shop;
 
+@SuppressWarnings("UnusedReturnValue")
 public interface ShopWizard {
 
     WizardState state();
-    void state(final WizardState state);
+    int x();
+    int y();
+    int z();
+    String world();
+    String item();
+    String note();
+    Double buyPrice();
+    Double sellPrice();
+    int quantity();
 
-    void x(final int x);
-    void y(final int y);
-    void z(final int z);
-    void world(final String world);
+    ShopWizard state(final WizardState state);
 
-    void item(final String item);
-    void note(final String note);
+    ShopWizard x(final int x);
+    ShopWizard y(final int y);
+    ShopWizard z(final int z);
+    ShopWizard world(final String world);
 
-    void buyPrice(final Double buyPrice);
-    void sellPrice(final Double sellPrice);
-    void quantity(final int quantity);
+    ShopWizard item(final String item);
+    ShopWizard note(final String note);
+
+    ShopWizard buyPrice(final Double buyPrice);
+    ShopWizard sellPrice(final Double sellPrice);
+    ShopWizard quantity(final int quantity);
 
     void destroy();
 
     enum WizardState {
-        SELECT_ITEM,
-        CONFIRMED
+        AWAITING_ITEM,
+        AWAITING_NOTE,
+        AWAITING_BUY_PRICE,
+        AWAITING_SELL_PRICE,
+        AWAITING_QUANTITY,
+        AWAITING_CONFIRMATION;
+
+        public boolean awaitingInput() {
+            return this == AWAITING_NOTE
+                    || this == AWAITING_BUY_PRICE
+                    || this == AWAITING_SELL_PRICE
+                    || this == AWAITING_QUANTITY;
+        }
+
     }
 
 }

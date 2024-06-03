@@ -7,11 +7,13 @@ import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = true)
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class BukkitShopWizard implements ShopWizard {
+public final class BukkitShopWizard implements ShopWizard {
+
+    //TODO: proper way of handling defaults
 
     private final UUID uniqueId;
     private final BukkitShopOperations operations;
@@ -23,9 +25,9 @@ public class BukkitShopWizard implements ShopWizard {
     private int z;
     private String world;
     private String item;
-    private String note;
-    private Double buyPrice;
-    private Double sellPrice;
+    private String note = "Let's trade!";
+    private Double buyPrice = (double) 0;
+    private Double sellPrice = (double) 0;
     private int quantity;
 
     @Override

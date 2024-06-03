@@ -68,6 +68,8 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         }
     }
 
+    //TODO: create or update should do verification
+
     @Override
     public void create(final ShopOwner shopOwner) {
         try {
@@ -111,7 +113,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .and()
                     .eq("world", world)
                     .queryForFirst();
-            return Optional.of(result);
+            return Optional.ofNullable(result);
         } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw new RuntimeException();
