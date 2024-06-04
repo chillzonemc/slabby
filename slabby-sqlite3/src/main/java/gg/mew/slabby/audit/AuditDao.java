@@ -7,7 +7,7 @@ import gg.mew.slabby.SlabbyHelper;
 import java.sql.SQLException;
 import java.util.Collection;
 
-public final class AuditDao<T extends Auditable> extends BaseDaoImpl<T, Integer> {
+public class AuditDao<T extends Auditable> extends BaseDaoImpl<T, Integer> {
 
     public AuditDao(final ConnectionSource connectionSource, final Class<T> dataClass) throws SQLException {
         super(connectionSource, dataClass);

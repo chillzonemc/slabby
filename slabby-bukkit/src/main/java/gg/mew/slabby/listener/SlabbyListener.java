@@ -2,6 +2,7 @@ package gg.mew.slabby.listener;
 
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.invui.ReloadableItem;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
@@ -18,9 +19,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -38,29 +41,33 @@ public final class SlabbyListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerInteract(final PlayerInteractEvent event) {
-        final var itemInHand = event.getItem();
         final var block = event.getClickedBlock();
 
-        if (!event.hasBlock() || block.getType() == Material.AIR)
+        //noinspection DataFlowIssue
+        if (!event.hasBlock() || block.getType() == Material.AIR || event.getHand() != EquipmentSlot.HAND || event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
 
-        boolean tryOpen = true;
+        var tryOpen = true;
 
-        if (itemInHand != null) {
+        final var shopOpt = api.repository().shopAt(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
+
+        if (event.getItem() != null) {
             final var configurationItem = Bukkit.getItemFactory().createItemStack(api.configuration().item());
 
-            if (itemInHand.isSimilar(configurationItem)) {
+            if (event.getItem().isSimilar(configurationItem)) {
                 //TODO: don't allow if shop already exists, plus other filters.
 
                 tryOpen = false;
 
-                newShopUI(event.getPlayer(), block);
+                if (shopOpt.isPresent()) {
+                    destroyShopUI(event.getPlayer(), shopOpt.get());
+                } else {
+                    newShopUI(event.getPlayer(), block);
+                }
             }
         }
 
         if (tryOpen) {
-            final var shopOpt = api.repository().shopAt(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
-
             shopOpt.ifPresent(shop -> {
                 ownerShopUI(event.getPlayer(), shop);
             });
@@ -122,6 +129,106 @@ public final class SlabbyListener implements Listener {
 
     //TODO: clientShopUI
 
+    private ItemStack itemStack(final Material material, final Consumer<ItemStack> action) {
+        final var itemStack = new ItemStack(material);
+
+        action.accept(itemStack);
+
+        return itemStack;
+    }
+
+    private void clientShopUI(final Player client, final Shop shop) {
+        final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+
+        final var gui = Gui.normal()
+                .setStructure("12..3.456")
+                .addIngredient('1', new ReloadableItem(s -> itemStack(Material.GOLD_INGOT, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(
+                            Component.text("Sell '", NamedTextColor.GOLD)
+                                    .append(item.displayName())
+                                    .append(Component.text(String.format("' * %d", shop.quantity()), NamedTextColor.GOLD))
+                    );
+                    it.setItemMeta(meta);
+                }), c -> {
+
+                }))
+                .build();
+
+        final var window = Window.single()
+                .setViewer(client)
+                .setTitle("[Slabby] Client")
+                .setGui(gui)
+                .build();
+
+        window.open();
+    }
+
+    private void destroyShopUI(final Player shopOwner, final Shop shop) {
+        final var gui = Gui.normal()
+                .setStructure("...123...")
+                .addIngredient('.', new SimpleItem(new ItemBuilder(Material.AIR)))
+                .addIngredient('1', new SimpleItem(itemStack(Material.GREEN_STAINED_GLASS_PANE, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Destroy Shop", NamedTextColor.GREEN));
+                    meta.lore(new ArrayList<>() {{
+                        add(Component.text("This will destroy your items.", NamedTextColor.RED));
+                    }});
+                    it.setItemMeta(meta);
+                }), c -> {
+                    api.repository().destroy(shop);
+                    shopOwner.closeInventory();
+                }))
+                .addIngredient('2', new SimpleItem(itemStack(Material.COMMAND_BLOCK, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Slabby Shop", NamedTextColor.GOLD));
+
+                    final var owners = shop.owners().stream().map(o -> Bukkit.getOfflinePlayer(o.uniqueId()).getName()).toArray(String[]::new);
+
+                    meta.lore(new ArrayList<>() {{
+                        add(Component.text(String.format("Owned by %s", String.join(", ", owners)), NamedTextColor.GREEN));
+
+                        final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+
+                        add(Component.text("Selling: ", NamedTextColor.DARK_PURPLE).append(item.displayName()));
+
+                        //TODO: ensure quantity > 0
+
+                        if (shop.buyPrice() != null) {
+                            final var buyPrice = api.decimalFormat().format(shop.buyPrice());
+                            final var buyPriceEach = shop.buyPrice() == 0 ? "0" : api.decimalFormat().format(shop.buyPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Buy %d for $%s ($%s each)", shop.quantity(), buyPrice, buyPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
+
+                        if (shop.sellPrice() != null) {
+                            final var sellPrice = api.decimalFormat().format(shop.sellPrice());
+                            final var sellPriceEach = shop.sellPrice() == 0 ? "0" : api.decimalFormat().format(shop.sellPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Sell %d for $%s ($%s each)", shop.quantity(), sellPrice, sellPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
+                    }});
+
+                    it.setItemMeta(meta);
+                })))
+                .addIngredient('3', new SimpleItem(itemStack(Material.BARRIER, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Cancel", NamedTextColor.RED));
+                    it.setItemMeta(meta);
+                }), c -> {
+                    shopOwner.closeInventory();
+                }))
+                .build();
+
+        final var window = Window.single()
+                .setViewer(shopOwner)
+                .setTitle("[Slabby] Destroy Shop")
+                .setGui(gui)
+                .build();
+
+        window.open();
+    }
+
     private void newShopUI(final Player shopOwner, final Block block) {
         final var gui = Gui.normal()
                 .setStructure(".........")
@@ -145,23 +252,14 @@ public final class SlabbyListener implements Listener {
                 .world(block.getWorld().getName());
     }
 
-    private ItemStack itemStack(final Material material, final Consumer<ItemStack> action) {
-        final var itemStack = new ItemStack(material);
-
-        action.accept(itemStack);
-
-        return itemStack;
-    }
-
     private void ownerShopUI(final Player shopOwner, final Shop shop) {
         final var item = Bukkit.getItemFactory().createItemStack(shop.item());
         final var gui = Gui.normal()
                 .setStructure("shm.icprt")
-                .addIngredient('s', new SimpleItem(itemStack(Material.CHEST_MINECART, it -> {
+                .addIngredient('s', new ReloadableItem(s -> itemStack(Material.CHEST_MINECART, it -> {
                     final var meta = it.getItemMeta();
                     meta.displayName(Component.text("Deposit '", NamedTextColor.GOLD)
-                            .appendSpace()
-                            .append(item.displayName())//TODO: reset?
+                            .append(item.displayName()) //TODO: reset?
                             .append(Component.text("'"))
                     );
                     meta.lore(new ArrayList<>() {{
@@ -171,13 +269,16 @@ public final class SlabbyListener implements Listener {
                     }});
                     it.setItemMeta(meta);
                 }), c -> {
+                    //TODO: ensure two people using a shop at the same time does not cause issues. e.g shop object not updating its stock
+                    final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
 
+                    if (!result.success())
+                        shopOwner.sendMessage(Component.text(result.cause().name()));
                 }))
-                .addIngredient('h', new SimpleItem(itemStack(Material.HOPPER_MINECART, it -> {
+                .addIngredient('h', new ReloadableItem(s -> itemStack(Material.HOPPER_MINECART, it -> {
                     final var meta = it.getItemMeta();
                     meta.displayName(Component.text("Withdraw '", NamedTextColor.GOLD)
-                            .appendSpace()
-                            .append(item.displayName())//TODO: reset?
+                            .append(item.displayName()) //TODO: reset?
                             .append(Component.text("'"))
                     );
                     meta.lore(new ArrayList<>() {{
@@ -187,9 +288,12 @@ public final class SlabbyListener implements Listener {
                     }});
                     it.setItemMeta(meta);
                 }), c -> {
+                    final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
 
+                    if (!result.success())
+                        shopOwner.sendMessage(Component.text(result.cause().name()));
                 }))
-                .addIngredient('m', new SimpleItem(itemStack(Material.MINECART, it -> {
+                .addIngredient('m', new ReloadableItem(s -> itemStack(Material.MINECART, it -> {
                     final var meta = it.getItemMeta();
                     meta.displayName(Component.text("Change rate", NamedTextColor.GOLD));
                     meta.lore(new ArrayList<>() {{
@@ -197,7 +301,7 @@ public final class SlabbyListener implements Listener {
                     }});
                     it.setItemMeta(meta);
                 }), c -> {
-
+                    shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
                 }))
                 .addIngredient('.', new SimpleItem(new ItemBuilder(Material.AIR)))
                 .addIngredient('i', new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))))
@@ -220,22 +324,39 @@ public final class SlabbyListener implements Listener {
                     meta.lore(new ArrayList<>() {{
                         add(Component.text(String.format("Owned by %s", String.join(", ", owners)), NamedTextColor.GREEN));
                         add(Component.text("Selling: ", NamedTextColor.DARK_PURPLE).append(item.displayName()));
-                        //TODO: buy, sell
+
+                        //TODO: ensure quantity > 0
+
+                        if (shop.buyPrice() != null) {
+                            final var buyPrice = api.decimalFormat().format(shop.buyPrice());
+                            final var buyPriceEach = shop.buyPrice() == 0 ? "0" : api.decimalFormat().format(shop.buyPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Buy %d for $%s ($%s each)", shop.quantity(), buyPrice, buyPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
+
+                        if (shop.sellPrice() != null) {
+                            final var sellPrice = api.decimalFormat().format(shop.sellPrice());
+                            final var sellPriceEach = shop.sellPrice() == 0 ? "0" : api.decimalFormat().format(shop.sellPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Sell %d for $%s ($%s each)", shop.quantity(), sellPrice, sellPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
                     }});
 
                     it.setItemMeta(meta);
-                }), c -> {
-
-                }))
+                })))
                 .addIngredient('r', new SimpleItem(itemStack(Material.COMPARATOR, it -> {
-
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Modify Shop", NamedTextColor.GOLD));
+                    it.setItemMeta(meta);
                 }), c -> {
-
+                    modifyShopUI(shopOwner, api.operations().wizardFor(shopOwner.getUniqueId()).useExisting(shop));
                 }))
                 .addIngredient('t', new SimpleItem(itemStack(Material.OAK_SIGN, it -> {
-
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("View as customer", NamedTextColor.GOLD));
+                    it.setItemMeta(meta);
                 }), c -> {
-
+                    shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
                 }))
                 .build();
 
@@ -316,6 +437,8 @@ public final class SlabbyListener implements Listener {
                     }});
                     it.setItemMeta(meta);
                 }), c -> {
+                    //TODO: should be create or update.
+
                     final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
                             .x(wizard.x())
                             .y(wizard.y())

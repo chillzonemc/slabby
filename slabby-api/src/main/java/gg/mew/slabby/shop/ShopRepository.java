@@ -9,6 +9,9 @@ public interface ShopRepository {
     void create(final Shop shop);
     void create(final ShopOwner shopOwner);
 
+    void destroy(final Shop shop);
+    void destroy(final ShopOwner shopOwner);
+
     void update(final Shop shop);
     void update(final ShopOwner shopOwner);
 

@@ -17,11 +17,11 @@ public interface ShopOperations {
     record ShopOperationResult(boolean success, Cause cause) {}
 
     enum Cause {
-        INSUFFICIENT_BALANCE_BUYER,
-        INSUFFICIENT_BALANCE_SELLER,
+        INSUFFICIENT_BALANCE_WITHDRAW,
+        INSUFFICIENT_BALANCE_DEPOSIT,
 
-        INSUFFICIENT_STOCK_SELLER,
-        INSUFFICIENT_STOCK_BUYER,
+        INSUFFICIENT_STOCK_WITHDRAW,
+        INSUFFICIENT_STOCK_DEPOSIT,
 
         NONE
     }

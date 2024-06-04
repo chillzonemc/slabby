@@ -64,8 +64,8 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
             @Comment("Owners can punch their shop while crouching to restock all items at once.")
             private boolean bulk;
 
-            @Comment("Owners can punch their shop with a shulker box to restock using matching items within.")
-            private boolean shulkerBox;
+            @Comment("Owners can punch their shop with a shulker box to restock using the matching items within.")
+            private boolean shulker;
 
         }
 

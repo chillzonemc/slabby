@@ -10,7 +10,7 @@ item: minecraft:stick
 # Options for the database
 database:
   # SQLite3 connection url
-  url: "jdbc:sqlite:slabby.db"
+  url: "jdbc:sqlite:plugins/Slabby/slabby.db"
 
 # Defaults for new shops.
 defaults:
@@ -20,6 +20,8 @@ defaults:
   sellPrice: 0
   # Default quantity for new shops.
   quantity: 64
+  # Default sellers note for new shops.
+  note: Let's trade!
 
 # Options for restocking shops.
 restock:
@@ -29,6 +31,8 @@ restock:
     enabled: true
     # Owners can punch their shop while crouching to restock all items at once.
     bulk: true
+    # Owners can punch their shop with a shulker box to restock using the matching items within.
+    shulker: true
   # Options for chest linking.
   chests:
     # Chests can be linked to a shop.

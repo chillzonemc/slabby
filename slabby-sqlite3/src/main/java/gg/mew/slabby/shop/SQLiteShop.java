@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 import java.util.Collection;
 import java.util.Date;
 
-@DatabaseTable(tableName = "shops", daoClass = AuditDao.class)
+@DatabaseTable(tableName = "shops", daoClass = ShopDao.class)
 @Builder
 @Accessors(fluent = true, chain = false)
 @Getter
@@ -19,6 +19,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class SQLiteShop implements Shop {
+
+    //TODO: Create Index: x, y, z and world
+    //TODO: Create Unique Constraint for x, y, z, world
 
     @DatabaseField(generatedId = true)
     private int id;
@@ -38,38 +41,38 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = false)
     private String world;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private Double buyPrice;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private Double sellPrice;
 
-    @DatabaseField(canBeNull = false, defaultValue = "0")
+    @DatabaseField(canBeNull = false)
     private int quantity;
 
     @DatabaseField(canBeNull = false)
     private int stock;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private String note;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private String name;
 
     @ForeignCollectionField(eager = false)
     private ForeignCollection<SQLiteShopOwner> owners;
+
+    @DatabaseField(canBeNull = false)
+    private Date createdOn;
+
+    @DatabaseField(canBeNull = true)
+    private Date lastModifiedOn;
 
     @SuppressWarnings("unchecked")
     @Override
     public Collection<ShopOwner> owners() {
         return (Collection<ShopOwner>) (Collection<? extends ShopOwner>) this.owners;
     }
-
-    @DatabaseField(canBeNull = false)
-    private Date createdOn;
-
-    @DatabaseField
-    private Date lastModifiedOn;
 
     public static final class SQLiteShopBuilder implements Shop.Builder {}
 

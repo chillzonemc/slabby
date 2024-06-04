@@ -28,6 +28,20 @@ public interface ShopWizard {
     ShopWizard sellPrice(final Double sellPrice);
     ShopWizard quantity(final int quantity);
 
+    //TODO: could use a better design
+    default ShopWizard useExisting(final Shop shop) {
+        x(shop.x());
+        y(shop.y());
+        z(shop.z());
+        world(shop.world());
+        item(shop.item());
+        note(shop.note());
+        buyPrice(shop.buyPrice());
+        sellPrice(shop.sellPrice());
+        quantity(shop.quantity());
+        return this;
+    }
+
     void destroy();
 
     enum WizardState {

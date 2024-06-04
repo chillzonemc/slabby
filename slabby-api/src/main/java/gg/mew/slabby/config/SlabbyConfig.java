@@ -44,7 +44,7 @@ public interface SlabbyConfig {
 
             boolean bulk();
 
-            boolean shulkerBox();
+            boolean shulker();
 
         }
 

@@ -11,7 +11,6 @@ import java.util.UUID;
 @Accessors(fluent = true, chain = true)
 @Getter
 @Setter
-@RequiredArgsConstructor
 public final class BukkitShopWizard implements ShopWizard {
 
     private final UUID uniqueId;
@@ -26,11 +25,21 @@ public final class BukkitShopWizard implements ShopWizard {
 
     private String item;
 
-    //TODO: Here, or use defaults in repository?
-    private String note = this.api.configuration().defaults().note();
-    private Double buyPrice = this.api.configuration().defaults().buyPrice();
-    private Double sellPrice = this.api.configuration().defaults().sellPrice();
-    private int quantity = this.api.configuration().defaults().quantity();
+    private String note;
+    private Double buyPrice;
+    private Double sellPrice;
+    private int quantity;
+
+    public BukkitShopWizard(final UUID uniqueId, final SlabbyAPI api) {
+        this.uniqueId = uniqueId;
+        this.api = api;
+
+        //TODO: Here, or use defaults in repository?
+        this.note = this.api.configuration().defaults().note();
+        this.buyPrice = this.api.configuration().defaults().buyPrice();
+        this.sellPrice = this.api.configuration().defaults().sellPrice();
+        this.quantity = this.api.configuration().defaults().quantity();
+    }
 
     @Override
     public void destroy() {

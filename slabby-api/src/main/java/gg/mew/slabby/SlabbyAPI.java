@@ -8,6 +8,7 @@ import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.permission.PermissionWrapper;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -26,6 +27,8 @@ public interface SlabbyAPI {
     LocalDateTime now();
 
     Date legacyNow();
+
+    DecimalFormat decimalFormat();
 
     File directory();
 

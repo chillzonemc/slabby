@@ -3,6 +3,7 @@ package gg.mew.slabby.shop;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
+import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import gg.mew.slabby.SlabbyAPI;
@@ -33,6 +34,9 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShop.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
     }
+
+    //TODO: Verify data that goes to the database. Using SQL when possible, otherwise Dao.
+    //TODO: Any DB action needs a result that I can act on.
 
     @Override
     public void close() {
@@ -67,7 +71,25 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         }
     }
 
-    //TODO: create or update should do verification
+    @Override
+    public void destroy(final Shop shop) {
+        try {
+            this.shopDao.delete((SQLiteShop) shop);
+        } catch (SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void destroy(ShopOwner shopOwner) {
+        try {
+            this.shopOwnerDao.delete((SQLiteShopOwner) shopOwner);
+        } catch (SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void create(final ShopOwner shopOwner) {

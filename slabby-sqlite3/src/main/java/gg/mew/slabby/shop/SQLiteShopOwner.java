@@ -24,16 +24,16 @@ public final class SQLiteShopOwner implements ShopOwner {
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private SQLiteShop shop;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     private UUID uniqueId;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     private int share;
 
     @DatabaseField(canBeNull = false)
     private Date createdOn;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = true)
     private Date lastModifiedOn;
 
     public static final class SQLiteShopOwnerBuilder implements ShopOwner.Builder {}

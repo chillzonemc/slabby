@@ -32,6 +32,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -66,6 +67,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     @Getter
     private final ShopOperations operations = new BukkitShopOperations(this);
+
+    @Getter
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))

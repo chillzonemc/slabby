@@ -37,14 +37,14 @@ public final class BukkitShopOperations implements ShopOperations {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < shop.quantity())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_SELLER);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_WITHDRAW);
 
         //TODO: check for space
 
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_BUYER);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_WITHDRAW);
 
         shop.stock(shop.stock() - shop.quantity());
 
@@ -73,7 +73,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < amount)
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_SELLER);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_WITHDRAW);
 
         //TODO: check for space
 
@@ -92,11 +92,11 @@ public final class BukkitShopOperations implements ShopOperations {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
         if (!player.getInventory().containsAtLeast(itemStack, amount))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_BUYER);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_DEPOSIT);
 
         itemStack.setAmount(amount);
 
-        player.getInventory().remove(itemStack);
+        player.getInventory().removeItem(itemStack);
 
         shop.stock(shop.stock() + amount);
 
