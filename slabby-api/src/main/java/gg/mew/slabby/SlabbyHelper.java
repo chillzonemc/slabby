@@ -1,6 +1,7 @@
 package gg.mew.slabby;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.UtilityClass;
 
@@ -17,8 +18,8 @@ public final class SlabbyHelper {
     /**
      * Used by Slabby for initializing the static API singleton. You are not supposed to call this method!
      */
-    public static void init(final SlabbyAPI api) {
-        if (api == null || SlabbyHelper.api != null) {
+    public static void init(@NonNull final SlabbyAPI api) {
+        if (SlabbyHelper.api != null) {
             throw new UnsupportedOperationException("API already initialized");
         }
         SlabbyHelper.api = api;

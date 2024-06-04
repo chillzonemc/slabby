@@ -28,6 +28,8 @@ public interface SlabbyConfig {
 
         int quantity();
 
+        String note();
+
     }
 
     interface Restock {
@@ -41,6 +43,8 @@ public interface SlabbyConfig {
             boolean enabled();
 
             boolean bulk();
+
+            boolean shulkerBox();
 
         }
 

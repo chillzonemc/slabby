@@ -64,6 +64,9 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
             @Comment("Owners can punch their shop while crouching to restock all items at once.")
             private boolean bulk;
 
+            @Comment("Owners can punch their shop with a shulker box to restock using matching items within.")
+            private boolean shulkerBox;
+
         }
 
         @Accessors(fluent = true)
@@ -104,6 +107,9 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
 
         @Comment("Default quantity for new shops.")
         private int quantity;
+
+        @Comment("Default sellers note for new shops.")
+        private String note;
 
     }
 

@@ -19,7 +19,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public BukkitShopWizard wizardFor(final UUID uniqueId) {
-        return wizards.computeIfAbsent(uniqueId, key -> new BukkitShopWizard(uniqueId, this));
+        return wizards.computeIfAbsent(uniqueId, key -> new BukkitShopWizard(uniqueId, this.api));
     }
 
     @Override

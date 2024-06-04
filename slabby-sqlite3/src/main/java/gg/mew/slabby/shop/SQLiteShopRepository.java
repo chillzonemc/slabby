@@ -30,7 +30,6 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     public void initialize() throws SQLException {
-
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShop.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
     }

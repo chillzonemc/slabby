@@ -3,6 +3,7 @@ package gg.mew.slabby.listener;
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.invui.gui.Gui;
@@ -75,7 +75,7 @@ public final class SlabbyListener implements Listener {
             if (wizard.state() == ShopWizard.WizardState.AWAITING_ITEM) {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
-                wizard.item(String.format("%s%s", item.getType().getKey().asString(), item.getItemMeta().getAsString()));
+                wizard.item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
                 wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION);
 
                 modifyShopUI(event.getWhoClicked(), wizard);
@@ -98,7 +98,7 @@ public final class SlabbyListener implements Listener {
         if (api.operations().wizardExists(event.getPlayer().getUniqueId())) {
             final var wizard = api.operations().wizardFor(event.getPlayer().getUniqueId());
 
-            if (!wizard.state().awaitingInput())
+            if (!wizard.state().awaitingTextInput())
                 return;
 
             final var serializer = PlainTextComponentSerializer.plainText();
@@ -119,6 +119,8 @@ public final class SlabbyListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+    //TODO: clientShopUI
 
     private void newShopUI(final Player shopOwner, final Block block) {
         final var gui = Gui.normal()
@@ -329,6 +331,11 @@ public final class SlabbyListener implements Listener {
                     wizard.destroy();
 
                     api.repository().create(shop);
+
+                    shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                            .uniqueId(shopOwner.getUniqueId())
+                            .share(100)
+                            .build());
 
                     shopOwner.closeInventory();
 

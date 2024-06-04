@@ -38,7 +38,7 @@ public interface ShopWizard {
         AWAITING_QUANTITY,
         AWAITING_CONFIRMATION;
 
-        public boolean awaitingInput() {
+        public boolean awaitingTextInput() {
             return this == AWAITING_NOTE
                     || this == AWAITING_BUY_PRICE
                     || this == AWAITING_SELL_PRICE

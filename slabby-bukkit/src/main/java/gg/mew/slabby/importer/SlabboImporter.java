@@ -44,7 +44,7 @@ public final class SlabboImporter implements Importer {
 
                 final var shop = api.repository()
                         .<Shop.Builder>builder(Shop.Builder.class)
-                        .item(item.getItemMeta().getAsString())
+                        .item(item.getType().getKey().asString() + item.getItemMeta().getAsString())
                         .x(location.getBlockX())
                         .y(location.getBlockY())
                         .z(location.getBlockZ())

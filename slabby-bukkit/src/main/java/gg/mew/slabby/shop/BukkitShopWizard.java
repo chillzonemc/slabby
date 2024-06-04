@@ -1,5 +1,6 @@
 package gg.mew.slabby.shop;
 
+import gg.mew.slabby.SlabbyAPI;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -13,10 +14,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public final class BukkitShopWizard implements ShopWizard {
 
-    //TODO: proper way of handling defaults
-
     private final UUID uniqueId;
-    private final BukkitShopOperations operations;
+    private final SlabbyAPI api;
 
     private WizardState state;
 
@@ -24,14 +23,17 @@ public final class BukkitShopWizard implements ShopWizard {
     private int y;
     private int z;
     private String world;
+
     private String item;
-    private String note = "Let's trade!";
-    private Double buyPrice = (double) 0;
-    private Double sellPrice = (double) 0;
-    private int quantity;
+
+    //TODO: Here, or use defaults in repository?
+    private String note = this.api.configuration().defaults().note();
+    private Double buyPrice = this.api.configuration().defaults().buyPrice();
+    private Double sellPrice = this.api.configuration().defaults().sellPrice();
+    private int quantity = this.api.configuration().defaults().quantity();
 
     @Override
     public void destroy() {
-        this.operations.destroyWizard(this.uniqueId);
+        this.api.operations().destroyWizard(this.uniqueId);
     }
 }

@@ -67,8 +67,6 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private final ShopOperations operations = new BukkitShopOperations(this);
 
-    private PaperCommandManager commandManager;
-
     private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
             .build();
@@ -93,7 +91,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             return;
         }
 
-        this.commandManager = new PaperCommandManager(this);
+        final var commandManager = new PaperCommandManager(this);
         commandManager.registerCommand(new SlabbyCommand(this));
 
         SlabbyHelper.init(this);
