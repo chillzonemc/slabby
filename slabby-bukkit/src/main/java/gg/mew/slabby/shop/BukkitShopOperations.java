@@ -33,6 +33,19 @@ public final class BukkitShopOperations implements ShopOperations {
     }
 
     @Override
+    public Map<UUID, Double> splitCost(final double amount, final Shop shop) {
+        final var result = new HashMap<UUID, Double>();
+
+        for (final var shopOwner : shop.owners()) {
+            result.put(shopOwner.uniqueId(), amount * (shopOwner.share() * 0.01));
+        }
+
+        return result;
+    }
+
+    //TODO: re-use withdraw/deposit for buy/sell.
+
+    @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
@@ -46,6 +59,15 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!result.success())
             return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_WITHDRAW);
 
+        //TODO: bug with cost, fixed with splitCost fix I think
+
+        final var cost = splitCost(result.amount(), shop);
+
+        for (final var entry : cost.entrySet()) {
+            //TODO: verify success
+            api.economy().deposit(entry.getKey(), entry.getValue());
+        }
+
         shop.stock(shop.stock() - shop.quantity());
 
         api.repository().update(shop);
@@ -55,17 +77,36 @@ public final class BukkitShopOperations implements ShopOperations {
         return new ShopOperationResult(true, Cause.NONE);
     }
 
-    private static void addItemToInventory(final Shop shop, final Player player) {
+    @Override
+    public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
+        final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+
+        if (!player.getInventory().containsAtLeast(itemStack, shop.quantity()))
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_DEPOSIT);
+
+        final var cost = splitCost(shop.sellPrice(), shop);
+
+        for (final var entry : cost.entrySet()) {
+            if (!api.economy().hasAmount(entry.getKey(), entry.getValue()))
+                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_DEPOSIT);
+        }
+
+        for (final var entry : cost.entrySet()) {
+            api.economy().withdraw(entry.getKey(), entry.getValue());
+        }
+
+        api.economy().deposit(uniqueId, shop.sellPrice());
 
         itemStack.setAmount(shop.quantity());
 
-        player.getInventory().addItem(itemStack);
-    }
+        player.getInventory().removeItem(itemStack);
 
-    @Override
-    public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
-        return null;
+        shop.stock(shop.stock() + shop.quantity());
+
+        api.repository().update(shop);
+
+        return new ShopOperationResult(true, Cause.NONE);
     }
 
     @Override
@@ -103,6 +144,14 @@ public final class BukkitShopOperations implements ShopOperations {
         api.repository().update(shop);
 
         return new ShopOperationResult(true, Cause.NONE);
+    }
+
+    private static void addItemToInventory(final Shop shop, final Player player) {
+        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+
+        itemStack.setAmount(shop.quantity());
+
+        player.getInventory().addItem(itemStack);
     }
 
 }

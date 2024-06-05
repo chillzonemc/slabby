@@ -1,5 +1,6 @@
 package gg.mew.slabby.shop;
 
+import java.util.Map;
 import java.util.UUID;
 
 public interface ShopOperations {
@@ -13,6 +14,8 @@ public interface ShopOperations {
 
     ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount);
     ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount);
+
+    Map<UUID, Double> splitCost(final double amount, final Shop shop);
 
     record ShopOperationResult(boolean success, Cause cause) {}
 

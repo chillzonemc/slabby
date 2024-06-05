@@ -30,6 +30,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -140,19 +141,102 @@ public final class SlabbyListener implements Listener {
     private void clientShopUI(final Player client, final Shop shop) {
         final var item = Bukkit.getItemFactory().createItemStack(shop.item());
 
+        //TODO: remove buy/sell options when not available
+
         final var gui = Gui.normal()
                 .setStructure("12..3.456")
                 .addIngredient('1', new ReloadableItem(s -> itemStack(Material.GOLD_INGOT, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(
+                            Component.text("Buy '", NamedTextColor.GOLD)
+                                    .append(item.displayName())
+                                    .append(Component.text(String.format("' * %d", shop.quantity()), NamedTextColor.GOLD))
+                    );
+                    meta.lore(new ArrayList<>() {{
+                        if (shop.buyPrice() != null) {
+                            add(Component.text(String.format("Buy for: %s", api.decimalFormat().format(shop.buyPrice())), NamedTextColor.DARK_PURPLE));
+                        }
+                        add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
+                        add(Component.text(String.format("(%s stacks)", shop.stock() / item.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+                    }});
+                    it.setItemMeta(meta);
+                }), c -> {
+                    final var result = api.operations().buy(client.getUniqueId(), shop);
+
+                    if (!result.success())
+                        client.sendMessage(Component.text(result.cause().name()));
+                }))
+                .addIngredient('2', new ReloadableItem(s -> itemStack(Material.IRON_INGOT, it -> {
                     final var meta = it.getItemMeta();
                     meta.displayName(
                             Component.text("Sell '", NamedTextColor.GOLD)
                                     .append(item.displayName())
                                     .append(Component.text(String.format("' * %d", shop.quantity()), NamedTextColor.GOLD))
                     );
+                    meta.lore(new ArrayList<>() {{
+                        if (shop.sellPrice() != null) {
+                            add(Component.text(String.format("Sell for: %s", api.decimalFormat().format(shop.sellPrice())), NamedTextColor.DARK_PURPLE));
+                        }
+                        add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
+                        add(Component.text(String.format("(%s stacks)", shop.stock() / item.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+                    }});
                     it.setItemMeta(meta);
                 }), c -> {
+                    final var result = api.operations().sell(client.getUniqueId(), shop);
 
+                    if (!result.success())
+                        client.sendMessage(Component.text(result.cause().name()));
                 }))
+                .addIngredient('.', new SimpleItem(new ItemBuilder(Material.AIR)))
+                .addIngredient('3', new SimpleItem(item))
+                .addIngredient('4', new SimpleItem(itemStack(Material.NAME_TAG, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Sellers note", NamedTextColor.GREEN));
+                    meta.lore(new ArrayList<>() {{
+                        add(Component.text(shop.note(), NamedTextColor.DARK_PURPLE));
+                    }});
+                    it.setItemMeta(meta);
+                })))
+                .addIngredient('5', new SimpleItem(itemStack(Material.PAPER, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Current funds", NamedTextColor.GOLD));
+                    meta.lore(new ArrayList<>() {{
+                        add(Component.text("Funds:", NamedTextColor.DARK_PURPLE)
+                                .appendSpace()
+                                .color(NamedTextColor.GREEN)
+                                .append(Component.text(String.format("$%s", api.decimalFormat().format(api.economy().balance(client.getUniqueId()))))));
+                    }});
+                    it.setItemMeta(meta);
+                })))
+                .addIngredient('6', new SimpleItem(itemStack(Material.COMMAND_BLOCK, it -> {
+                    final var meta = it.getItemMeta();
+                    meta.displayName(Component.text("Slabby Shop", NamedTextColor.GOLD));
+
+                    final var owners = shop.owners().stream().map(o -> Bukkit.getOfflinePlayer(o.uniqueId()).getName()).toArray(String[]::new);
+
+                    meta.lore(new ArrayList<>() {{
+                        add(Component.text(String.format("Owned by %s", String.join(", ", owners)), NamedTextColor.GREEN));
+                        add(Component.text("Selling: ", NamedTextColor.DARK_PURPLE).append(item.displayName()));
+
+                        //TODO: ensure quantity > 0
+
+                        if (shop.buyPrice() != null) {
+                            final var buyPrice = api.decimalFormat().format(shop.buyPrice());
+                            final var buyPriceEach = shop.buyPrice() == 0 ? "0" : api.decimalFormat().format(shop.buyPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Buy %d for $%s ($%s each)", shop.quantity(), buyPrice, buyPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
+
+                        if (shop.sellPrice() != null) {
+                            final var sellPrice = api.decimalFormat().format(shop.sellPrice());
+                            final var sellPriceEach = shop.sellPrice() == 0 ? "0" : api.decimalFormat().format(shop.sellPrice() / shop.quantity());
+
+                            add(Component.text(String.format("Sell %d for $%s ($%s each)", shop.quantity(), sellPrice, sellPriceEach), NamedTextColor.DARK_PURPLE));
+                        }
+                    }});
+
+                    it.setItemMeta(meta);
+                })))
                 .build();
 
         final var window = Window.single()
@@ -356,7 +440,7 @@ public final class SlabbyListener implements Listener {
                     meta.displayName(Component.text("View as customer", NamedTextColor.GOLD));
                     it.setItemMeta(meta);
                 }), c -> {
-                    shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
+                    clientShopUI(shopOwner, shop);
                 }))
                 .build();
 

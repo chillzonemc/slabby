@@ -22,6 +22,7 @@ public final class SQLiteShop implements Shop {
 
     //TODO: Create Index: x, y, z and world
     //TODO: Create Unique Constraint for x, y, z, world
+    //TODO: Store money as integer? money * 100 for store, money * 0.01 for retrieve
 
     @DatabaseField(generatedId = true)
     private int id;
