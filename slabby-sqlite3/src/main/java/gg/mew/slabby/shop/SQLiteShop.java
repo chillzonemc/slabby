@@ -20,8 +20,6 @@ import java.util.Date;
 @AllArgsConstructor
 public final class SQLiteShop implements Shop {
 
-    //TODO: Create Index: x, y, z and world
-    //TODO: Create Unique Constraint for x, y, z, world
     //TODO: Store money as integer? money * 100 for store, money * 0.01 for retrieve
 
     @DatabaseField(generatedId = true)
@@ -30,16 +28,16 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = false)
     private String item;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueIndex = true)
     private int x;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueIndex = true)
     private int y;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueIndex = true)
     private int z;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueIndex = true)
     private String world;
 
     @DatabaseField(canBeNull = true)
