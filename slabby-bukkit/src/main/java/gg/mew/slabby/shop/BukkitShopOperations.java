@@ -3,7 +3,6 @@ package gg.mew.slabby.shop;
 import gg.mew.slabby.SlabbyAPI;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -48,17 +47,20 @@ public final class BukkitShopOperations implements ShopOperations {
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
         api.repository().refresh(shop);
 
+        if (shop.buyPrice() == null)
+            return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < shop.quantity())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_WITHDRAW);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
 
         //TODO: check for space
 
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_WITHDRAW);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_WITHDRAW);
 
         final var cost = splitCost(result.amount(), shop);
 
@@ -80,17 +82,20 @@ public final class BukkitShopOperations implements ShopOperations {
     public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
         api.repository().refresh(shop);
 
+        if (shop.sellPrice() == null)
+            return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
         if (!player.getInventory().containsAtLeast(itemStack, shop.quantity()))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_DEPOSIT);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
 
         final var cost = splitCost(shop.sellPrice(), shop);
 
         for (final var entry : cost.entrySet()) {
             if (!api.economy().hasAmount(entry.getKey(), entry.getValue()))
-                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_DEPOSIT);
+                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_DEPOSIT);
         }
 
         for (final var entry : cost.entrySet()) {
@@ -117,7 +122,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < amount)
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_WITHDRAW);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
 
         //TODO: check for space
 
@@ -138,7 +143,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
         if (!player.getInventory().containsAtLeast(itemStack, amount))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_DEPOSIT);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
 
         itemStack.setAmount(amount);
 
