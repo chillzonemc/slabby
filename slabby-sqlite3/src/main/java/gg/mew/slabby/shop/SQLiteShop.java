@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 
 @DatabaseTable(tableName = "shops", daoClass = ShopDao.class)
 @Builder
@@ -25,19 +26,19 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, index = true)
     private String item;
 
-    @DatabaseField(canBeNull = false, uniqueIndex = true)
+    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
     private int x;
 
-    @DatabaseField(canBeNull = false, uniqueIndex = true)
+    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
     private int y;
 
-    @DatabaseField(canBeNull = false, uniqueIndex = true)
+    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
     private int z;
 
-    @DatabaseField(canBeNull = false, uniqueIndex = true)
+    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
     private String world;
 
     @DatabaseField(canBeNull = true)
@@ -47,7 +48,7 @@ public final class SQLiteShop implements Shop {
     private Double sellPrice;
 
     @DatabaseField(canBeNull = false)
-    private int quantity;
+    private int quantity; //TODO: > 0
 
     @DatabaseField(canBeNull = false)
     private int stock;
@@ -55,7 +56,7 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = true)
     private String note;
 
-    @DatabaseField(canBeNull = true)
+    @DatabaseField(canBeNull = true) //TODO: unique?
     private String name;
 
     @ForeignCollectionField(eager = false)
@@ -71,6 +72,11 @@ public final class SQLiteShop implements Shop {
     @Override
     public Collection<ShopOwner> owners() {
         return (Collection<ShopOwner>) (Collection<? extends ShopOwner>) this.owners;
+    }
+
+    @Override
+    public boolean isOwner(final UUID uniqueId) {
+        return this.owners.stream().anyMatch(it -> it.uniqueId().equals(uniqueId));
     }
 
     public static final class SQLiteShopBuilder implements Shop.Builder {}

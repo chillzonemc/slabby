@@ -4,6 +4,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.logger.Logger;
+import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import gg.mew.slabby.SlabbyAPI;
@@ -11,6 +12,7 @@ import gg.mew.slabby.SlabbyAPI;
 import java.io.Closeable;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -64,6 +66,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     public void create(final Shop shop) {
         try {
             this.shopDao.create((SQLiteShop) shop);
+            //NOTE: Required because the owners collection is not eagerly loaded
             this.shopDao.refresh((SQLiteShop) shop);
         } catch (final SQLException e) {
             api.exceptionService().log(e);
@@ -72,7 +75,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void destroy(final Shop shop) {
+    public void delete(final Shop shop) {
         try {
             this.shopDao.delete((SQLiteShop) shop);
         } catch (SQLException e) {
@@ -82,7 +85,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void destroy(ShopOwner shopOwner) {
+    public void delete(ShopOwner shopOwner) {
         try {
             this.shopOwnerDao.delete((SQLiteShopOwner) shopOwner);
         } catch (SQLException e) {
@@ -122,6 +125,26 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public void refresh(final Shop shop) {
+        try {
+            this.shopDao.refresh((SQLiteShop) shop);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void refresh(final ShopOwner shopOwner) {
+        try {
+            this.shopOwnerDao.refresh((SQLiteShopOwner) shopOwner);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) {
         try {
             final var result = this.shopDao.queryBuilder()
@@ -141,4 +164,13 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         }
     }
 
+    @Override
+    public <T> T transaction(final Callable<T> transaction) {
+        try {
+            return TransactionManager.callInTransaction(this.connectionSource, transaction);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
 }

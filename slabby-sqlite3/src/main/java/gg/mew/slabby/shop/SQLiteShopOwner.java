@@ -21,10 +21,10 @@ public final class SQLiteShopOwner implements ShopOwner {
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, uniqueCombo = true)
     private SQLiteShop shop;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = false, uniqueCombo = true)
     private UUID uniqueId;
 
     @DatabaseField(canBeNull = false)

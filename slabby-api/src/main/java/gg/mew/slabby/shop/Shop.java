@@ -3,6 +3,7 @@ package gg.mew.slabby.shop;
 import gg.mew.slabby.audit.Auditable;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public interface Shop extends Auditable {
 
@@ -41,6 +42,8 @@ public interface Shop extends Auditable {
     void name(final String name);
 
     Collection<ShopOwner> owners();
+
+    boolean isOwner(final UUID uniqueId);
 
     interface Builder {
 

@@ -3,6 +3,7 @@ package gg.mew.slabby.shop;
 import gg.mew.slabby.SlabbyAPI;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -43,10 +44,10 @@ public final class BukkitShopOperations implements ShopOperations {
         return result;
     }
 
-    //TODO: re-use withdraw/deposit for buy/sell.
-
     @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
+        api.repository().refresh(shop);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < shop.quantity())
@@ -58,8 +59,6 @@ public final class BukkitShopOperations implements ShopOperations {
 
         if (!result.success())
             return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_WITHDRAW);
-
-        //TODO: bug with cost, fixed with splitCost fix I think
 
         final var cost = splitCost(result.amount(), shop);
 
@@ -79,6 +78,8 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
+        api.repository().refresh(shop);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
@@ -111,6 +112,8 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount) {
+        api.repository().refresh(shop);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (shop.stock() < amount)
@@ -129,6 +132,8 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount) {
+        api.repository().refresh(shop);
+
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
@@ -137,6 +142,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         itemStack.setAmount(amount);
 
+        //TODO: what does the hashmap do?
         player.getInventory().removeItem(itemStack);
 
         shop.stock(shop.stock() + amount);
