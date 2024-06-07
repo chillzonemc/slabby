@@ -13,6 +13,8 @@ import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.economy.VaultEconomyWrapper;
 import gg.mew.slabby.wrapper.permission.BukkitPermissionWrapper;
 import gg.mew.slabby.wrapper.permission.PermissionWrapper;
+import gg.mew.slabby.wrapper.sound.BukkitSoundWrapper;
+import gg.mew.slabby.wrapper.sound.SoundWrapper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.milkbowl.vault.economy.Economy;
@@ -58,6 +60,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     @Getter
     private final PermissionWrapper permission = new BukkitPermissionWrapper();
+
+    @Getter
+    private final SoundWrapper sound = new BukkitSoundWrapper();
 
     @Getter
     private SlabbyConfig configuration;

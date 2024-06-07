@@ -45,7 +45,11 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
-        api.repository().refresh(shop);
+        try {
+            api.repository().refresh(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
 
         if (shop.buyPrice() == null)
             return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
@@ -62,16 +66,20 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!result.success())
             return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_WITHDRAW);
 
+        shop.stock(shop.stock() - shop.quantity());
+
+        try {
+            api.repository().update(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
+
         final var cost = splitCost(result.amount(), shop);
 
         for (final var entry : cost.entrySet()) {
-            //TODO: verify success
+            //TODO: verify success?
             api.economy().deposit(entry.getKey(), entry.getValue());
         }
-
-        shop.stock(shop.stock() - shop.quantity());
-
-        api.repository().update(shop);
 
         addItemToInventory(shop, player);
 
@@ -80,7 +88,11 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
-        api.repository().refresh(shop);
+        try {
+            api.repository().refresh(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
 
         if (shop.sellPrice() == null)
             return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
@@ -98,6 +110,14 @@ public final class BukkitShopOperations implements ShopOperations {
                 return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_DEPOSIT);
         }
 
+        shop.stock(shop.stock() + shop.quantity());
+
+        try {
+            api.repository().update(shop);
+        } catch (Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
+
         for (final var entry : cost.entrySet()) {
             api.economy().withdraw(entry.getKey(), entry.getValue());
         }
@@ -108,16 +128,19 @@ public final class BukkitShopOperations implements ShopOperations {
 
         player.getInventory().removeItem(itemStack);
 
-        shop.stock(shop.stock() + shop.quantity());
-
-        api.repository().update(shop);
-
         return new ShopOperationResult(true, Cause.NONE);
     }
 
     @Override
     public ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount) {
-        api.repository().refresh(shop);
+        if (amount < 1)
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
+
+        try {
+            api.repository().refresh(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
@@ -128,7 +151,11 @@ public final class BukkitShopOperations implements ShopOperations {
 
         shop.stock(shop.stock() - amount);
 
-        api.repository().update(shop);
+        try {
+            api.repository().update(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
 
         addItemToInventory(shop, player);
 
@@ -137,7 +164,14 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount) {
-        api.repository().refresh(shop);
+        if (amount < 1)
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
+
+        try {
+            api.repository().refresh(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
@@ -145,14 +179,18 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!player.getInventory().containsAtLeast(itemStack, amount))
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
 
+        shop.stock(shop.stock() + amount);
+
+        try {
+            api.repository().update(shop);
+        } catch (final Exception e) {
+            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        }
+
         itemStack.setAmount(amount);
 
         //TODO: what does the hashmap do?
         player.getInventory().removeItem(itemStack);
-
-        shop.stock(shop.stock() + amount);
-
-        api.repository().update(shop);
 
         return new ShopOperationResult(true, Cause.NONE);
     }

@@ -7,6 +7,7 @@ import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopRepository;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.permission.PermissionWrapper;
+import gg.mew.slabby.wrapper.sound.SoundWrapper;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -19,6 +20,8 @@ public interface SlabbyAPI {
     EconomyWrapper economy();
 
     PermissionWrapper permission();
+
+    SoundWrapper sound();
 
     ShopRepository repository();
 

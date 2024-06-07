@@ -28,6 +28,8 @@ public interface ShopOperations {
 
         OPERATION_NOT_ALLOWED,
 
+        OPERATION_FAILED,
+
         NONE
     }
 
