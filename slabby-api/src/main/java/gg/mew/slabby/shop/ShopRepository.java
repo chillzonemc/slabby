@@ -7,8 +7,8 @@ public interface ShopRepository {
 
     <T> T builder(final Class<?> builderType);
 
-    void create(final Shop shop) throws Exception;
-    void create(final ShopOwner shopOwner) throws Exception;
+    void createOrUpdate(final Shop shop) throws Exception;
+    void createOrUpdate(final ShopOwner shopOwner) throws Exception;
 
     void delete(final Shop shop) throws Exception;
     void delete(final ShopOwner shopOwner) throws Exception;

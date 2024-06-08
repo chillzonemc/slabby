@@ -66,9 +66,9 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void create(final Shop shop) throws Exception {
+    public void createOrUpdate(final Shop shop) throws Exception {
         try {
-            this.shopDao.create((SQLiteShop) shop);
+            this.shopDao.createOrUpdate((SQLiteShop) shop);
             //NOTE: Required because the owners collection is not eagerly loaded
             this.shopDao.refresh((SQLiteShop) shop);
         } catch (final SQLException e) {
@@ -98,9 +98,9 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void create(final ShopOwner shopOwner) throws Exception {
+    public void createOrUpdate(final ShopOwner shopOwner) throws Exception {
         try {
-            this.shopOwnerDao.create((SQLiteShopOwner) shopOwner);
+            this.shopOwnerDao.createOrUpdate((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw e;

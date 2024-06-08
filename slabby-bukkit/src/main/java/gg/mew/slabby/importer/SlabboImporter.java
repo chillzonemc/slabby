@@ -18,6 +18,8 @@ public final class SlabboImporter implements Importer {
     @SneakyThrows
     @Override
     public void onImport(final SlabbyAPI api) {
+        //TODO: allow without running Slabbo
+        //TODO: remove slabbo items
         final var slabbo = Bukkit.getPluginManager().getPlugin("Slabbo");
 
         //TODO: Allow some kind of result
@@ -60,7 +62,7 @@ public final class SlabboImporter implements Importer {
                             .name(name)
                             .build();
 
-                    api.repository().create(shop);
+                    api.repository().createOrUpdate(shop);
 
                     final var owner = api.repository()
                             .<ShopOwner.Builder>builder(ShopOwner.Builder.class)

@@ -3,6 +3,7 @@ package gg.mew.slabby.listener;
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
@@ -12,9 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -211,10 +211,22 @@ public final class SlabbyListener implements Listener {
                     final var result = api.operations().buy(client.getUniqueId(), shop);
 
                     if (!result.success()) {
-                        client.sendMessage(Component.text(result.cause().name()));
+                        client.sendMessage(localize(result));
                         api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
                     } else {
                         api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+
+                        client.sendMessage(
+                                Component.text("Bought", NamedTextColor.GREEN)
+                                        .appendSpace()
+                                        .append(Component.text(shop.quantity()))
+                                        .appendSpace()
+                                        .append(item.displayName())
+                                        .appendSpace()
+                                        .append(Component.text("for a total of $"))
+                                        .append(Component.text(api.decimalFormat().format(shop.buyPrice())))
+                        );
+                        //TODO: notify sellers
                     }
                     return true;
                 }))
@@ -235,12 +247,21 @@ public final class SlabbyListener implements Listener {
                     final var result = api.operations().sell(client.getUniqueId(), shop);
 
                     if (!result.success()) {
-                        client.sendMessage(Component.text(result.cause().name()));
+                        client.sendMessage(localize(result));
                         api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
                     } else {
-                        api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                        client.sendMessage(
+                                Component.text("Sold", NamedTextColor.GREEN)
+                                        .appendSpace()
+                                        .append(Component.text(shop.quantity()))
+                                        .appendSpace()
+                                        .append(item.displayName())
+                                        .appendSpace()
+                                        .append(Component.text("for a total of $"))
+                                        .append(Component.text(api.decimalFormat().format(shop.sellPrice())))
+                        );
+                        //TODO: notify sellers
                     }
-
                     return true;
                 }))
                 .addIngredient('.', new SimpleItem(new ItemBuilder(Material.AIR)))
@@ -293,6 +314,18 @@ public final class SlabbyListener implements Listener {
                 .build();
 
         window.open();
+    }
+
+    private static Component localize(ShopOperations.ShopOperationResult result) {
+        return switch (result.cause()) {
+            case INSUFFICIENT_BALANCE_TO_WITHDRAW -> Component.text("You don't have enough funds!", NamedTextColor.RED);
+            case INSUFFICIENT_BALANCE_TO_DEPOSIT ->
+                    Component.text("The shop doesn't have enough funds!", NamedTextColor.RED);
+            case INSUFFICIENT_STOCK_TO_WITHDRAW -> Component.text("This shop is out of stock!", NamedTextColor.RED);
+            case INSUFFICIENT_STOCK_TO_DEPOSIT -> Component.text("You don't have enough items", NamedTextColor.RED);
+            case OPERATION_NOT_ALLOWED, OPERATION_FAILED, NONE ->
+                    Component.text("Something went wrong!", NamedTextColor.RED);
+        };
     }
 
     private void destroyShopUI(final Player shopOwner, final Shop shop) {
@@ -404,7 +437,7 @@ public final class SlabbyListener implements Listener {
                     final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
 
                     if (!result.success()) {
-                        shopOwner.sendMessage(Component.text(result.cause().name()));
+                        shopOwner.sendMessage(localize(result));
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
                     } else {
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
@@ -426,7 +459,7 @@ public final class SlabbyListener implements Listener {
                     final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
 
                     if (!result.success()) {
-                        shopOwner.sendMessage(Component.text(result.cause().name()));
+                        shopOwner.sendMessage(localize(result));
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
                     } else {
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
@@ -568,37 +601,48 @@ public final class SlabbyListener implements Listener {
                 }).get(), c -> {
                     try {
                         api.repository().transaction(() -> {
-                            final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
-                                    .x(wizard.x())
-                                    .y(wizard.y())
-                                    .z(wizard.z())
-                                    .world(wizard.world())
-                                    .item(wizard.item())
-                                    .buyPrice(wizard.buyPrice())
-                                    .sellPrice(wizard.sellPrice())
-                                    .quantity(wizard.quantity())
-                                    .note(wizard.note())
-                                    .build();
+                            final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                            api.repository().create(shop);
+                            shopOpt.ifPresentOrElse(shop -> {
+                                shop.buyPrice(wizard.buyPrice());
+                                shop.sellPrice(wizard.sellPrice());
+                                shop.quantity(wizard.quantity());
+                                shop.note(wizard.note());
+                                try {
+                                    api.repository().update(shop);
+                                } catch (final Exception ignored) {}
+                            }, () -> {
+                                final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
+                                        .x(wizard.x())
+                                        .y(wizard.y())
+                                        .z(wizard.z())
+                                        .world(wizard.world())
+                                        .item(wizard.item())
+                                        .buyPrice(wizard.buyPrice())
+                                        .sellPrice(wizard.sellPrice())
+                                        .quantity(wizard.quantity())
+                                        .note(wizard.note())
+                                        .build();
 
-                            shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
-                                    .uniqueId(shopOwner.getUniqueId())
-                                    .share(100)
-                                    .build());
+                                try {
+                                    api.repository().createOrUpdate(shop);
+
+                                    shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                                            .uniqueId(shopOwner.getUniqueId())
+                                            .share(100)
+                                            .build());
+                                } catch (final Exception ignored) {}
+                            });
 
                             return null;
                         });
+                        wizard.destroy();
+                        shopOwner.closeInventory();
+                        api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
                     } catch (final Exception e) {
                         api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
                         //TODO: notify player
                     }
-
-                    wizard.destroy();
-
-                    shopOwner.closeInventory();
-
-                    api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
                 }))
                 .addIngredient('b', new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
                     meta.displayName(Component.text("Cancel", NamedTextColor.RED));
