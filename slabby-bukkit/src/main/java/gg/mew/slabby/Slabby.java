@@ -4,21 +4,29 @@ import co.aikar.commands.PaperCommandManager;
 import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
+import gg.mew.slabby.listener.SlabbyListener;
 import gg.mew.slabby.service.ExceptionService;
+import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
+import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.economy.VaultEconomyWrapper;
+import gg.mew.slabby.wrapper.permission.BukkitPermissionWrapper;
+import gg.mew.slabby.wrapper.permission.PermissionWrapper;
+import gg.mew.slabby.wrapper.sound.BukkitSoundWrapper;
+import gg.mew.slabby.wrapper.sound.SoundWrapper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
-import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
@@ -26,9 +34,12 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
+@ApiVersion(ApiVersion.Target.v1_20)
 @DependsOn(value = {
         @Dependency("Vault")
 })
@@ -48,12 +59,22 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     private EconomyWrapper economy;
 
     @Getter
+    private final PermissionWrapper permission = new BukkitPermissionWrapper();
+
+    @Getter
+    private final SoundWrapper sound = new BukkitSoundWrapper();
+
+    @Getter
     private SlabbyConfig configuration;
 
     @Getter //TODO: Implement better.
     private final ExceptionService exceptionService = Throwable::printStackTrace;
 
-    private final PaperCommandManager commandManager = new PaperCommandManager(this);
+    @Getter
+    private final ShopOperations operations = new BukkitShopOperations(this);
+
+    @Getter
+    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
@@ -62,34 +83,49 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public void onEnable() {
         if (!setupEconomy()) {
+            getLogger().warning("Error while setting up economy");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
         if (!setupConfig()) {
+            getLogger().warning("Error while setting up config");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        if (!setupShopRepository()) {
+        if (!setupRepository()) {
+            getLogger().warning("Error while setting up repository");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        final var commandManager = new PaperCommandManager(this);
+        commandManager.registerCommand(new SlabbyCommand(this));
 
         SlabbyHelper.init(this);
 
-        commandManager.registerCommand(new SlabbyCommand(this));
+        getServer().getPluginManager().registerEvents(new SlabbyListener(this), this);
 
         getServer().getServicesManager().register(SlabbyAPI.class, this, this, ServicePriority.Highest);
     }
 
-    private boolean setupShopRepository() {
+    @Override
+    public void onDisable() {
+        getServer().getServicesManager().unregister(this);
+        HandlerList.unregisterAll(this);
+        if (this.repository != null) {
+            this.repository.close();
+        }
+    }
+
+    private boolean setupRepository() {
         try {
             this.repository = new SQLiteShopRepository(this);
             this.repository.initialize();
         } catch (SQLException e) {
             exceptionService().log(e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         return true;
@@ -97,12 +133,15 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     private boolean setupConfig() {
         try {
+            //TODO: Temp
+            saveDefaultConfig();
+
             final var root = loader.load();
 
             this.configuration = root.get(BukkitSlabbyConfig.class);
         } catch (ConfigurateException e) {
             exceptionService().log(e);
-            return false;
+            throw new RuntimeException(e);
         }
 
         return true;
@@ -123,13 +162,13 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     }
 
     @Override
-    public void onDisable() {
-        getServer().getServicesManager().unregister(this);
+    public LocalDateTime now() {
+        return LocalDateTime.now();
     }
 
     @Override
-    public LocalDateTime now() {
-        return LocalDateTime.now();
+    public Date legacyNow() {
+        return new Date();
     }
 
     @Override

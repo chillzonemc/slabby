@@ -1,10 +1,9 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("io.github.goooler.shadow") version "8.1.7"
 }
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://repo.aikar.co/content/groups/aikar/")
     maven("https://hub.spigotmc.org/nexus/content/groups/public/")
     maven("https://repo.xenondevs.xyz/releases")
 }

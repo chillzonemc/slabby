@@ -3,38 +3,38 @@ package gg.mew.slabby.shop;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import gg.mew.slabby.audit.AuditDao;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Builder
 @DatabaseTable(tableName = "shop_owners", daoClass = AuditDao.class)
-@Accessors(fluent = true)
+@Accessors(fluent = true, chain = false)
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public final class SQLiteShopOwner implements ShopOwner {
 
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true, uniqueCombo = true)
     private SQLiteShop shop;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false, uniqueCombo = true)
     private UUID uniqueId;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     private int share;
 
-    @DatabaseField
-    private LocalDateTime createdOn;
+    @DatabaseField(canBeNull = false)
+    private Date createdOn;
 
-    @DatabaseField
-    private LocalDateTime lastModifiedOn;
+    @DatabaseField(canBeNull = true)
+    private Date lastModifiedOn;
 
     public static final class SQLiteShopOwnerBuilder implements ShopOwner.Builder {}
 

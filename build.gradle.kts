@@ -18,12 +18,8 @@ subprojects {
 
     repositories {
         mavenCentral()
-
         maven("https://jitpack.io")
-    }
-
-    java {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+        maven("https://repo.aikar.co/content/groups/aikar/")
     }
 
     dependencies {
@@ -32,5 +28,9 @@ subprojects {
 
         testCompileOnly("org.projectlombok:lombok:1.18.32")
         testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+    }
+
+    java {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
