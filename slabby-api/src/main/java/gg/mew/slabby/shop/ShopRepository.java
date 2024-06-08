@@ -21,6 +21,8 @@ public interface ShopRepository {
 
     Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception;
 
+    Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception;
+
     @SuppressWarnings("UnusedReturnValue")
     <T> T transaction(final Callable<T> transaction) throws Exception;
 

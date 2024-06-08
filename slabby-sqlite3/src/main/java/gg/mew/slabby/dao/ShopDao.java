@@ -1,8 +1,9 @@
-package gg.mew.slabby.shop;
+package gg.mew.slabby.dao;
 
 import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.support.ConnectionSource;
-import gg.mew.slabby.audit.AuditDao;
+import gg.mew.slabby.dao.AuditDao;
+import gg.mew.slabby.shop.SQLiteShop;
 
 import java.sql.SQLException;
 import java.util.Collection;

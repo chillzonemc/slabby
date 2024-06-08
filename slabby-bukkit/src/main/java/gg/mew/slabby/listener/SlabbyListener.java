@@ -22,11 +22,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -119,6 +119,33 @@ public final class SlabbyListener implements Listener {
                         }
                     }
                 });
+
+                if (api.operations().wizardExists(player.getUniqueId())) {
+                    final var wizard = api.operations().wizardFor(player.getUniqueId());
+
+                    if (wizard.state() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
+                        if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
+                            try {
+                                final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+
+                                linkShopOpt.ifPresent(shop -> {
+                                    shop.inventoryX(block.getX());
+                                    shop.inventoryY(block.getY());
+                                    shop.inventoryZ(block.getZ());
+                                    shop.inventoryWorld(block.getWorld().getName());
+                                });
+
+                                if (linkShopOpt.isPresent()) {
+                                    api.repository().update(linkShopOpt.get());
+                                    api.sound().play(player.getUniqueId(), linkShopOpt.get(), Sounds.SUCCESS);
+                                }
+                            } catch (final Exception e) {
+                                //TODO: notify player
+                            }
+                            wizard.destroy();
+                        }
+                    }
+                }
             }
         }
     }
@@ -180,6 +207,44 @@ public final class SlabbyListener implements Listener {
 
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onInventoryMoveItem(final InventoryMoveItemEvent event) {
+        final var restock = api.configuration().restock();
+
+        if (!restock.chests().enabled() || !restock.chests().hoppers().enabled())
+            return;
+
+        final var location = event.getDestination().getLocation();
+
+        if (location == null)
+            return;
+
+        //TODO: do this per stack in order to reduce database calls
+
+        Optional<Shop> shopOpt = Optional.empty();
+
+        //TODO: caching would be very useful for this
+
+        try {
+            shopOpt = api.repository().shopWithInventoryAt(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+        } catch (final Exception ignored) {}
+
+        shopOpt.ifPresent(shop -> {
+            final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+
+            if (!itemStack.isSimilar(event.getItem()))
+                return;
+
+            shop.stock(shop.stock() + event.getItem().getAmount());
+
+            try {
+                api.repository().update(shop);
+
+                event.setItem(ItemStack.empty());
+            } catch (final Exception ignored) {}
+        });
     }
 
     private Supplier<? extends ItemProvider> itemStack(final Material material, final BiConsumer<ItemStack, ItemMeta> action) {
@@ -492,8 +557,17 @@ public final class SlabbyListener implements Listener {
                         add(Component.text("Link a chest for refilling!", NamedTextColor.GREEN));
                     }});
                 }).get(), c -> {
-                    shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
+                    if (!api.permission().hasPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LINK)) {
+                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
+                        shopOwner.sendMessage(Component.text("You do not have permission!", NamedTextColor.RED));
+                        return;
+                    }
+                    api.operations().wizardFor(shopOwner.getUniqueId())
+                            .useExisting(shop)
+                            .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
+                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
+                    shopOwner.sendMessage(Component.text("Please crouch and punch the chest you want to link.", NamedTextColor.GREEN));
+                    shopOwner.closeInventory();
                 }))
                 .addIngredient('p', new SimpleItem(itemStack(Material.COMMAND_BLOCK, (it, meta) -> {
                     meta.displayName(Component.text("Slabby Shop", NamedTextColor.GOLD));

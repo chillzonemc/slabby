@@ -1,8 +1,9 @@
-package gg.mew.slabby.audit;
+package gg.mew.slabby.dao;
 
 import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.support.ConnectionSource;
 import gg.mew.slabby.SlabbyHelper;
+import gg.mew.slabby.audit.Auditable;
 
 import java.sql.SQLException;
 import java.util.Collection;

@@ -41,6 +41,18 @@ public interface Shop extends Auditable {
 
     void name(final String name);
 
+    Integer inventoryX();
+    void inventoryX(final Integer chestX);
+
+    Integer inventoryY();
+    void inventoryY(final Integer chestY);
+
+    Integer inventoryZ();
+    void inventoryZ(final Integer chestZ);
+
+    String inventoryWorld();
+    void inventoryWorld(final String chestWorld);
+
     Collection<ShopOwner> owners();
 
     boolean isOwner(final UUID uniqueId);

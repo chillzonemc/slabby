@@ -168,6 +168,26 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception {
+        try {
+            final var result = this.shopDao.queryBuilder()
+                    .where()
+                    .eq("inventoryX", x)
+                    .and()
+                    .eq("inventoryY", y)
+                    .and()
+                    .eq("inventoryZ", z)
+                    .and()
+                    .eq("inventoryWorld", world)
+                    .queryForFirst();
+            return Optional.ofNullable(result);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
+        }
+    }
+
+    @Override
     public <T> T transaction(final Callable<T> transaction) throws Exception {
         try {
             return TransactionManager.callInTransaction(this.connectionSource, transaction);
