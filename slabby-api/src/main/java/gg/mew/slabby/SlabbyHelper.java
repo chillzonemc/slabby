@@ -13,12 +13,12 @@ import lombok.experimental.UtilityClass;
 public final class SlabbyHelper {
 
     @Getter
-    private static SlabbyAPI api;
+    private SlabbyAPI api;
 
     /**
      * Used by Slabby for initializing the static API singleton. You are not supposed to call this method!
      */
-    public static void init(@NonNull final SlabbyAPI api) {
+    public void init(@NonNull final SlabbyAPI api) {
         if (SlabbyHelper.api != null) {
             throw new UnsupportedOperationException("API already initialized");
         }

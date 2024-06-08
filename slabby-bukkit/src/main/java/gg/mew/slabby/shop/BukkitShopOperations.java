@@ -1,6 +1,7 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.permission.SlabbyPermissions;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -45,6 +46,9 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
+        if (api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
+            return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
+
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
@@ -88,6 +92,9 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
+        if (api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
+            return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
+
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
