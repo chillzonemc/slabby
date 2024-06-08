@@ -27,8 +27,8 @@ public interface ShopOperations {
         INSUFFICIENT_STOCK_TO_DEPOSIT,
 
         OPERATION_NOT_ALLOWED,
-
         OPERATION_FAILED,
+        OPERATION_NO_PERMISSION,
 
         NONE
     }

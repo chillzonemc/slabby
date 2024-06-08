@@ -2,6 +2,7 @@ package gg.mew.slabby.listener;
 
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopOwner;
@@ -48,11 +49,14 @@ public final class SlabbyListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerInteract(final PlayerInteractEvent event) {
+        api.permission().ifPermission(event.getPlayer().getUniqueId(), SlabbyPermissions.SHOP_INTERACT, () -> handlePlayerInteract(event));
+    }
+
+    private void handlePlayerInteract(PlayerInteractEvent event) {
         final var block = event.getClickedBlock();
         final var player = event.getPlayer();
 
-        //noinspection DataFlowIssue
-        if (!event.hasBlock() || block.getType() == Material.AIR || event.getHand() != EquipmentSlot.HAND)
+        if (block == null || block.getType() == Material.AIR || event.getHand() != EquipmentSlot.HAND)
             return;
 
         final Optional<Shop> shopOpt;
@@ -72,6 +76,7 @@ public final class SlabbyListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK -> {
                 shopOpt.ifPresentOrElse(shop -> {
+                    //TODO: need a way for SHOP_MODIFY_OTHERS to express intent. command? /slabby admin
                     if (shop.isOwner(player.getUniqueId())) {
                         if (hasConfigurationItem) {
                             destroyShopUI(player, shop);
@@ -82,8 +87,9 @@ public final class SlabbyListener implements Listener {
                         clientShopUI(player, shop);
                     }
                 }, () -> {
-                    if (hasConfigurationItem)
-                        newShopUI(player, block);
+                    if (hasConfigurationItem) {
+                        api.permission().ifPermission(player.getUniqueId(), SlabbyPermissions.SHOP_MODIFY, () -> newShopUI(player, block));
+                    }
                 });
             }
             case LEFT_CLICK_BLOCK -> {
@@ -164,7 +170,7 @@ public final class SlabbyListener implements Listener {
                 }
 
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 event.getPlayer().sendMessage(Component.text("That's not a valid number!", NamedTextColor.RED));
             }
 
@@ -323,6 +329,7 @@ public final class SlabbyListener implements Listener {
                     Component.text("The shop doesn't have enough funds!", NamedTextColor.RED);
             case INSUFFICIENT_STOCK_TO_WITHDRAW -> Component.text("This shop is out of stock!", NamedTextColor.RED);
             case INSUFFICIENT_STOCK_TO_DEPOSIT -> Component.text("You don't have enough items", NamedTextColor.RED);
+            case OPERATION_NO_PERMISSION -> Component.text("You don't have permission to do this!", NamedTextColor.RED);
             case OPERATION_NOT_ALLOWED, OPERATION_FAILED, NONE ->
                     Component.text("Something went wrong!", NamedTextColor.RED);
         };

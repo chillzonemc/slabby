@@ -5,6 +5,7 @@ import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.listener.SlabbyListener;
+import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
@@ -25,6 +26,7 @@ import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
+import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
@@ -44,7 +46,12 @@ import java.util.Date;
         @Dependency("Vault")
 })
 @Permissions(value = {
-
+        @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
+        @Permission(name = SlabbyPermissions.SHOP_MODIFY, desc = "Allows for creation, modification and deletion of new shops"),
+        @Permission(name = SlabbyPermissions.SHOP_MODIFY_OTHERS, desc = "Allows for creation, modification and deletion of any shop"),
+        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops"),
+        @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking chests to shops"),
+        @Permission(name = SlabbyPermissions.SHOP_NOTIFY, desc = "Allows shop owners to receive notifications"),
 })
 @Commands(value = {
         @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
