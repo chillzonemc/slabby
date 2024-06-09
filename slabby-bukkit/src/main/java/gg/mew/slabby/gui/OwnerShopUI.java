@@ -27,97 +27,114 @@ public final class OwnerShopUI {
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
-        final var gui = Gui.normal()
-                .setStructure("shm.icprt")
-                .addIngredient('s', new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
-                    meta.displayName(Component.text("Deposit '", NamedTextColor.GOLD)
-                            .append(itemStack.displayName()) //TODO: reset?
-                            .append(Component.text("'"))
-                    );
-                    meta.lore(new ArrayList<>() {{
-                        add(Component.text("+Shift for bulk deposit", NamedTextColor.DARK_PURPLE));
-                        add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
-                        add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
-                    }});
-                }), c -> {
-                    final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
+        final var gui = Gui.empty(9, 1);
 
-                    if (!result.success()) {
-                        shopOwner.sendMessage(localize(result));
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                    } else {
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+        gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
+            meta.displayName(Component.text("Deposit '", NamedTextColor.GOLD)
+                    .append(itemStack.displayName()) //TODO: reset?
+                    .append(Component.text("'"))
+            );
+            meta.lore(new ArrayList<>() {{
+                add(Component.text("+Shift for bulk deposit", NamedTextColor.DARK_PURPLE));
+                add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
+                add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+            }});
+        }), c -> {
+            final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
+
+            if (!result.success()) {
+                shopOwner.sendMessage(localize(result));
+                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
+            } else {
+                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+            }
+
+            return true;
+        }));
+
+        gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
+            meta.displayName(Component.text("Withdraw '", NamedTextColor.GOLD)
+                    .append(itemStack.displayName()) //TODO: reset?
+                    .append(Component.text("'"))
+            );
+            meta.lore(new ArrayList<>() {{
+                add(Component.text("+Shift for bulk withdrawal", NamedTextColor.DARK_PURPLE));
+                add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
+                add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+            }});
+        }), c -> {
+            final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
+
+            if (!result.success()) {
+                shopOwner.sendMessage(localize(result));
+                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
+            } else {
+                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+            }
+
+            return true;
+        }));
+
+        gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
+            meta.displayName(Component.text("Change rate", NamedTextColor.GOLD));
+            meta.lore(new ArrayList<>() {{
+                add(Component.text(String.format("Amount per click: %d", shop.quantity()), NamedTextColor.DARK_PURPLE));
+            }});
+        }), c -> {
+            shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
+
+            return false;
+        }));
+
+        gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
+
+        api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LINK, () -> {
+            if (shop.hasInventory()) {
+                gui.setItem(5, 0, new SimpleItem(itemStack(Material.ENDER_CHEST, (it, meta) -> {
+                    meta.displayName(Component.text("Cancel chest link", NamedTextColor.GOLD));
+                }).get(), c -> {
+                    try {
+                        shop.inventory(null, null, null, null);
+                        api.repository().update(shop);
+                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
+                        shopOwner.sendMessage(Component.text("Shop linking has been removed", NamedTextColor.GREEN));
+                    } catch (final Exception ignored) {
+                        //TODO: notify player
                     }
-
-                    return true;
-                }))
-                .addIngredient('h', new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
-                    meta.displayName(Component.text("Withdraw '", NamedTextColor.GOLD)
-                            .append(itemStack.displayName()) //TODO: reset?
-                            .append(Component.text("'"))
-                    );
-                    meta.lore(new ArrayList<>() {{
-                        add(Component.text("+Shift for bulk withdrawal", NamedTextColor.DARK_PURPLE));
-                        add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
-                        add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
-                    }});
-                }), c -> {
-                    final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
-
-                    if (!result.success()) {
-                        shopOwner.sendMessage(localize(result));
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                    } else {
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
-                    }
-
-                    return true;
-                }))
-                .addIngredient('m', new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
-                    meta.displayName(Component.text("Change rate", NamedTextColor.GOLD));
-                    meta.lore(new ArrayList<>() {{
-                        add(Component.text(String.format("Amount per click: %d", shop.quantity()), NamedTextColor.DARK_PURPLE));
-                    }});
-                }), c -> {
-                    shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
-
-                    return false;
-                }))
-                .addIngredient('.', new SimpleItem(new ItemBuilder(Material.AIR)))
-                .addIngredient('i', new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))))
-                .addIngredient('c', new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
+                    shopOwner.closeInventory();
+                }));
+            } else {
+                gui.setItem(5, 0, new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
                     meta.displayName(Component.text("Link chest", NamedTextColor.GOLD));
                     meta.lore(new ArrayList<>() {{
                         add(Component.text("Link a chest for refilling!", NamedTextColor.GREEN));
                     }});
                 }).get(), c -> {
-                    if (!api.permission().hasPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LINK)) {
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                        shopOwner.sendMessage(Component.text("You do not have permission!", NamedTextColor.RED));
-                        return;
-                    }
-                    //TODO: allow for destruction of chest link
                     api.operations().wizardFor(shopOwner.getUniqueId())
                             .useExisting(shop)
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
                     shopOwner.sendMessage(Component.text("Please crouch and punch the chest you want to link.", NamedTextColor.GREEN));
                     shopOwner.closeInventory();
-                }))
-                .addIngredient('p', commandBlock(api, shop, itemStack))
-                .addIngredient('r', new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
-                    meta.displayName(Component.text("Modify Shop", NamedTextColor.GOLD));
-                }).get(), c -> {
-                    ModifyShopUI.open(api, shopOwner, api.operations().wizardFor(shopOwner.getUniqueId()).useExisting(shop));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
-                }))
-                .addIngredient('t', new SimpleItem(itemStack(Material.OAK_SIGN, (it, meta) -> {
-                    meta.displayName(Component.text("View as customer", NamedTextColor.GOLD));
-                }).get(), c -> {
-                    ClientShopUI.open(api, shopOwner, shop);
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
-                }))
-                .build();
+                }));
+            }
+        });
+
+        gui.setItem(6, 0, commandBlock(api, shop, itemStack));
+
+        gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
+            meta.displayName(Component.text("Modify Shop", NamedTextColor.GOLD));
+        }).get(), c -> {
+            ModifyShopUI.open(api, shopOwner, api.operations().wizardFor(shopOwner.getUniqueId()).useExisting(shop));
+            api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
+        }));
+
+        gui.setItem(8, 0, new SimpleItem(itemStack(Material.OAK_SIGN, (it, meta) -> {
+            meta.displayName(Component.text("View as customer", NamedTextColor.GOLD));
+        }).get(), c -> {
+            ClientShopUI.open(api, shopOwner, shop);
+            api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
+        }));
 
         final var window = Window.single()
                 .setViewer(shopOwner)

@@ -1,12 +1,9 @@
 package gg.mew.slabby.listener;
 
-import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.ShopOperations;
-import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -16,7 +13,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,21 +21,10 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import xyz.xenondevs.invui.gui.Gui;
-import xyz.xenondevs.invui.item.ItemProvider;
-import xyz.xenondevs.invui.item.builder.ItemBuilder;
-import xyz.xenondevs.invui.item.impl.AutoUpdateItem;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
-import xyz.xenondevs.invui.item.impl.SuppliedItem;
-import xyz.xenondevs.invui.window.Window;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 public final class SlabbyListener implements Listener {
@@ -127,19 +112,15 @@ public final class SlabbyListener implements Listener {
                             try {
                                 final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                                linkShopOpt.ifPresent(shop -> {
-                                    shop.inventoryX(block.getX());
-                                    shop.inventoryY(block.getY());
-                                    shop.inventoryZ(block.getZ());
-                                    shop.inventoryWorld(block.getWorld().getName());
-                                });
-
                                 if (linkShopOpt.isPresent()) {
-                                    api.repository().update(linkShopOpt.get());
-                                    api.sound().play(player.getUniqueId(), linkShopOpt.get(), Sounds.SUCCESS);
+                                    final var shop = linkShopOpt.get();
+                                    shop.inventory(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
+                                    api.repository().update(shop);
+                                    api.sound().play(player.getUniqueId(), shop, Sounds.SUCCESS);
                                 }
                             } catch (final Exception e) {
                                 //TODO: notify player
+                                //TODO: if an inventory is already being used, it'll cause an exception here. we need to check an inventory isn't already linked.
                             }
                             wizard.destroy();
                         }
@@ -186,13 +167,23 @@ public final class SlabbyListener implements Listener {
             final var text = serializer.serialize(event.message());
 
             //TODO: limit precision to 2 decimals
+            //TODO: min/max constraints
 
             try {
                 switch (wizard.state()) {
                     case AWAITING_NOTE -> wizard.note(text);
-                    case AWAITING_BUY_PRICE -> wizard.buyPrice(Double.parseDouble(text));
-                    case AWAITING_SELL_PRICE -> wizard.sellPrice(Double.parseDouble(text));
-                    case AWAITING_QUANTITY -> wizard.quantity(Integer.parseInt(text));
+                    case AWAITING_BUY_PRICE -> {
+                        final var buyPrice = Double.parseDouble(text);
+                        wizard.buyPrice(buyPrice == -1 ? null : buyPrice);
+                    }
+                    case AWAITING_SELL_PRICE -> {
+                        final var sellPrice = Double.parseDouble(text);
+                        wizard.sellPrice(sellPrice == -1 ? null : sellPrice);
+                    }
+                    case AWAITING_QUANTITY -> {
+                        final var quantity = Integer.parseInt(text);
+                        wizard.quantity(quantity);
+                    }
                 }
 
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
@@ -221,10 +212,10 @@ public final class SlabbyListener implements Listener {
             return;
 
         //TODO: do this per stack in order to reduce database calls
+        //TODO: caching would be very useful for this
+        //TODO: disabling chest linking while items are being transferred can cause a loss of items
 
         Optional<Shop> shopOpt = Optional.empty();
-
-        //TODO: caching would be very useful for this
 
         try {
             shopOpt = api.repository().shopWithInventoryAt(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());

@@ -42,16 +42,18 @@ public interface Shop extends Auditable {
     void name(final String name);
 
     Integer inventoryX();
-    void inventoryX(final Integer chestX);
 
     Integer inventoryY();
-    void inventoryY(final Integer chestY);
 
     Integer inventoryZ();
-    void inventoryZ(final Integer chestZ);
 
     String inventoryWorld();
-    void inventoryWorld(final String chestWorld);
+
+    void inventory(final Integer x, final Integer y, final Integer z, final String world);
+
+    default boolean hasInventory() {
+        return inventoryX() != null && inventoryY() != null && inventoryZ() != null && inventoryWorld() != null;
+    }
 
     Collection<ShopOwner> owners();
 

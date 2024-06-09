@@ -80,6 +80,14 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = true)
     private Date lastModifiedOn;
 
+    @Override
+    public void inventory(final Integer x, final Integer y, final Integer z, final String world) {
+        inventoryX = x;
+        inventoryY = y;
+        inventoryZ = z;
+        inventoryWorld = world;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public Collection<ShopOwner> owners() {
