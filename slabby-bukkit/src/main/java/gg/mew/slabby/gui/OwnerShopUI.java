@@ -89,6 +89,7 @@ public final class OwnerShopUI {
         gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
 
         api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LINK, () -> {
+            //TODO: update item after clicking
             if (shop.hasInventory()) {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.ENDER_CHEST, (it, meta) -> {
                     meta.displayName(Component.text("Cancel chest link", NamedTextColor.GOLD));
@@ -101,7 +102,6 @@ public final class OwnerShopUI {
                     } catch (final Exception ignored) {
                         //TODO: notify player
                     }
-                    shopOwner.closeInventory();
                 }));
             } else {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
@@ -115,7 +115,7 @@ public final class OwnerShopUI {
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
                     shopOwner.sendMessage(Component.text("Please crouch and punch the chest you want to link.", NamedTextColor.GREEN));
-                    shopOwner.closeInventory();
+                    gui.closeForAllViewers();
                 }));
             }
         });

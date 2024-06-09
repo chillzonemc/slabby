@@ -151,6 +151,8 @@ public final class SlabbyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClose(final InventoryCloseEvent event) {
         if (event.getReason() == InventoryCloseEvent.Reason.PLAYER) {
+            //TODO: while correct, this causes issues for chest linking, should the player open and close their inventory.
+            //TODO: rework wizard
             api.operations().destroyWizard(event.getPlayer().getUniqueId());
         }
     }

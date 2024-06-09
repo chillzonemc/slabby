@@ -29,6 +29,7 @@ public interface Shop extends Auditable {
 
     void quantity(final int quantity);
 
+    //TODO: allow null stock, null stock is infinite stock
     int stock();
 
     void stock(final int stock);
