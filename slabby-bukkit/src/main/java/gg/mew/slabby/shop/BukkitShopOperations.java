@@ -151,6 +151,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
+        //TODO: stock == 0?
         if (shop.stock() < amount)
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
 
@@ -183,6 +184,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
+        //TODO: doesn't contain at least 1?
         if (!player.getInventory().containsAtLeast(itemStack, amount))
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
 
