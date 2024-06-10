@@ -4,7 +4,7 @@ import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
-import gg.mew.slabby.audit.AuditDao;
+import gg.mew.slabby.dao.ShopDao;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -59,6 +59,18 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = true) //TODO: unique?
     private String name;
 
+    @DatabaseField(canBeNull = true, uniqueIndexName = "inventory_location")
+    private Integer inventoryX;
+
+    @DatabaseField(canBeNull = true, uniqueIndexName = "inventory_location")
+    private Integer inventoryY;
+
+    @DatabaseField(canBeNull = true, uniqueIndexName = "inventory_location")
+    private Integer inventoryZ;
+
+    @DatabaseField(canBeNull = true, uniqueIndexName = "inventory_location")
+    private String inventoryWorld;
+
     @ForeignCollectionField(eager = false)
     private ForeignCollection<SQLiteShopOwner> owners;
 
@@ -67,6 +79,14 @@ public final class SQLiteShop implements Shop {
 
     @DatabaseField(canBeNull = true)
     private Date lastModifiedOn;
+
+    @Override
+    public void inventory(final Integer x, final Integer y, final Integer z, final String world) {
+        inventoryX = x;
+        inventoryY = y;
+        inventoryZ = z;
+        inventoryWorld = world;
+    }
 
     @SuppressWarnings("unchecked")
     @Override

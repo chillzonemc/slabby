@@ -50,6 +50,7 @@ public interface ShopWizard {
         AWAITING_BUY_PRICE,
         AWAITING_SELL_PRICE,
         AWAITING_QUANTITY,
+        AWAITING_INVENTORY_LINK,
         AWAITING_CONFIRMATION;
 
         public boolean awaitingTextInput() {

@@ -29,6 +29,7 @@ public interface Shop extends Auditable {
 
     void quantity(final int quantity);
 
+    //TODO: allow null stock, null stock is infinite stock
     int stock();
 
     void stock(final int stock);
@@ -40,6 +41,20 @@ public interface Shop extends Auditable {
     String name();
 
     void name(final String name);
+
+    Integer inventoryX();
+
+    Integer inventoryY();
+
+    Integer inventoryZ();
+
+    String inventoryWorld();
+
+    void inventory(final Integer x, final Integer y, final Integer z, final String world);
+
+    default boolean hasInventory() {
+        return inventoryX() != null && inventoryY() != null && inventoryZ() != null && inventoryWorld() != null;
+    }
 
     Collection<ShopOwner> owners();
 

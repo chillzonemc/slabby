@@ -2,7 +2,7 @@ package gg.mew.slabby.shop;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import gg.mew.slabby.audit.AuditDao;
+import gg.mew.slabby.dao.AuditDao;
 import lombok.*;
 import lombok.experimental.Accessors;
 
