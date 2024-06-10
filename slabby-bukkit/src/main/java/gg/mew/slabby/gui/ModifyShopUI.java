@@ -10,7 +10,11 @@ import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.invui.gui.Gui;
@@ -123,12 +127,12 @@ public final class ModifyShopUI {
                                     .build());
                         } catch (final Exception ignored) {}
                     });
-
                     return null;
                 });
                 wizard.destroy();
                 gui.closeForAllViewers();
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
+                spawnDisplayEntity(wizard);
             } catch (final Exception e) {
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
                 //TODO: notify player
@@ -150,6 +154,20 @@ public final class ModifyShopUI {
                 .build();
 
         Bukkit.getScheduler().runTask((Slabby)api, window::open);
+    }
+
+    private static void spawnDisplayEntity(final ShopWizard wizard) {
+        //TODO: once these render exactly the way i want, store their entity id on the shop. that way, we can delete them when the shop gets destroyed
+
+        final var item = Bukkit.getItemFactory().createItemStack(wizard.item());
+        final var world = Bukkit.getWorld(wizard.world());
+
+        final var itemDisplay = (ItemDisplay) world.spawnEntity(new Location(world, wizard.x() + 0.5, wizard.y() + 1, wizard.z() + 0.5), EntityType.ITEM_DISPLAY);
+
+        itemDisplay.setBillboard(Display.Billboard.VERTICAL);
+
+        itemDisplay.setItemStack(item);
+        itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
     }
 
 }

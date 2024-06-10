@@ -69,6 +69,8 @@ public final class SlabbyListener implements Listener {
                         }
                     } else {
                         ClientShopUI.open(api, player, shop);
+
+                        
                     }
                 }, () -> {
                     if (hasConfigurationItem) {
