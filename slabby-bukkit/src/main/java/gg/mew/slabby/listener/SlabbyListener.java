@@ -77,6 +77,8 @@ public final class SlabbyListener implements Listener {
                         }
                     } else {
                         ClientShopUI.open(api, player, shop);
+
+
                     }
                 }, () -> {
                     final var canAccessClaim = api.claim() == null ||

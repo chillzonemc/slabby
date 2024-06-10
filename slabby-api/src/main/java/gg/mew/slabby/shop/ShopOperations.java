@@ -22,6 +22,12 @@ public interface ShopOperations {
 
     Map<UUID, Double> splitCost(final double amount, final Shop shop);
 
+    void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws Exception;
+
+    void removeShop(final Shop shop) throws Exception;
+
+    void removeAndSpawnDisplayItem(final Shop shop);
+
     //TODO: We need something better than this. Custom exception?
     record ShopOperationResult(boolean success, Cause cause) {}
 

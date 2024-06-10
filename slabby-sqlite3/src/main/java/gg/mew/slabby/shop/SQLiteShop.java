@@ -90,6 +90,9 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = false, defaultValue = "ACTIVE")
     private State state;
 
+    @DatabaseField(canBeNull = true)
+    private UUID displayEntityId;
+
     @Override
     public void location(final Integer x, final Integer y, final Integer z, final String world) {
         this.x = x;
