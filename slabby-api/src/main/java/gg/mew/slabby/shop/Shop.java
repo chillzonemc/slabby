@@ -58,6 +58,8 @@ public interface Shop extends Auditable {
 
     Collection<ShopOwner> owners();
 
+    Collection<ShopLog> logs();
+
     boolean isOwner(final UUID uniqueId);
 
     interface Builder {

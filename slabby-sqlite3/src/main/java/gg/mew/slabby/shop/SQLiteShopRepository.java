@@ -38,6 +38,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     public void initialize() throws SQLException {
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShop.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
+        TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopLog.class);
     }
 
     //TODO: Verify data that goes to the database. Using SQL when possible, otherwise Dao.
@@ -61,6 +62,9 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
         if (builderType == ShopOwner.Builder.class)
             return (T) SQLiteShopOwner.builder();
+
+        if (builderType == ShopLog.Builder.class)
+            return (T) SQLiteShopLog.builder();
 
         throw new IllegalArgumentException();
     }

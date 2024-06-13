@@ -70,9 +70,20 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!result.success())
             return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_WITHDRAW);
 
-        shop.stock(shop.stock() - shop.quantity());
+        final var stock = shop.stock();
+
+        shop.stock(stock - shop.quantity());
 
         try {
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .oldValue(Integer.toString(stock))
+                    .newValue(Integer.toString(shop.stock()))
+                    .action(ShopLog.Action.ITEM_SOLD)
+                    .build();
+
+            shop.logs().add(log);
+
             api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
@@ -117,9 +128,20 @@ public final class BukkitShopOperations implements ShopOperations {
                 return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_DEPOSIT);
         }
 
-        shop.stock(shop.stock() + shop.quantity());
+        final var stock = shop.stock();
+
+        shop.stock(stock + shop.quantity());
 
         try {
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .oldValue(Integer.toString(stock))
+                    .newValue(Integer.toString(shop.stock()))
+                    .action(ShopLog.Action.ITEM_BOUGHT)
+                    .build();
+
+            shop.logs().add(log);
+
             api.repository().update(shop);
         } catch (Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
@@ -157,9 +179,20 @@ public final class BukkitShopOperations implements ShopOperations {
 
         //TODO: check for space
 
-        shop.stock(shop.stock() - amount);
+        final var stock = shop.stock();
+
+        shop.stock(stock - amount);
 
         try {
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.WITHDRAW)
+                    .oldValue(Integer.toString(stock))
+                    .newValue(Integer.toString(shop.stock()))
+                    .build();
+
+            shop.logs().add(log);
+
             api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
@@ -188,9 +221,20 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!player.getInventory().containsAtLeast(itemStack, amount))
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
 
-        shop.stock(shop.stock() + amount);
+        final var stock = shop.stock();
+
+        shop.stock(stock + amount);
 
         try {
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.DEPOSIT)
+                    .oldValue(Integer.toString(stock))
+                    .newValue(Integer.toString(shop.stock()))
+                    .build();
+
+            shop.logs().add(log);
+
             api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);

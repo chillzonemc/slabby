@@ -1,22 +1,39 @@
 package gg.mew.slabby.shop;
 
-import gg.mew.slabby.audit.Auditable;
+public interface ShopLog {
 
-public interface ShopLog extends Auditable {
-
+    Action action();
     String oldValue();
     String newValue();
-    // shop
-    // type
-    // oldValue?
-    // newValue?
-    // audit
 
-    enum ShopAction {
+    enum Action {
         LOCATION_CHANGED,
         BUY_PRICE_CHANGED,
-        //...
-        // OWNER_ADDED/REMOVED, etc.
+        SELL_PRICE_CHANGED,
+        QUANTITY_CHANGED,
+        NOTE_CHANGED,
+        LINKED_INVENTORY_CHANGED,
+
+        OWNER_ADDED,
+        OWNER_REMOVED,
+
+        ITEM_SOLD,
+        ITEM_BOUGHT,
+
+        DEPOSIT,
+        WITHDRAW,
+
+        SHOP_CREATED,
+        SHOP_DESTROYED,
+    }
+
+    interface Builder {
+
+        Builder action(final Action action);
+        Builder oldValue(final String oldValue);
+        Builder newValue(final String newValue);
+        ShopLog build();
+
     }
 
 }
