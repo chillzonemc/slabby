@@ -17,7 +17,7 @@ public final class SQLiteShopLog implements ShopLog {
     @DatabaseField(generatedId = true)
     private int id;
 
-    @DatabaseField(foreign = true, foreignAutoRefresh = true, uniqueCombo = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private SQLiteShop shop;
 
     @DatabaseField(canBeNull = false)
