@@ -2,10 +2,13 @@ package gg.mew.slabby.shop;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import gg.mew.slabby.dao.AuditDao;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-@DatabaseTable(tableName = "shop_logs")
+import java.util.Date;
+
+@DatabaseTable(tableName = "shop_logs", daoClass = AuditDao.class)
 @Builder
 @Accessors(fluent = true, chain = false)
 @Getter
@@ -24,10 +27,13 @@ public final class SQLiteShopLog implements ShopLog {
     private Action action;
 
     @DatabaseField(canBeNull = false)
-    private String oldValue;
+    private String data;
 
     @DatabaseField(canBeNull = false)
-    private String newValue;
+    private Date createdOn;
+
+    @DatabaseField(canBeNull = true)
+    private Date lastModifiedOn;
 
     public static final class SQLiteShopLogBuilder implements ShopLog.Builder {}
 

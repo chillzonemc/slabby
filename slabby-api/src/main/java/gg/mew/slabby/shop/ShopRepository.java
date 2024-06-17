@@ -1,6 +1,8 @@
 package gg.mew.slabby.shop;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public interface ShopRepository {

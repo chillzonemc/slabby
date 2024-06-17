@@ -97,6 +97,7 @@ public final class SQLiteShop implements Shop {
         return (Collection<ShopOwner>) (Collection<? extends ShopOwner>) this.owners;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<ShopLog> logs() {
         return (Collection<ShopLog>) (Collection<? extends ShopLog>) this.logs;

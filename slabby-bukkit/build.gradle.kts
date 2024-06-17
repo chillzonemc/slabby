@@ -22,7 +22,7 @@ dependencies {
     // Library for interacting with server economy
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
 
-    // Library for handling configurations
+    // Library for handling yaml
     implementation("org.spongepowered:configurate-yaml:4.1.2")
 
     // Library for creating item UIs

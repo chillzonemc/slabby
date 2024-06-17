@@ -1,6 +1,8 @@
 package gg.mew.slabby;
 
 import co.aikar.commands.PaperCommandManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
@@ -52,6 +54,7 @@ import java.util.Date;
         @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops"),
         @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking chests to shops"),
         @Permission(name = SlabbyPermissions.SHOP_NOTIFY, desc = "Allows shop owners to receive notifications"),
+        @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs")
 })
 @Commands(value = {
         @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
@@ -83,9 +86,14 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-    private final YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
+    private final YamlConfigurationLoader yaml = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
             .build();
+
+    @Getter
+    private final Gson gson = new GsonBuilder()
+            .serializeNulls()
+            .create();
 
     @Override
     public void onEnable() {
@@ -143,7 +151,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             //TODO: Temp
             saveDefaultConfig();
 
-            final var root = loader.load();
+            final var root = yaml.load();
 
             this.configuration = root.get(BukkitSlabbyConfig.class);
         } catch (ConfigurateException e) {

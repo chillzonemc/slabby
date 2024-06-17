@@ -7,6 +7,24 @@ import java.util.UUID;
 
 public interface Shop extends Auditable {
 
+    class Names {
+        public static final String ITEM = "item";
+        public static final String X = "x";
+        public static final String Y = "y";
+        public static final String Z = "z";
+        public static final String WORLD = "world";
+        public static final String BUY_PRICE = "buyPrice";
+        public static final String SELL_PRICE = "sellPrice";
+        public static final String QUANTITY = "quantity";
+        public static final String STOCK = "stock";
+        public static final String NOTE = "note";
+        public static final String NAME = "name";
+        public static final String INVENTORY_X = "inventoryX";
+        public static final String INVENTORY_Y = "inventoryY";
+        public static final String INVENTORY_Z = "inventoryZ";
+        public static final String INVENTORY_WORLD = "inventoryWorld";
+    }
+
     String item();
 
     int x();

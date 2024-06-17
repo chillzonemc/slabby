@@ -46,7 +46,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
-        if (api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
+        if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
             return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
 
         try {
@@ -75,16 +75,15 @@ public final class BukkitShopOperations implements ShopOperations {
         shop.stock(stock - shop.quantity());
 
         try {
+            api.repository().update(shop);
+
             final var log = api.repository()
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .oldValue(Integer.toString(stock))
-                    .newValue(Integer.toString(shop.stock()))
-                    .action(ShopLog.Action.ITEM_SOLD)
+                    .action(ShopLog.Action.BUY)
+                    .serialized(new ShopLog.Sale(uniqueId, shop.buyPrice(), shop.quantity()))
                     .build();
 
             shop.logs().add(log);
-
-            api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
         }
@@ -103,7 +102,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
-        if (api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
+        if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
             return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
 
         try {
@@ -133,16 +132,15 @@ public final class BukkitShopOperations implements ShopOperations {
         shop.stock(stock + shop.quantity());
 
         try {
+            api.repository().update(shop);
+
             final var log = api.repository()
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .oldValue(Integer.toString(stock))
-                    .newValue(Integer.toString(shop.stock()))
-                    .action(ShopLog.Action.ITEM_BOUGHT)
+                    .action(ShopLog.Action.SELL)
+                    .serialized(new ShopLog.Sale(uniqueId, shop.sellPrice(), shop.quantity()))
                     .build();
 
             shop.logs().add(log);
-
-            api.repository().update(shop);
         } catch (Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
         }
@@ -184,16 +182,15 @@ public final class BukkitShopOperations implements ShopOperations {
         shop.stock(stock - amount);
 
         try {
+            api.repository().update(shop);
+
             final var log = api.repository()
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
                     .action(ShopLog.Action.WITHDRAW)
-                    .oldValue(Integer.toString(stock))
-                    .newValue(Integer.toString(shop.stock()))
+                    .serialized(new ShopLog.ValueChanged<>(Shop.Names.STOCK, stock, shop.stock()))
                     .build();
 
             shop.logs().add(log);
-
-            api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
         }
@@ -226,16 +223,15 @@ public final class BukkitShopOperations implements ShopOperations {
         shop.stock(stock + amount);
 
         try {
+            api.repository().update(shop);
+
             final var log = api.repository()
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
                     .action(ShopLog.Action.DEPOSIT)
-                    .oldValue(Integer.toString(stock))
-                    .newValue(Integer.toString(shop.stock()))
+                    .serialized(new ShopLog.ValueChanged<>(Shop.Names.STOCK, stock, shop.stock()))
                     .build();
 
             shop.logs().add(log);
-
-            api.repository().update(shop);
         } catch (final Exception e) {
             return new ShopOperationResult(false, Cause.OPERATION_FAILED);
         }

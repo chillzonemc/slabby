@@ -13,5 +13,6 @@ public final class SlabbyPermissions {
     public final String SHOP_IMPORT = BASE + ".shop.import";
     public final String SHOP_LINK = BASE + ".shop.link";
     public final String SHOP_NOTIFY = BASE + ".shop.notify";
+    public final String SHOP_LOGS = BASE + ".shop.logs";
 
 }

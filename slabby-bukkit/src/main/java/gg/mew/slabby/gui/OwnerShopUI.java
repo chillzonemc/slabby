@@ -27,7 +27,7 @@ public final class OwnerShopUI {
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
-        final var gui = Gui.empty(9, 1);
+        final var gui = Gui.empty(9, 2);
 
         gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
             meta.displayName(Component.text("Deposit '", NamedTextColor.GOLD)
@@ -85,6 +85,12 @@ public final class OwnerShopUI {
 
             return false;
         }));
+
+        api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LOGS, () -> {
+            gui.setItem(4, 1, new SimpleItem(GuiHelper.itemStack(Material.PAPER, (it, meta) -> {
+                meta.displayName(Component.text("Logs", NamedTextColor.GOLD));
+            }).get(), c -> ShopLogUI.open(api, shopOwner, shop)));
+        });
 
         gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
 
