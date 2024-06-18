@@ -1,28 +1,31 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.audit.Auditable;
+import lombok.experimental.FieldNameConstants;
+import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
 import java.util.UUID;
 
 public interface Shop extends Auditable {
 
-    class Names {
-        public static final String ITEM = "item";
-        public static final String X = "x";
-        public static final String Y = "y";
-        public static final String Z = "z";
-        public static final String WORLD = "world";
-        public static final String BUY_PRICE = "buyPrice";
-        public static final String SELL_PRICE = "sellPrice";
-        public static final String QUANTITY = "quantity";
-        public static final String STOCK = "stock";
-        public static final String NOTE = "note";
-        public static final String NAME = "name";
-        public static final String INVENTORY_X = "inventoryX";
-        public static final String INVENTORY_Y = "inventoryY";
-        public static final String INVENTORY_Z = "inventoryZ";
-        public static final String INVENTORY_WORLD = "inventoryWorld";
+    @UtilityClass
+    final class Names {
+        public final String ITEM = "item";
+        public final String X = "x";
+        public final String Y = "y";
+        public final String Z = "z";
+        public final String WORLD = "world";
+        public final String BUY_PRICE = "buyPrice";
+        public final String SELL_PRICE = "sellPrice";
+        public final String QUANTITY = "quantity";
+        public final String STOCK = "stock";
+        public final String NOTE = "note";
+        public final String NAME = "name";
+        public final String INVENTORY_X = "inventoryX";
+        public final String INVENTORY_Y = "inventoryY";
+        public final String INVENTORY_Z = "inventoryZ";
+        public final String INVENTORY_WORLD = "inventoryWorld";
     }
 
     String item();

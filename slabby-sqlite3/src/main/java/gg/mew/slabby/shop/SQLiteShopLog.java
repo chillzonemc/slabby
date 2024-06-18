@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.UUID;
 
 @DatabaseTable(tableName = "shop_logs", daoClass = AuditDao.class)
 @Builder
@@ -22,6 +23,9 @@ public final class SQLiteShopLog implements ShopLog {
 
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private SQLiteShop shop;
+
+    @DatabaseField(canBeNull = true)
+    private UUID uniqueId;
 
     @DatabaseField(canBeNull = false)
     private Action action;

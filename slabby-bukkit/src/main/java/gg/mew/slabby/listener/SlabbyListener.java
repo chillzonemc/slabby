@@ -4,7 +4,9 @@ import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
+import gg.mew.slabby.shop.log.LinkedInventoryChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,7 @@ public final class SlabbyListener implements Listener {
         } catch (final Exception e) {
             final var location = player.getLocation();
             api.sound().play(player.getUniqueId(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), Sounds.BLOCKED);
-            //TODO: notify player
+            //TODO: notify uniqueId
             return;
         }
 
@@ -83,7 +85,7 @@ public final class SlabbyListener implements Listener {
 
                     if (api.configuration().restock().punch().enabled()) {
                         if (api.configuration().restock().punch().shulker() && event.getItem() != null && event.getItem().getType() == Material.SHULKER_BOX) {
-                            //TODO: shulker, deposit operation only supports player inventory atm
+                            //TODO: shulker, deposit operation only supports uniqueId inventory atm
                         } else if (api.configuration().restock().punch().bulk())  {
                             final var item = Bukkit.getItemFactory().createItemStack(shop.item());
 
@@ -104,9 +106,7 @@ public final class SlabbyListener implements Listener {
                     }
                 });
 
-                if (api.operations().wizardExists(player.getUniqueId())) {
-                    final var wizard = api.operations().wizardFor(player.getUniqueId());
-
+                api.operations().ifWizard(player.getUniqueId(), wizard -> {
                     if (wizard.state() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
                         if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
                             try {
@@ -114,54 +114,62 @@ public final class SlabbyListener implements Listener {
 
                                 if (linkShopOpt.isPresent()) {
                                     final var shop = linkShopOpt.get();
+
                                     shop.inventory(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
                                     api.repository().update(shop);
+
+                                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                                            .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
+                                            .uniqueId(player.getUniqueId())
+                                            .serialized(new LinkedInventoryChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
+                                            .build();
+
+                                    shop.logs().add(log);
+
                                     api.sound().play(player.getUniqueId(), shop, Sounds.SUCCESS);
+                                    //TODO: message player
                                 }
                             } catch (final Exception e) {
-                                //TODO: notify player
+                                //TODO: notify uniqueId
                                 //TODO: if an inventory is already being used, it'll cause an exception here. we need to check an inventory isn't already linked.
                             }
-                            wizard.destroy();
+                            api.operations().wizards().remove(player.getUniqueId());
                         }
                     }
-                }
+                });
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClick(final InventoryClickEvent event) {
-        if (api.operations().wizardExists(event.getWhoClicked().getUniqueId())) {
-            final var wizard = api.operations().wizardFor(event.getWhoClicked().getUniqueId());
-
+        api.operations().ifWizard(event.getWhoClicked().getUniqueId(), wizard -> {
             if (wizard.state() == ShopWizard.WizardState.AWAITING_ITEM) {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
-                wizard.item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
-                wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+                wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION)
+                        .item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
 
                 ModifyShopUI.open(api, (Player) event.getWhoClicked(), wizard);
 
                 event.setCancelled(true);
             }
-        }
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClose(final InventoryCloseEvent event) {
         if (event.getReason() == InventoryCloseEvent.Reason.PLAYER) {
-            //TODO: while correct, this causes issues for chest linking, should the player open and close their inventory.
-            //TODO: rework wizard
-            api.operations().destroyWizard(event.getPlayer().getUniqueId());
+            api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
+                if (wizard.state() == ShopWizard.WizardState.AWAITING_CONFIRMATION)
+                    api.operations().wizards().remove(event.getPlayer().getUniqueId());
+            });
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onChatMessage(final AsyncChatEvent event) {
-        if (api.operations().wizardExists(event.getPlayer().getUniqueId())) {
-            final var wizard = api.operations().wizardFor(event.getPlayer().getUniqueId());
-
+        api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
             if (!wizard.state().awaitingTextInput())
                 return;
 
@@ -198,7 +206,7 @@ public final class SlabbyListener implements Listener {
             ModifyShopUI.open(api, event.getPlayer(), wizard);
 
             event.setCancelled(true);
-        }
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

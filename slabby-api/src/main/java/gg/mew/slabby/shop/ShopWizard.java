@@ -1,5 +1,10 @@
 package gg.mew.slabby.shop;
 
+import gg.mew.slabby.shop.log.ValueChanged;
+
+import java.util.Collection;
+import java.util.Map;
+
 @SuppressWarnings("UnusedReturnValue")
 public interface ShopWizard {
 
@@ -13,13 +18,11 @@ public interface ShopWizard {
     Double buyPrice();
     Double sellPrice();
     int quantity();
+    Map<ShopLog.Action, ValueChanged<?>> valueChanges();
 
     ShopWizard state(final WizardState state);
 
-    ShopWizard x(final int x);
-    ShopWizard y(final int y);
-    ShopWizard z(final int z);
-    ShopWizard world(final String world);
+    ShopWizard location(final int x, final int y, final int z, final String world);
 
     ShopWizard item(final String item);
     ShopWizard note(final String note);
@@ -27,22 +30,6 @@ public interface ShopWizard {
     ShopWizard buyPrice(final Double buyPrice);
     ShopWizard sellPrice(final Double sellPrice);
     ShopWizard quantity(final int quantity);
-
-    //TODO: could use a better design
-    default ShopWizard useExisting(final Shop shop) {
-        x(shop.x());
-        y(shop.y());
-        z(shop.z());
-        world(shop.world());
-        item(shop.item());
-        note(shop.note());
-        buyPrice(shop.buyPrice());
-        sellPrice(shop.sellPrice());
-        quantity(shop.quantity());
-        return this;
-    }
-
-    void destroy();
 
     enum WizardState {
         AWAITING_ITEM,

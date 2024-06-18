@@ -2,8 +2,11 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.permission.SlabbyPermissions;
+import gg.mew.slabby.shop.BukkitShopWizard;
 import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
+import gg.mew.slabby.shop.log.LinkedInventoryChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
@@ -87,9 +90,9 @@ public final class OwnerShopUI {
         }));
 
         api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LOGS, () -> {
-            gui.setItem(4, 1, new SimpleItem(GuiHelper.itemStack(Material.PAPER, (it, meta) -> {
+            gui.setItem(0, 1, new SimpleItem(GuiHelper.itemStack(Material.BOOK, (it, meta) -> {
                 meta.displayName(Component.text("Logs", NamedTextColor.GOLD));
-            }).get(), c -> ShopLogUI.open(api, shopOwner, shop)));
+            }).get(), c -> LogShopUI.open(api, shopOwner, shop)));
         });
 
         gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
@@ -103,10 +106,19 @@ public final class OwnerShopUI {
                     try {
                         shop.inventory(null, null, null, null);
                         api.repository().update(shop);
+
+                        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                                .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
+                                .uniqueId(shopOwner.getUniqueId())
+                                .serialized(new LinkedInventoryChanged(null, null, null, null))
+                                .build();
+
+                        shop.logs().add(log);
+
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
                         shopOwner.sendMessage(Component.text("Shop linking has been removed", NamedTextColor.GREEN));
                     } catch (final Exception ignored) {
-                        //TODO: notify player
+                        //TODO: notify uniqueId
                     }
                 }));
             } else {
@@ -116,9 +128,10 @@ public final class OwnerShopUI {
                         add(Component.text("Link a chest for refilling!", NamedTextColor.GREEN));
                     }});
                 }).get(), c -> {
-                    api.operations().wizardFor(shopOwner.getUniqueId())
-                            .useExisting(shop)
+                    api.operations()
+                            .wizardFrom(shopOwner.getUniqueId(), shop)
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
+
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
                     shopOwner.sendMessage(Component.text("Please crouch and punch the chest you want to link.", NamedTextColor.GREEN));
                     gui.closeForAllViewers();
@@ -131,7 +144,7 @@ public final class OwnerShopUI {
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
             meta.displayName(Component.text("Modify Shop", NamedTextColor.GOLD));
         }).get(), c -> {
-            ModifyShopUI.open(api, shopOwner, api.operations().wizardFor(shopOwner.getUniqueId()).useExisting(shop));
+            ModifyShopUI.open(api, shopOwner, api.operations().wizardFrom(shopOwner.getUniqueId(), shop));
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
         }));
 

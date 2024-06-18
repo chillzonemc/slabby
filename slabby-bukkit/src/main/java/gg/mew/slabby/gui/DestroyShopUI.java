@@ -37,7 +37,7 @@ public final class DestroyShopUI {
                 api.sound().play(shopOwner.getUniqueId(), shop, Sounds.DESTROY);
                 gui.closeForAllViewers();
             } catch (final Exception e) {
-                //TODO: explain to player what happened
+                //TODO: explain to uniqueId what happened
                 api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
             }
         }));

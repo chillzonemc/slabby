@@ -2,12 +2,16 @@ package gg.mew.slabby.shop;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public interface ShopOperations {
 
-    ShopWizard wizardFor(final UUID uniqueId);
-    boolean wizardExists(final UUID uniqueId);
-    void destroyWizard(final UUID uniqueId);
+    Map<UUID, ShopWizard> wizards();
+
+    ShopWizard wizard(final UUID uniqueId);
+    ShopWizard wizardFrom(final UUID uniqueId, final Shop shop);
+
+    void ifWizard(final UUID uniqueId, Consumer<ShopWizard> action);
 
     ShopOperationResult buy(final UUID uniqueId, final Shop shop);
     ShopOperationResult sell(final UUID uniqueId, final Shop shop);

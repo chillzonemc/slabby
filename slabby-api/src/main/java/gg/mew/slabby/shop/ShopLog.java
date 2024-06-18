@@ -2,6 +2,7 @@ package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyHelper;
 import gg.mew.slabby.audit.Auditable;
+import gg.mew.slabby.shop.log.*;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
@@ -9,22 +10,30 @@ import java.util.UUID;
 
 public interface ShopLog extends Auditable {
 
+    UUID uniqueId();
     Action action();
     String data();
 
     @Getter
     @Accessors(fluent = true, chain = false)
     enum Action {
-        PROPERTY_CHANGED(ValueChanged.class),
+        LOCATION_CHANGED(StringValueChanged.class),
+        BUY_PRICE_CHANGED(DoubleValueChanged.class),
+        SELL_PRICE_CHANGED(DoubleValueChanged.class),
+        QUANTITY_CHANGED(IntValueChanged.class),
+        NOTE_CHANGED(StringValueChanged.class),
+        NAME_CHANGED(StringValueChanged.class),
+
+        LINKED_INVENTORY_CHANGED(LinkedInventoryChanged.class),
 
         OWNER_ADDED(Void.class),
         OWNER_REMOVED(Void.class),
 
-        BUY(Sale.class),
-        SELL(Sale.class),
+        BUY(Transaction.class),
+        SELL(Transaction.class),
 
-        DEPOSIT(Sale.class),
-        WITHDRAW(Sale.class),
+        DEPOSIT(Transaction.class),
+        WITHDRAW(Transaction.class),
 
         SHOP_CREATED(Void.class),
         SHOP_DESTROYED(Void.class);
@@ -39,6 +48,7 @@ public interface ShopLog extends Auditable {
     interface Builder {
 
         Builder action(final Action action);
+        Builder uniqueId(final UUID uniqueId);
         Builder data(final String data);
         ShopLog build();
 
@@ -48,9 +58,4 @@ public interface ShopLog extends Auditable {
 
     }
 
-    //TODO: We can't use generics with serialization
-    record ValueChanged<T>(String name, T from, T to) {}
-
-    //TODO: Rename person -> player
-    record Sale(UUID person, double price, int quantity) {}
 }

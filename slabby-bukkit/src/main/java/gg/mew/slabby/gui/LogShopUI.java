@@ -3,8 +3,10 @@ package gg.mew.slabby.gui;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.audit.Auditable;
 import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.ShopLog;
-import lombok.SneakyThrows;
+import gg.mew.slabby.shop.log.IntValueChanged;
+import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.Transaction;
+import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
+import xyz.xenondevs.invui.item.Item;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
@@ -25,11 +28,10 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @UtilityClass
-public final class ShopLogUI {
+public final class LogShopUI {
 
     //TODO: category menu
 
-    @SneakyThrows
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var items = shop.logs().stream().sorted(Comparator.comparing(Auditable::createdOn, Comparator.reverseOrder())).map(it -> {
             final var item = new ItemStack(Material.PAPER);
@@ -38,27 +40,37 @@ public final class ShopLogUI {
             meta.displayName(Component.text(it.action().name(), NamedTextColor.GOLD));
 
             meta.lore(new ArrayList<>() {{
+                add(Component.text("Player: %s".formatted(Bukkit.getOfflinePlayer(it.uniqueId()).getName())));
+
                 switch (it.action()) {
                     case BUY, SELL -> {
-                        final var data = api.gson().fromJson(it.data(), ShopLog.Sale.class);
-                        add(Component.text("Player: %s".formatted(Bukkit.getOfflinePlayer(data.person()).getName())));
-                        add(Component.text("Price: %s".formatted(data.price())));
+                        final var data = api.gson().fromJson(it.data(), Transaction.class);
+                        add(Component.text("Price: $%s".formatted(data.price())));
                         add(Component.text("Quantity: %d".formatted(data.quantity())));
-                        add(Component.text("Total: %.2f".formatted(data.quantity() * data.price())));
                     }
                     case DEPOSIT -> {
-                        final var data = api.gson().fromJson(it.data(), ShopLog.ValueChanged.class);
-                        final var deposited = ((double)data.to()) - ((double)data.from());
+                        final var data = api.gson().fromJson(it.data(), IntValueChanged.class);
+                        final var deposited = data.to() - data.from();
                         add(Component.text("Deposited: %s".formatted(api.decimalFormat().format(deposited))));
                     }
                     case WITHDRAW -> {
-                        final var data = api.gson().fromJson(it.data(), ShopLog.ValueChanged.class);
-                        final var withdrew = ((double)data.from()) - ((double)data.to());
+                        final var data = api.gson().fromJson(it.data(), IntValueChanged.class);
+                        final var withdrew = data.from() - data.to();
                         add(Component.text("Withdrew: %s".formatted(api.decimalFormat().format(withdrew))));
                     }
-                    case PROPERTY_CHANGED -> {
-                        final var data = api.gson().fromJson(it.data(), ShopLog.ValueChanged.class);
-                        add(Component.text("Property: %s".formatted(data.name())));
+                    case LINKED_INVENTORY_CHANGED -> {
+                        final var data = api.gson().fromJson(it.data(), LinkedInventoryChanged.class);
+                        if (data.isRemoved()) {
+                            add(Component.text("Inventory Link removed"));
+                        } else {
+                            add(Component.text("X: %d".formatted(data.x())));
+                            add(Component.text("Y: %d".formatted(data.y())));
+                            add(Component.text("Z: %d".formatted(data.z())));
+                            add(Component.text("World: %s".formatted(data.world())));
+                        }
+                    }
+                    case LOCATION_CHANGED, BUY_PRICE_CHANGED, SELL_PRICE_CHANGED, QUANTITY_CHANGED, NOTE_CHANGED, NAME_CHANGED -> {
+                        final var data = (ValueChanged<?>) api.gson().fromJson(it.data(), it.action().dataClass());
                         add(Component.text("From: %s".formatted(data.from().toString())));
                         add(Component.text("To: %s".formatted(data.to().toString())));
                     }
@@ -70,11 +82,13 @@ public final class ShopLogUI {
 
             item.setItemMeta(meta);
 
-            return (xyz.xenondevs.invui.item.Item) new SimpleItem(item);
+            return (Item) new SimpleItem(item);
         }).collect(Collectors.toList());
 
         final var gui = PagedGui.items()
                 .setStructure(
+                        "X X X X X X X X X",
+                        "X X X X X X X X X",
                         "X X X X X X X X X",
                         "X X X X X X X X X",
                         "X X X X X X X X X",
