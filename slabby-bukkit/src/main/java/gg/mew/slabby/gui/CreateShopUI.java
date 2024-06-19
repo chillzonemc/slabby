@@ -28,13 +28,9 @@ public final class CreateShopUI {
 
         window.open();
 
-        final var wizard = api.operations().wizardFor(shopOwner.getUniqueId());
-
-        wizard.state(ShopWizard.WizardState.AWAITING_ITEM)
-                .x(block.getX())
-                .y(block.getY())
-                .z(block.getZ())
-                .world(block.getWorld().getName());
+        api.operations().wizard(shopOwner.getUniqueId())
+                .state(ShopWizard.WizardState.AWAITING_ITEM)
+                .location(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
     }
 
 }

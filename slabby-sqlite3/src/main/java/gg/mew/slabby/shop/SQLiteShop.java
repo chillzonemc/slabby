@@ -74,6 +74,9 @@ public final class SQLiteShop implements Shop {
     @ForeignCollectionField(eager = false)
     private ForeignCollection<SQLiteShopOwner> owners;
 
+    @ForeignCollectionField(eager = false)
+    private ForeignCollection<SQLiteShopLog> logs;
+
     @DatabaseField(canBeNull = false)
     private Date createdOn;
 
@@ -92,6 +95,12 @@ public final class SQLiteShop implements Shop {
     @Override
     public Collection<ShopOwner> owners() {
         return (Collection<ShopOwner>) (Collection<? extends ShopOwner>) this.owners;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<ShopLog> logs() {
+        return (Collection<ShopLog>) (Collection<? extends ShopLog>) this.logs;
     }
 
     @Override

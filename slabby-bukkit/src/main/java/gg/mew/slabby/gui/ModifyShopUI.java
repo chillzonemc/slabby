@@ -3,6 +3,7 @@ package gg.mew.slabby.gui;
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.shop.Shop;
+import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
@@ -85,6 +86,7 @@ public final class ModifyShopUI {
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.NETHER_STAR, (it, meta) -> {
             meta.displayName(Component.text("Confirm", NamedTextColor.GREEN));
             meta.lore(new ArrayList<>() {{
+                //TODO: not really new in this case
                 add(Component.text("New Shop", NamedTextColor.DARK_PURPLE));
                 add(Component.text(String.format("%s,%d,%d,%d", wizard.world(), wizard.x(), wizard.y(), wizard.z()), NamedTextColor.DARK_PURPLE));
             }});
@@ -98,6 +100,17 @@ public final class ModifyShopUI {
                         shop.sellPrice(wizard.sellPrice());
                         shop.quantity(wizard.quantity());
                         shop.note(wizard.note());
+
+                        for (final var entry : wizard.valueChanges().entrySet()) {
+                            final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                                    .action(entry.getKey())
+                                    .uniqueId(shopOwner.getUniqueId())
+                                    .serialized(entry.getValue())
+                                    .build();
+
+                            shop.logs().add(log);
+                        }
+
                         try {
                             api.repository().update(shop);
                         } catch (final Exception ignored) {}
@@ -126,19 +139,21 @@ public final class ModifyShopUI {
 
                     return null;
                 });
-                wizard.destroy();
+
+                api.operations().wizards().remove(shopOwner.getUniqueId());
+
                 gui.closeForAllViewers();
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
             } catch (final Exception e) {
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
-                //TODO: notify player
+                //TODO: notify uniqueId
             }
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
             meta.displayName(Component.text("Cancel", NamedTextColor.RED));
         }).get(), c -> {
-            wizard.destroy();
+            api.operations().wizards().remove(shopOwner.getUniqueId());
             gui.closeForAllViewers();
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.CANCEL);
         }));

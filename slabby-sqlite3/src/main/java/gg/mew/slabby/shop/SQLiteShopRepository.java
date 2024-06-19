@@ -11,7 +11,10 @@ import gg.mew.slabby.SlabbyAPI;
 
 import java.io.Closeable;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
@@ -22,6 +25,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
     private final Dao<SQLiteShop, Integer> shopDao;
     private final Dao<SQLiteShopOwner, Integer> shopOwnerDao;
+    private final Dao<SQLiteShopLog, Integer> shopLogDao;
 
     public SQLiteShopRepository(final SlabbyAPI api) throws SQLException {
         this.api = api;
@@ -30,6 +34,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
         this.shopDao = DaoManager.createDao(this.connectionSource, SQLiteShop.class);
         this.shopOwnerDao = DaoManager.createDao(this.connectionSource, SQLiteShopOwner.class);
+        this.shopLogDao = DaoManager.createDao(this.connectionSource, SQLiteShopLog.class);
 
         //TODO: when rendering client side items, this will be very useful
         // this.shopDao.setObjectCache(true);
@@ -38,6 +43,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     public void initialize() throws SQLException {
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShop.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
+        TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopLog.class);
     }
 
     //TODO: Verify data that goes to the database. Using SQL when possible, otherwise Dao.
@@ -61,6 +67,9 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
         if (builderType == ShopOwner.Builder.class)
             return (T) SQLiteShopOwner.builder();
+
+        if (builderType == ShopLog.Builder.class)
+            return (T) SQLiteShopLog.builder();
 
         throw new IllegalArgumentException();
     }
@@ -152,13 +161,13 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
-                    .eq("x", x)
+                    .eq(Shop.Names.X, x)
                     .and()
-                    .eq("y", y)
+                    .eq(Shop.Names.Y, y)
                     .and()
-                    .eq("z", z)
+                    .eq(Shop.Names.Z, z)
                     .and()
-                    .eq("world", world)
+                    .eq(Shop.Names.WORLD, world)
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {
@@ -172,13 +181,13 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
-                    .eq("inventoryX", x)
+                    .eq(Shop.Names.INVENTORY_X, x)
                     .and()
-                    .eq("inventoryY", y)
+                    .eq(Shop.Names.INVENTORY_Y, y)
                     .and()
-                    .eq("inventoryZ", z)
+                    .eq(Shop.Names.INVENTORY_Z, z)
                     .and()
-                    .eq("inventoryWorld", world)
+                    .eq(Shop.Names.INVENTORY_WORLD, world)
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {

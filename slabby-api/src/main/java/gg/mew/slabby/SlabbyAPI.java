@@ -1,5 +1,6 @@
 package gg.mew.slabby;
 
+import com.google.gson.Gson;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.Shop;
@@ -38,5 +39,7 @@ public interface SlabbyAPI {
     File directory();
 
     ExceptionService exceptionService();
+
+    Gson gson();
 
 }

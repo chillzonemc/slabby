@@ -1,8 +1,6 @@
 package gg.mew.slabby.dao;
 
-import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.support.ConnectionSource;
-import gg.mew.slabby.dao.AuditDao;
 import gg.mew.slabby.shop.SQLiteShop;
 
 import java.sql.SQLException;
@@ -24,21 +22,6 @@ public final class ShopDao extends AuditDao<SQLiteShop> {
     public int delete(Collection<SQLiteShop> datas) throws SQLException {
         datas.forEach(it -> it.owners().clear());
         return super.delete(datas);
-    }
-
-    @Override
-    public int delete(PreparedDelete<SQLiteShop> preparedDelete) throws SQLException {
-        return super.delete(preparedDelete);
-    }
-
-    @Override
-    public int deleteById(Integer integer) throws SQLException {
-        return super.deleteById(integer);
-    }
-
-    @Override
-    public int deleteIds(Collection<Integer> integers) throws SQLException {
-        return super.deleteIds(integers);
     }
 
 }
