@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import gg.mew.slabby.command.SlabbyCommand;
+import gg.mew.slabby.config.BukkitSlabbyMessages;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.listener.SlabbyListener;
@@ -77,6 +78,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private SlabbyConfig configuration;
 
+    @Getter
+    private BukkitSlabbyMessages messages;
+
     @Getter //TODO: Implement better.
     private final ExceptionService exceptionService = Throwable::printStackTrace;
 
@@ -86,14 +90,23 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-    private final YamlConfigurationLoader yaml = YamlConfigurationLoader.builder()
+    private final YamlConfigurationLoader configLoader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
+            .build();
+
+    private final YamlConfigurationLoader messagesLoader = YamlConfigurationLoader.builder()
+            .path(Path.of(getDataFolder().getAbsolutePath(), "messages.yml"))
             .build();
 
     @Getter
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
             .create();
+
+    @Override
+    public void reload() {
+        setupConfig();
+    }
 
     @Override
     public void onEnable() {
@@ -150,10 +163,12 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
         try {
             //TODO: Temp
             saveDefaultConfig();
+            final var configRoot = configLoader.load();
+            this.configuration = configRoot.get(BukkitSlabbyConfig.class);
 
-            final var root = yaml.load();
-
-            this.configuration = root.get(BukkitSlabbyConfig.class);
+            saveResource("messages.yml", false);
+            final var messagesRoot = messagesLoader.load();
+            this.messages = messagesRoot.get(BukkitSlabbyMessages.class);
         } catch (ConfigurateException e) {
             exceptionService().log(e);
             throw new RuntimeException(e);

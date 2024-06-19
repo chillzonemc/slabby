@@ -1,0 +1,61 @@
+# Messages for the client shop interface
+client:
+  # Title for a shops' client UI
+  title: '[Slabby] Client'
+  # Title for the sellers note
+  sellers-note: '<green>Sellers note</green>'
+  # Title for the current funds
+  current-funds-title: '<gold>Current funds</gold>'
+  # Current funds
+  current-funds-balance: '<dark_purple>Funds: $<balance:''#.##''></dark_purple>'
+  # Messages for shop client buy button
+  buy:
+    # Title for the buy button
+    title: '<gold>Buy ''<item>'' * <quantity></gold>'
+    # Price for the buy button
+    price: '<dark_purple>Buy for: $<price:''#.##''></dark_purple>'
+    # Stock for the buy button
+    stock: '<dark_purple>In stock: <stock></dark_purple>'
+    # Stacks for the buy button
+    stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
+    # Success buy message
+    message: '<green>Bought <quantity> <item> for a total of $<price:''#.##''></green>'
+  # Messages for shop client sell button
+  sell:
+    # Title for the sell button
+    title: '<gold>Sell ''<item>'' * <quantity></gold>'
+    # Price for the sell button
+    price: '<dark_purple>Sell for: $<price:''#.##''></dark_purple>'
+    # Stock for the sell button
+    stock: '<dark_purple>In stock: <stock></dark_purple>'
+    # Stacks for the sell button
+    stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
+    # Success sell message
+    message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
+# Messages for the create shop interface
+create:
+  # Title for the create shop UI
+  title: '[Slabby] Create Shop'
+# Messages for the destroy shop interface
+destroy:
+  # Title for the destroy shop UI
+  title: '[Slabby] Destroy Shop'
+  # Title for the destroy shop button
+  confirm: '<green>Destroy Shop</green>'
+  # Warning text for the destroy shop button
+  confirm-warning: '<red>This will destroy your items.</red>'
+  # Title for the cancel button
+  cancel: '<red>Cancel</red>'
+
+# Messages for the command block interface item
+command-block:
+  # Title for the command block item
+  title: '<gold>Slabby Shop</gold>'
+  # Owners of the shop
+  owners: '<green>Owned by <names></green>'
+  # Item being sold
+  selling: '<dark_purple>Selling: <item></dark_purple>'
+  # Buy price of the item being sold
+  buy-price: '<dark_purple>Buy <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'
+  # Sell price of the item being sold
+  sell-price: '<dark_purple>Sell <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'
