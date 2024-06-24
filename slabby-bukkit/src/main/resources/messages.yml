@@ -46,7 +46,10 @@ destroy:
   confirm-warning: '<red>This will destroy your items.</red>'
   # Title for the cancel button
   cancel: '<red>Cancel</red>'
-
+# Messages for the shop logs interface
+log:
+  # Title for the shop logs interface
+  title: '[Slabby] Logs'
 # Messages for the command block interface item
 command-block:
   # Title for the command block item

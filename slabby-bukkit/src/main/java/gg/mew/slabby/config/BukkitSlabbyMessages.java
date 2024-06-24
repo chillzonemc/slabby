@@ -1,5 +1,6 @@
 package gg.mew.slabby.config;
 
+import gg.mew.slabby.shop.ShopLog;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
@@ -25,6 +26,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
     @Comment("Messages for the command block interface item")
     private BukkitCommandBlock commandBlock;
+
+    @Comment("Messages for the shop logs interface")
+    private BukkitLog log;
 
     @ConfigSerializable
     @Accessors(fluent = true, chain = false)
@@ -263,6 +267,18 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component cancel() {
             return MiniMessage.miniMessage().deserialize(this.cancel);
+        }
+    }
+
+    @ConfigSerializable
+    final static class BukkitLog implements Log {
+
+        @Comment("Title for the shop logs interface")
+        private String title;
+
+        @Override
+        public Component title() {
+            return MiniMessage.miniMessage().deserialize(this.title);
         }
     }
 

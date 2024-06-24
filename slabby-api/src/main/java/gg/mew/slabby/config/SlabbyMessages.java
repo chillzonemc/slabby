@@ -7,6 +7,7 @@ public interface SlabbyMessages {
     Client client();
     Create create();
     Destroy destroy();
+    Log log();
 
     CommandBlock commandBlock();
 
@@ -53,6 +54,10 @@ public interface SlabbyMessages {
         Component confirm();
         Component confirmWarning();
         Component cancel();
+    }
+
+    interface Log {
+        Component title();
     }
 
 }

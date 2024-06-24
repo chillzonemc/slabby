@@ -4,7 +4,7 @@ import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.audit.Auditable;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.log.IntValueChanged;
-import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.shop.log.Transaction;
 import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.experimental.UtilityClass;
@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
 import xyz.xenondevs.invui.item.Item;
@@ -58,8 +59,8 @@ public final class LogShopUI {
                         final var withdrew = data.from() - data.to();
                         add(Component.text("Withdrew: %s".formatted(api.decimalFormat().format(withdrew))));
                     }
-                    case LINKED_INVENTORY_CHANGED -> {
-                        final var data = api.gson().fromJson(it.data(), LinkedInventoryChanged.class);
+                    case LINKED_INVENTORY_CHANGED, LOCATION_CHANGED -> {
+                        final var data = api.gson().fromJson(it.data(), LocationChanged.class);
                         if (data.isRemoved()) {
                             add(Component.text("Inventory Link removed"));
                         } else {
@@ -69,7 +70,7 @@ public final class LogShopUI {
                             add(Component.text("World: %s".formatted(data.world())));
                         }
                     }
-                    case LOCATION_CHANGED, BUY_PRICE_CHANGED, SELL_PRICE_CHANGED, QUANTITY_CHANGED, NOTE_CHANGED, NAME_CHANGED -> {
+                    case BUY_PRICE_CHANGED, SELL_PRICE_CHANGED, QUANTITY_CHANGED, NOTE_CHANGED, NAME_CHANGED -> {
                         final var data = (ValueChanged<?>) api.gson().fromJson(it.data(), it.action().dataClass());
                         add(Component.text("From: %s".formatted(data.from().toString())));
                         add(Component.text("To: %s".formatted(data.to().toString())));
@@ -111,7 +112,7 @@ public final class LogShopUI {
 
         final var window = Window.single()
                 .setViewer(shopOwner)
-                .setTitle("[Slabby] Logs")
+                .setTitle(new AdventureComponentWrapper(api.messages().log().title()))
                 .setGui(gui)
                 .build();
 
