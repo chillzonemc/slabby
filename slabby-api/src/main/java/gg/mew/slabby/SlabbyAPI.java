@@ -1,9 +1,9 @@
 package gg.mew.slabby;
 
 import com.google.gson.Gson;
+import gg.mew.slabby.config.SlabbyMessages;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
-import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopRepository;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
@@ -14,7 +14,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
 
 public interface SlabbyAPI {
 
@@ -34,6 +33,7 @@ public interface SlabbyAPI {
 
     Date legacyNow();
 
+    @Deprecated
     DecimalFormat decimalFormat();
 
     File directory();
@@ -41,5 +41,9 @@ public interface SlabbyAPI {
     ExceptionService exceptionService();
 
     Gson gson();
+
+    SlabbyMessages messages();
+
+    void reload();
 
 }

@@ -6,7 +6,7 @@ import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
-import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
@@ -121,7 +121,7 @@ public final class SlabbyListener implements Listener {
                                     final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
                                             .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
                                             .uniqueId(player.getUniqueId())
-                                            .serialized(new LinkedInventoryChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
+                                            .serialized(new LocationChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
                                             .build();
 
                                     shop.logs().add(log);

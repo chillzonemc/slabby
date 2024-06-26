@@ -2,11 +2,10 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.permission.SlabbyPermissions;
-import gg.mew.slabby.shop.BukkitShopWizard;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
-import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
@@ -110,7 +109,7 @@ public final class OwnerShopUI {
                         final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
                                 .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
                                 .uniqueId(shopOwner.getUniqueId())
-                                .serialized(new LinkedInventoryChanged(null, null, null, null))
+                                .serialized(new LocationChanged(null, null, null, null))
                                 .build();
 
                         shop.logs().add(log);

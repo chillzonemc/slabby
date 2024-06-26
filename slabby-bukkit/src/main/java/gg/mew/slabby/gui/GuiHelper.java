@@ -48,26 +48,25 @@ public final class GuiHelper {
 
     public SimpleItem commandBlock(final SlabbyAPI api, final Shop shop, final ItemStack itemStack) {
         return new SimpleItem(itemStack(Material.COMMAND_BLOCK, (it, meta) -> {
-            meta.displayName(Component.text("Slabby Shop", NamedTextColor.GOLD));
+            meta.displayName(api.messages().commandBlock().title());
 
-            final var owners = shop.owners().stream().map(o -> Bukkit.getOfflinePlayer(o.uniqueId()).getName()).toArray(String[]::new);
+            final var owners = shop.owners()
+                    .stream()
+                    .map(o -> Bukkit.getOfflinePlayer(o.uniqueId()).getName())
+                    .toArray(String[]::new);
 
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("Owned by %s", String.join(", ", owners)), NamedTextColor.GREEN));
-                add(Component.text("Selling: ", NamedTextColor.DARK_PURPLE).append(itemStack.displayName()));
+                add(api.messages().commandBlock().owners(owners));
+                add(api.messages().commandBlock().selling(itemStack.displayName()));
 
                 if (shop.buyPrice() != null) {
-                    final var buyPrice = api.decimalFormat().format(shop.buyPrice());
-                    final var buyPriceEach = shop.buyPrice() == 0 ? "0" : api.decimalFormat().format(shop.buyPrice() / shop.quantity());
-
-                    add(Component.text(String.format("Buy %d for $%s ($%s each)", shop.quantity(), buyPrice, buyPriceEach), NamedTextColor.DARK_PURPLE));
+                    final var buyPriceEach = shop.buyPrice() == 0 ? 0 : shop.buyPrice() / shop.quantity();
+                    add(api.messages().commandBlock().buyPrice(shop.quantity(), shop.buyPrice(), buyPriceEach));
                 }
 
                 if (shop.sellPrice() != null) {
-                    final var sellPrice = api.decimalFormat().format(shop.sellPrice());
-                    final var sellPriceEach = shop.sellPrice() == 0 ? "0" : api.decimalFormat().format(shop.sellPrice() / shop.quantity());
-
-                    add(Component.text(String.format("Sell %d for $%s ($%s each)", shop.quantity(), sellPrice, sellPriceEach), NamedTextColor.DARK_PURPLE));
+                    final var sellPriceEach = shop.sellPrice() == 0 ? 0 : shop.sellPrice() / shop.quantity();
+                    add(api.messages().commandBlock().sellPrice(shop.quantity(), shop.sellPrice(), sellPriceEach));
                 }
             }});
         }).get());

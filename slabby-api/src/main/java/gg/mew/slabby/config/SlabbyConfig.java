@@ -64,10 +64,7 @@ public interface SlabbyConfig {
 
     enum DisplayMode {
 
-        QUANTITY,
-        STACK,
-        SINGLE,
-        NONE
+        QUANTITY, STACK, SINGLE, NONE
 
     }
 }
