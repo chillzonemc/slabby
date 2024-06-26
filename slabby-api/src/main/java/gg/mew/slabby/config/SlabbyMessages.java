@@ -8,6 +8,7 @@ public interface SlabbyMessages {
     Create create();
     Destroy destroy();
     Log log();
+    Modify modify();
 
     CommandBlock commandBlock();
 
@@ -58,6 +59,21 @@ public interface SlabbyMessages {
 
     interface Log {
         Component title();
+    }
+
+    interface Modify {
+        Component title();
+        Component sellersNote();
+        Component requestNote();
+        Component requestBuyPrice();
+        Component requestSellPrice();
+        Component buyPriceTitle();
+        Component buyPriceAmount(final double amount);
+        Component clickToSet();
+        Component notForSale();
+        Component notBuying();
+        Component sellPriceTitle();
+        Component sellPriceAmount(final double amount);
     }
 
 }

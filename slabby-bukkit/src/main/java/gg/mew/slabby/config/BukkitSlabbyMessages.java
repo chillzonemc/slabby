@@ -30,6 +30,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     @Comment("Messages for the shop logs interface")
     private BukkitLog log;
 
+    @Comment("Messages for the modify shop interface")
+    private BukkitModify modify;
+
     @ConfigSerializable
     @Accessors(fluent = true, chain = false)
     @Getter
@@ -279,6 +282,106 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component title() {
             return MiniMessage.miniMessage().deserialize(this.title);
+        }
+    }
+
+    @ConfigSerializable
+    final static class BukkitModify implements Modify {
+
+        @Comment("Title for the shop modify interface")
+        private String title;
+
+        @Comment("Title for the sellers note item")
+        private String sellersNote;
+
+        @Comment("Message for requesting a note")
+        private String requestNote;
+
+        @Comment("Message for requesting a buy price")
+        private String requestBuyPrice;
+
+        @Comment("Message for requesting a sell price")
+        private String requestSellPrice;
+
+        @Comment("Title for the buy price button")
+        private String buyPriceTitle;
+
+        @Comment("Format for the current buy price amount")
+        private String buyPriceAmount;
+
+        @Comment("Format for click to set")
+        private String clickToSet;
+
+        @Comment("Format for not for sale")
+        private String notForSale;
+
+        @Comment("Format for not buying")
+        private String notBuying;
+
+        @Comment("Title for the sell price button")
+        private String sellPriceTitle;
+
+        @Comment("Format for the current sell price amount")
+        private String sellPriceAmount;
+
+        @Override
+        public Component title() {
+            return MiniMessage.miniMessage().deserialize(this.title);
+        }
+
+        @Override
+        public Component sellersNote() {
+            return MiniMessage.miniMessage().deserialize(this.sellersNote);
+        }
+
+        @Override
+        public Component requestNote() {
+            return MiniMessage.miniMessage().deserialize(this.requestNote);
+        }
+
+        @Override
+        public Component requestBuyPrice() {
+            return MiniMessage.miniMessage().deserialize(this.requestBuyPrice);
+        }
+
+        @Override
+        public Component requestSellPrice() {
+            return MiniMessage.miniMessage().deserialize(this.requestSellPrice);
+        }
+
+        @Override
+        public Component buyPriceTitle() {
+            return MiniMessage.miniMessage().deserialize(this.buyPriceTitle);
+        }
+
+        @Override
+        public Component buyPriceAmount(final double amount) {
+            return MiniMessage.miniMessage().deserialize(this.buyPriceAmount, Formatter.number("amount", amount));
+        }
+
+        @Override
+        public Component clickToSet() {
+            return MiniMessage.miniMessage().deserialize(this.clickToSet);
+        }
+
+        @Override
+        public Component notForSale() {
+            return MiniMessage.miniMessage().deserialize(this.notForSale);
+        }
+
+        @Override
+        public Component notBuying() {
+            return MiniMessage.miniMessage().deserialize(this.notBuying);
+        }
+
+        @Override
+        public Component sellPriceTitle() {
+            return MiniMessage.miniMessage().deserialize(this.sellPriceTitle);
+        }
+
+        @Override
+        public Component sellPriceAmount(double amount) {
+            return MiniMessage.miniMessage().deserialize(this.sellPriceAmount, Formatter.number("amount", amount));
         }
     }
 

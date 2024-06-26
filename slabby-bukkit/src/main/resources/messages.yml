@@ -50,6 +50,33 @@ destroy:
 log:
   # Title for the shop logs interface
   title: '[Slabby] Logs'
+# Messages for the modify shop interface
+modify:
+  # Title for the shop modify interface
+  title: '[Slabby] Editing Shop'
+  # Title for the sellers note item
+  sellers-note: '<green>Sellers note</green>'
+  # Message for requesting a note
+  request-note: 'Please enter your note.'
+  # Message for requesting a buy price
+  request-buy-price: 'Please enter your buy price.'
+  # Message for requesting a sell price
+  request-sell-price: 'Please enter your sell price.'
+  # Title for the buy price button
+  buy-price-title: '<green>Buy price</green>'
+  # Format for the current buy price amount
+  buy-price-amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
+  # Format for click to set
+  click-to-set: '<dark_purple>Click to set</dark_purple>'
+  # Format for not for sale
+  not-for-sale: '<dark_purple>(-1 means not for sale)</dark_purple>'
+  # Format for not buying
+  not-buying: '<dark_purple>(-1 means not buying)</dark_purple>'
+  # Title for the sell price button
+  sell-price-title: '<red>Sell price</red>'
+  # Format for the current sell price amount
+  sell-price-amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
+
 # Messages for the command block interface item
 command-block:
   # Title for the command block item
