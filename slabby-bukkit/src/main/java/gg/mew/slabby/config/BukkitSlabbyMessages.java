@@ -1,6 +1,5 @@
 package gg.mew.slabby.config;
 
-import gg.mew.slabby.shop.ShopLog;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import net.kyori.adventure.text.Component;
@@ -303,6 +302,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Comment("Message for requesting a sell price")
         private String requestSellPrice;
 
+        @Comment("Message for requesting a quantity")
+        private String requestQuantity;
+
         @Comment("Title for the buy price button")
         private String buyPriceTitle;
 
@@ -323,6 +325,27 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @Comment("Format for the current sell price amount")
         private String sellPriceAmount;
+
+        @Comment("Format for the quantity button")
+        private String quantityTitle;
+
+        @Comment("Format for amount per transaction")
+        private String amountPerTransaction;
+
+        @Comment("Format for amount per transaction description")
+        private String amountPerTransactionDescription;
+
+        @Comment("Title for the confirm button")
+        private String confirmTitle;
+
+        @Comment("Format for the save shop description")
+        private String confirmDescription;
+
+        @Comment("Format for the location")
+        private String confirmLocation;
+
+        @Comment("Title for the cancel button")
+        private String cancelTitle;
 
         @Override
         public Component title() {
@@ -380,8 +403,53 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         @Override
-        public Component sellPriceAmount(double amount) {
+        public Component sellPriceAmount(final double amount) {
             return MiniMessage.miniMessage().deserialize(this.sellPriceAmount, Formatter.number("amount", amount));
+        }
+
+        @Override
+        public Component quantityTitle() {
+            return MiniMessage.miniMessage().deserialize(this.quantityTitle);
+        }
+
+        @Override
+        public Component amountPerTransaction(final int quantity) {
+            return MiniMessage.miniMessage().deserialize(this.amountPerTransaction, Formatter.number("quantity", quantity));
+        }
+
+        @Override
+        public Component amountPerTransactionDescription() {
+            return MiniMessage.miniMessage().deserialize(this.amountPerTransactionDescription);
+        }
+
+        @Override
+        public Component requestQuantity() {
+            return MiniMessage.miniMessage().deserialize(this.requestQuantity);
+        }
+
+        @Override
+        public Component confirmTitle() {
+            return MiniMessage.miniMessage().deserialize(this.confirmTitle);
+        }
+
+        @Override
+        public Component confirmDescription() {
+            return MiniMessage.miniMessage().deserialize(this.confirmDescription);
+        }
+
+        @Override
+        public Component confirmLocation(final String world, final int x, final int y, final int z) {
+            return MiniMessage.miniMessage().deserialize(this.confirmLocation,
+                    Placeholder.unparsed("world", world),
+                    Formatter.number("x", x),
+                    Formatter.number("y", y),
+                    Formatter.number("z", z)
+            );
+        }
+
+        @Override
+        public Component cancelTitle() {
+            return MiniMessage.miniMessage().deserialize(this.cancelTitle);
         }
     }
 

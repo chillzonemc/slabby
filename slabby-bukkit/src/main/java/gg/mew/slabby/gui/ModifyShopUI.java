@@ -72,25 +72,24 @@ public final class ModifyShopUI {
         }));
 
         gui.setItem(5, 0, new SimpleItem(itemStack(Material.YELLOW_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(Component.text("Quantity", NamedTextColor.YELLOW));
+            meta.displayName(api.messages().modify().quantityTitle());
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("Amount per transaction: %d", wizard.quantity()), NamedTextColor.DARK_PURPLE));
-                add(Component.text("Click to set", NamedTextColor.DARK_PURPLE));
-                add(Component.text("(Amount of items per buy/sell)", NamedTextColor.DARK_PURPLE));
+                add(api.messages().modify().amountPerTransaction(wizard.quantity()));
+                add(api.messages().modify().clickToSet());
+                add(api.messages().modify().amountPerTransactionDescription());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_QUANTITY);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(Component.text("Please enter your quantity."));
+            shopOwner.sendMessage(api.messages().modify().requestQuantity());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.NETHER_STAR, (it, meta) -> {
-            meta.displayName(Component.text("Confirm", NamedTextColor.GREEN));
+            meta.displayName(api.messages().modify().confirmTitle());
             meta.lore(new ArrayList<>() {{
-                //TODO: not really new in this case
-                add(Component.text("New Shop", NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("%s,%d,%d,%d", wizard.world(), wizard.x(), wizard.y(), wizard.z()), NamedTextColor.DARK_PURPLE));
+                add(api.messages().modify().confirmDescription());
+                add(api.messages().modify().confirmLocation(wizard.world(), wizard.x(), wizard.y(), wizard.z()));
             }});
         }).get(), c -> {
             try {
@@ -153,7 +152,7 @@ public final class ModifyShopUI {
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
-            meta.displayName(Component.text("Cancel", NamedTextColor.RED));
+            meta.displayName(api.messages().modify().cancelTitle());
         }).get(), c -> {
             api.operations().wizards().remove(shopOwner.getUniqueId());
             gui.closeForAllViewers();

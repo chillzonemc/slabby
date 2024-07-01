@@ -67,6 +67,7 @@ public interface SlabbyMessages {
         Component requestNote();
         Component requestBuyPrice();
         Component requestSellPrice();
+        Component requestQuantity();
         Component buyPriceTitle();
         Component buyPriceAmount(final double amount);
         Component clickToSet();
@@ -74,6 +75,13 @@ public interface SlabbyMessages {
         Component notBuying();
         Component sellPriceTitle();
         Component sellPriceAmount(final double amount);
+        Component quantityTitle();
+        Component amountPerTransaction(final int quantity);
+        Component amountPerTransactionDescription();
+        Component confirmTitle();
+        Component confirmDescription();
+        Component confirmLocation(final String world, final int x, final int y, final int z);
+        Component cancelTitle();
     }
 
 }
