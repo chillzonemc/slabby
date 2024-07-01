@@ -31,12 +31,20 @@ public interface SlabbyMessages {
             Component message(final Component displayName, final int quantity, final double sellPrice);
         }
 
+        interface Funds {
+            Component title();
+            Component balance(final double balance);
+        }
+
+        interface SellersNote {
+            Component title();
+        }
+
         Buy buy();
         Sell sell();
+        Funds funds();
         Component title();
-        Component sellersNote();
-        Component currentFundsTitle();
-        Component currentFundsBalance(final double balance);
+        SellersNote sellersNote();
     }
 
     interface CommandBlock {
@@ -60,6 +68,7 @@ public interface SlabbyMessages {
 
     interface Log {
         Component title();
+        Component player(final Component displayName);
     }
 
     interface Modify {

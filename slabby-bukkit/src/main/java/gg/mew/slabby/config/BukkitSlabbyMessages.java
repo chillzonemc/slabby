@@ -134,42 +134,55 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
+        @ConfigSerializable
+        final static class BukkitFunds implements Funds {
+
+            @Comment("Title for the current funds")
+            private String title;
+
+            @Comment("Current funds")
+            private String balance;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component balance(final double balance) {
+                return MiniMessage.miniMessage().deserialize(this.balance, Formatter.number("balance", balance));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitSellersNote implements SellersNote {
+            @Comment("Title for the sellers note")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
+
         @Comment("Messages for shop client buy button")
         private BukkitBuy buy;
 
         @Comment("Messages for shop client sell button")
         private BukkitSell sell;
 
+        @Comment("Messages for shop client funds button")
+        private BukkitFunds funds;
+
+        @Comment("Messages for shop client sellers note button")
+        private BukkitSellersNote sellersNote;
+
         @Comment("Title for shop client interface")
         private String title;
-
-        @Comment("Title for the sellers note")
-        private String sellersNote;
-
-        @Comment("Title for the current funds")
-        private String currentFundsTitle;
-
-        @Comment("Current funds")
-        private String currentFundsBalance;
 
         @Override
         public Component title() {
             return MiniMessage.miniMessage().deserialize(this.title);
-        }
-
-        @Override
-        public Component sellersNote() {
-            return MiniMessage.miniMessage().deserialize(this.sellersNote);
-        }
-
-        @Override
-        public Component currentFundsTitle() {
-            return MiniMessage.miniMessage().deserialize(this.currentFundsTitle);
-        }
-
-        @Override
-        public Component currentFundsBalance(final double balance) {
-            return MiniMessage.miniMessage().deserialize(this.currentFundsBalance, Formatter.number("balance", balance));
         }
 
     }
@@ -281,9 +294,17 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Comment("Title for the shop logs interface")
         private String title;
 
+        @Comment("Format for the player name")
+        private String player;
+
         @Override
         public Component title() {
             return MiniMessage.miniMessage().deserialize(this.title);
+        }
+
+        @Override
+        public Component player(final Component displayName) {
+            return MiniMessage.miniMessage().deserialize(this.player, Placeholder.component("player", displayName));
         }
     }
 

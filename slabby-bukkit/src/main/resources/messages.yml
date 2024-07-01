@@ -2,12 +2,16 @@
 client:
   # Title for a shops' client UI
   title: '[Slabby] Client'
-  # Title for the sellers note
-  sellers-note: '<green>Sellers note</green>'
-  # Title for the current funds
-  current-funds-title: '<gold>Current funds</gold>'
-  # Current funds
-  current-funds-balance: '<dark_purple>Funds: $<balance:''#.##''></dark_purple>'
+  # Messages for shop client sellers note button
+  sellers-note:
+    # Title for the sellers note
+    title: '<green>Sellers note</green>'
+  # Messages for shop client funds button
+  funds:
+    # Title for the current funds
+    title: '<gold>Current funds</gold>'
+    #
+    balance: '<dark_purple>Funds: $<balance:''#.##''></dark_purple>'
   # Messages for shop client buy button
   buy:
     # Title for the buy button
@@ -50,6 +54,9 @@ destroy:
 log:
   # Title for the shop logs interface
   title: '[Slabby] Logs'
+  # Format for the player name
+  player: '<dark_purple>Player: <player></dark_purple>'
+
 # Messages for the modify shop interface
 modify:
   # Title for the shop modify interface

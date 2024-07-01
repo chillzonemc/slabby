@@ -77,16 +77,16 @@ public final class ClientShopUI {
         gui.setItem(4, 0, new SimpleItem(item));
 
         gui.setItem(6, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
-            meta.displayName(api.messages().client().sellersNote());
+            meta.displayName(api.messages().client().sellersNote().title());
             meta.lore(new ArrayList<>() {{
                 add(Component.text(shop.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get()));
 
         gui.setItem(7, 0, new AutoUpdateItem(20, itemStack(Material.PAPER, (it, meta) -> {
-            meta.displayName(api.messages().client().currentFundsTitle());
+            meta.displayName(api.messages().client().funds().title());
             meta.lore(new ArrayList<>() {{
-                add(api.messages().client().currentFundsBalance(api.economy().balance(client.getUniqueId())));
+                add(api.messages().client().funds().balance(api.economy().balance(client.getUniqueId())));
             }});
         })));
 

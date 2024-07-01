@@ -41,7 +41,8 @@ public final class LogShopUI {
             meta.displayName(Component.text(it.action().name(), NamedTextColor.GOLD));
 
             meta.lore(new ArrayList<>() {{
-                add(Component.text("Player: %s".formatted(Bukkit.getOfflinePlayer(it.uniqueId()).getName())));
+                //TODO: I'm assuming I can use getPlayer if the player is offline, as long as they have logged on the server before
+                add(api.messages().log().player(Bukkit.getOfflinePlayer(it.uniqueId()).getPlayer().displayName()));
 
                 switch (it.action()) {
                     case BUY, SELL -> {
