@@ -9,6 +9,7 @@ public interface SlabbyMessages {
     Destroy destroy();
     Log log();
     Modify modify();
+    Owner owner();
 
     CommandBlock commandBlock();
 
@@ -82,6 +83,26 @@ public interface SlabbyMessages {
         Component confirmDescription();
         Component confirmLocation(final String world, final int x, final int y, final int z);
         Component cancelTitle();
+    }
+
+    interface Owner {
+        Component title();
+        Component depositTitle(final Component displayName);
+        Component shiftBulkDeposit();
+        Component inStock(final int stock);
+        Component stacks(final int stacks);
+        Component withdrawTitle(final Component displayName);
+        Component shiftBulkWithdraw();
+        Component changeRateTitle();
+        Component amountPerClick(final int amount);
+        Component logsTitle();
+        Component cancelChestLinkTitle();
+        Component cancelChestLinkingMessage();
+        Component chestLinkTitle();
+        Component chestLinkDescription();
+        Component chestLinkMessage();
+        Component modifyShopTitle();
+        Component viewAsCustomerTitle();
     }
 
 }

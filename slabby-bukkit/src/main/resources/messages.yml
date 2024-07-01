@@ -92,6 +92,42 @@ modify:
   confirm-location: '<dark_purple><world>, <x>, <y>, <z></dark_purple>'
   # Title for the cancel button
   cancel-title: '<red>Cancel</red>'
+# Messages for the owner shop interface
+owner:
+  # Title for the shop owner interface
+  title: '[Slabby] Owner'
+  # Title for the shop deposit button
+  deposit-title: '<gold>Deposit ''<item>''</gold>'
+  # Format for the shift bulk deposit message
+  shift-bulk-deposit: '<dark_purple>+Shift for bulk deposit</dark_purple>'
+  # Format for the in stock message
+  in-stock: '<dark_purple>In stock <stock></dark_purple>'
+  # Format for the stacks message
+  stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
+  # Title for the shop withdraw button
+  withdraw-title: '<gold>Withdraw ''<item>''</gold>'
+  # Format for the shift bulk withdraw message
+  shift-bulk-withdraw: '<dark_purple>+Shift for bulk withdraw</dark_purple>'
+  # Title for the change rate button
+  change-rate-title: '<gold>Change rate</gold>'
+  # Format for the amount per click message
+  amount-per-click: '<dark_purple>Amount per click: <amount><dark_purple>'
+  # Title for the shop logs button
+  logs-title: '<gold>Logs</gold>'
+  # Title for the cancel chest link button
+  cancel-chest-link-title: '<gold>Cancel chest link</gold>'
+  # Format for the cancel chest linking message
+  cancel-chest-link-message: '<green>Shop linking has been removed</green>'
+  # Title for the chest link button
+  chest-link-title: '<gold>Link chest</gold>'
+  # Format for the chest link description
+  chest-link-description: '<green>Link a chest for refilling!</green>'
+  # Format for the chest link message
+  chest-link-message: '<green>Please crouch and punch the chest you want to link.</green>'
+  # Title for the modify shop button
+  modify-shop-title: '<gold>Modify Shop</gold>'
+  # Title for the view as customer button
+  view-as-customer-title: '<gold>View as customer</gold>'
 # Messages for the command block interface item
 command-block:
   # Title for the command block item
