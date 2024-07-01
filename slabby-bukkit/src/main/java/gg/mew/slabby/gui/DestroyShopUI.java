@@ -28,9 +28,9 @@ public final class DestroyShopUI {
         final var gui = Gui.empty(9, 1);
 
         gui.setItem(3, 0, new SimpleItem(itemStack(Material.GREEN_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(api.messages().destroy().confirm());
+            meta.displayName(api.messages().destroy().confirm().title());
             meta.lore(new ArrayList<>() {{
-                add(api.messages().destroy().confirmWarning());
+                add(api.messages().destroy().confirm().description());
             }});
         }).get(), c -> {
             try {
@@ -46,7 +46,7 @@ public final class DestroyShopUI {
         gui.setItem(4, 0, commandBlock(api, shop, itemStack));
 
         gui.setItem(5, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
-            meta.displayName(api.messages().destroy().cancel());
+            meta.displayName(api.messages().destroy().cancel().title());
         }).get(), c -> {
             gui.closeForAllViewers();
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.CANCEL);

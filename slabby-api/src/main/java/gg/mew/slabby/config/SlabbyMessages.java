@@ -60,10 +60,19 @@ public interface SlabbyMessages {
     }
 
     interface Destroy {
+
+        interface Confirm {
+            Component title();
+            Component description();
+        }
+
+        interface Cancel {
+            Component title();
+        }
+
         Component title();
-        Component confirm();
-        Component confirmWarning();
-        Component cancel();
+        Confirm confirm();
+        Cancel cancel();
     }
 
     interface Log {

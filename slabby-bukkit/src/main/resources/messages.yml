@@ -44,12 +44,16 @@ create:
 destroy:
   # Title for the destroy shop UI
   title: '[Slabby] Destroy Shop'
-  # Title for the destroy shop button
-  confirm: '<green>Destroy Shop</green>'
-  # Warning text for the destroy shop button
-  confirm-warning: '<red>This will destroy your items.</red>'
-  # Title for the cancel button
-  cancel: '<red>Cancel</red>'
+  # Messages for shop destroy confirm button
+  confirm:
+    # Title for the destroy shop button
+    title: '<green>Destroy Shop</green>'
+    # Warning text for the destroy shop button
+    description: '<red>This will destroy your items.</red>'
+  # Messages for shop destroy cancel button
+  cancel:
+    # Title for the cancel button
+    title: '<red>Cancel</red>'
 # Messages for the shop logs interface
 log:
   # Title for the shop logs interface

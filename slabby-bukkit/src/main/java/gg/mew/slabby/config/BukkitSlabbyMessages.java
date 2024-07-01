@@ -253,39 +253,55 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
+    @Accessors(fluent = true, chain = true)
+    @Getter
     final static class BukkitDestroy implements Destroy {
+
+        @ConfigSerializable
+        final static class BukkitConfirm implements Confirm {
+            @Comment("Title for the destroy shop button")
+            private String title;
+
+            @Comment("Warning text for the destroy shop button")
+            private String description;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component description() {
+                return MiniMessage.miniMessage().deserialize(this.description);
+            }
+
+        }
+
+        @ConfigSerializable
+        final static class BukkitCancel implements Cancel {
+            @Comment("Title for the cancel button")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
 
         @Comment("Title for the destroy shop UI")
         private String title;
 
-        @Comment("Title for the destroy shop button")
-        private String confirm;
+        @Comment("Messages for shop destroy confirm button")
+        private BukkitConfirm confirm;
 
-        @Comment("Warning text for the destroy shop button")
-        private String confirmWarning;
-
-        @Comment("Title for the cancel button")
-        private String cancel;
+        @Comment("Messages for shop destroy cancel button")
+        private BukkitCancel cancel;
 
         @Override
         public Component title() {
             return MiniMessage.miniMessage().deserialize(this.title);
         }
 
-        @Override
-        public Component confirm() {
-            return MiniMessage.miniMessage().deserialize(this.confirm);
-        }
-
-        @Override
-        public Component confirmWarning() {
-            return MiniMessage.miniMessage().deserialize(this.confirmWarning);
-        }
-
-        @Override
-        public Component cancel() {
-            return MiniMessage.miniMessage().deserialize(this.cancel);
-        }
     }
 
     @ConfigSerializable
