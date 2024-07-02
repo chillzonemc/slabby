@@ -52,6 +52,7 @@ public final class GuiHelper {
 
             final var owners = shop.owners()
                     .stream()
+                    //TODO: use player display name
                     .map(o -> Bukkit.getOfflinePlayer(o.uniqueId()).getName())
                     .toArray(String[]::new);
 
