@@ -330,7 +330,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     final static class BukkitModify implements Modify {
 
         @ConfigSerializable
-        final static class BukkitSellersNote implements Modify.SellersNote {
+        final static class BukkitSellersNote implements SellersNote {
             @Comment("Title for the sellers note item")
             private String title;
 
@@ -487,6 +487,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
+        @ConfigSerializable
         final static class BukkitCancel implements Cancel {
             @Comment("Title for the cancel button")
             private String title;
@@ -533,58 +534,183 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
+    @Accessors(fluent = true, chain = false)
+    @Getter
     final static class BukkitOwner implements Owner {
+
+        @ConfigSerializable
+        final static class BukkitDeposit implements Deposit {
+            @Comment("Title for the shop deposit button")
+            private String title;
+
+            @Comment("Format for the shift bulk deposit message")
+            private String bulk;
+
+            @Override
+            public Component title(final Component displayName) {
+                return MiniMessage.miniMessage().deserialize(this.title, Placeholder.component("item", displayName));
+            }
+
+            @Override
+            public Component bulk() {
+                return MiniMessage.miniMessage().deserialize(this.bulk);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitWithdraw implements Withdraw {
+            @Comment("Title for the shop withdraw button")
+            private String title;
+
+            @Comment("Format for the shift bulk withdraw message")
+            private String bulk;
+
+            @Override
+            public Component title(final Component displayName) {
+                return MiniMessage.miniMessage().deserialize(this.title, Placeholder.component("item", displayName));
+            }
+
+            @Override
+            public Component bulk() {
+                return MiniMessage.miniMessage().deserialize(this.bulk);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitChangeRate implements ChangeRate {
+            @Comment("Title for the change rate button")
+            private String title;
+
+            @Comment("Format for the amount per click message")
+            private String amount;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final int amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitLogs implements Logs {
+            @Comment("Title for the shop logs button")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
+
+        @ConfigSerializable
+        @Accessors(fluent = true, chain = false)
+        @Getter
+        final static class BukkitInventory implements Inventory {
+
+            @ConfigSerializable
+            final static class BukkitCancel implements Cancel {
+                @Comment("Title for the cancel chest link button")
+                private String title;
+
+                @Comment("Format for the cancel chest linking message")
+                private String message;
+
+                @Override
+                public Component title() {
+                    return MiniMessage.miniMessage().deserialize(this.title);
+                }
+
+                @Override
+                public Component message() {
+                    return MiniMessage.miniMessage().deserialize(this.message);
+                }
+
+            }
+
+            @Comment("Title for the chest link button")
+            private String title;
+
+            @Comment("Format for the chest link description")
+            private String description;
+
+            @Comment("Format for the chest link message")
+            private String message;
+
+            @Comment("Messages for shop owner inventory-link cancel button")
+            private BukkitCancel cancel;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component description() {
+                return MiniMessage.miniMessage().deserialize(this.description);
+            }
+
+            @Override
+            public Component message() {
+                return MiniMessage.miniMessage().deserialize(this.message);
+            }
+
+        }
+
+        @ConfigSerializable
+        final static class BukkitModify implements Modify {
+            @Comment("Title for the modify shop button")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitCustomer implements Customer {
+            @Comment("Title for the view as customer button")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
 
         @Comment("Title for the shop owner interface")
         private String title;
 
-        @Comment("Title for the shop deposit button")
-        private String depositTitle;
-
-        @Comment("Format for the shift bulk deposit message")
-        private String shiftBulkDeposit;
-
-        @Comment("Format for the in stock message")
-        private String inStock;
+        @Comment("Format for the stock message")
+        private String stock;
 
         @Comment("Format for the stacks message")
         private String stacks;
 
-        @Comment("Title for the shop withdraw button")
-        private String withdrawTitle;
+        @Comment("Messages for shop owner deposit button")
+        private BukkitDeposit deposit;
 
-        @Comment("Format for the shift bulk withdraw message")
-        private String shiftBulkWithdraw;
+        @Comment("Messages for shop owner deposit button")
+        private BukkitWithdraw withdraw;
 
-        @Comment("Title for the change rate button")
-        private String changeRateTitle;
+        @Comment("Messages for shop owner change rate button")
+        private BukkitChangeRate changeRate;
 
-        @Comment("Format for the amount per click message")
-        private String amountPerClick;
+        @Comment("Messages for shop owner logs button")
+        private BukkitLogs logs;
 
-        @Comment("Title for the shop logs button")
-        private String logsTitle;
+        @Comment("Messages for shop owner inventory button")
+        private BukkitInventory inventory;
 
-        @Comment("Title for the cancel chest link button")
-        private String cancelChestLinkTitle;
-
-        @Comment("Format for the cancel chest linking message")
-        private String cancelChestLinkMessage;
-
-        @Comment("Title for the chest link button")
-        private String chestLinkTitle;
-
-        @Comment("Format for the chest link description")
-        private String chestLinkDescription;
-
-        @Comment("Format for the chest link message")
-        private String chestLinkMessage;
-
-        @Comment("Title for the modify shop button")
-        private String modifyShopTitle;
+        @Comment("Messages for shop owner modify button")
+        private BukkitModify modify;
 
         @Comment("Title for the view as customer button")
-        private String viewAsCustomerTitle;
+        private BukkitCustomer customer;
 
         @Override
         public Component title() {
@@ -592,18 +718,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         @Override
-        public Component depositTitle(final Component displayName) {
-            return MiniMessage.miniMessage().deserialize(this.depositTitle, Placeholder.component("item", displayName));
-        }
-
-        @Override
-        public Component shiftBulkDeposit() {
-            return MiniMessage.miniMessage().deserialize(this.shiftBulkDeposit);
-        }
-
-        @Override
-        public Component inStock(final int stock) {
-            return MiniMessage.miniMessage().deserialize(this.inStock, Formatter.number("stock", stock));
+        public Component stock(final int stock) {
+            return MiniMessage.miniMessage().deserialize(this.stock, Formatter.number("stock", stock));
         }
 
         @Override
@@ -611,65 +727,6 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             return MiniMessage.miniMessage().deserialize(this.stacks, Formatter.number("stacks", stacks));
         }
 
-        @Override
-        public Component withdrawTitle(final Component displayName) {
-            return MiniMessage.miniMessage().deserialize(this.withdrawTitle, Placeholder.component("item", displayName));
-        }
-
-        @Override
-        public Component shiftBulkWithdraw() {
-            return MiniMessage.miniMessage().deserialize(this.shiftBulkWithdraw);
-        }
-
-        @Override
-        public Component changeRateTitle() {
-            return MiniMessage.miniMessage().deserialize(this.changeRateTitle);
-        }
-
-        @Override
-        public Component amountPerClick(final int amount) {
-            return MiniMessage.miniMessage().deserialize(this.amountPerClick, Formatter.number("amount", amount));
-        }
-
-        @Override
-        public Component logsTitle() {
-            return MiniMessage.miniMessage().deserialize(this.logsTitle);
-        }
-
-        @Override
-        public Component cancelChestLinkTitle() {
-            return MiniMessage.miniMessage().deserialize(this.cancelChestLinkTitle);
-        }
-
-        @Override
-        public Component cancelChestLinkingMessage() {
-            return MiniMessage.miniMessage().deserialize(this.cancelChestLinkMessage);
-        }
-
-        @Override
-        public Component chestLinkTitle() {
-            return MiniMessage.miniMessage().deserialize(this.chestLinkTitle);
-        }
-
-        @Override
-        public Component chestLinkDescription() {
-            return MiniMessage.miniMessage().deserialize(this.chestLinkDescription);
-        }
-
-        @Override
-        public Component chestLinkMessage() {
-            return MiniMessage.miniMessage().deserialize(this.chestLinkMessage);
-        }
-
-        @Override
-        public Component modifyShopTitle() {
-            return MiniMessage.miniMessage().deserialize(this.modifyShopTitle);
-        }
-
-        @Override
-        public Component viewAsCustomerTitle() {
-            return MiniMessage.miniMessage().deserialize(this.viewAsCustomerTitle);
-        }
     }
 
 }

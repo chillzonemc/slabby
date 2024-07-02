@@ -130,23 +130,59 @@ public interface SlabbyMessages {
     }
 
     interface Owner {
+
+        interface Deposit {
+            Component title(final Component displayName);
+            Component bulk();
+        }
+
+        interface Withdraw {
+            Component title(final Component displayName);
+            Component bulk();
+        }
+
+        interface ChangeRate {
+            Component title();
+            Component amount(final int amount);
+        }
+
+        interface Logs {
+            Component title();
+        }
+
+        interface Inventory {
+
+            interface Cancel {
+                Component title();
+                Component message();
+            }
+
+            Component title();
+            Component description();
+            Component message();
+
+            Cancel cancel();
+        }
+
+        interface Modify {
+            Component title();
+        }
+
+        interface Customer {
+            Component title();
+        }
+
         Component title();
-        Component depositTitle(final Component displayName);
-        Component shiftBulkDeposit();
-        Component inStock(final int stock);
+        Component stock(final int stock);
         Component stacks(final int stacks);
-        Component withdrawTitle(final Component displayName);
-        Component shiftBulkWithdraw();
-        Component changeRateTitle();
-        Component amountPerClick(final int amount);
-        Component logsTitle();
-        Component cancelChestLinkTitle();
-        Component cancelChestLinkingMessage();
-        Component chestLinkTitle();
-        Component chestLinkDescription();
-        Component chestLinkMessage();
-        Component modifyShopTitle();
-        Component viewAsCustomerTitle();
+
+        Deposit deposit();
+        Withdraw withdraw();
+        ChangeRate changeRate();
+        Logs logs();
+        Inventory inventory();
+        Modify modify();
+        Customer customer();
     }
 
 }

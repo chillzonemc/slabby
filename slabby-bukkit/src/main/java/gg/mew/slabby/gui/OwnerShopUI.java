@@ -33,10 +33,10 @@ public final class OwnerShopUI {
         final var gui = Gui.empty(9, 2);
 
         gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
-            meta.displayName(api.messages().owner().depositTitle(itemStack.displayName()));
+            meta.displayName(api.messages().owner().deposit().title(itemStack.displayName()));
             meta.lore(new ArrayList<>() {{
-                add(api.messages().owner().shiftBulkDeposit());
-                add(api.messages().owner().inStock(shop.stock()));
+                add(api.messages().owner().deposit().bulk());
+                add(api.messages().owner().stock(shop.stock()));
                 add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
             }});
         }), c -> {
@@ -53,10 +53,10 @@ public final class OwnerShopUI {
         }));
 
         gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
-            meta.displayName(api.messages().owner().withdrawTitle(itemStack.displayName()));
+            meta.displayName(api.messages().owner().withdraw().title(itemStack.displayName()));
             meta.lore(new ArrayList<>() {{
-                add(api.messages().owner().shiftBulkWithdraw());
-                add(api.messages().owner().inStock(shop.stock()));
+                add(api.messages().owner().withdraw().bulk());
+                add(api.messages().owner().stock(shop.stock()));
                 add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
             }});
         }), c -> {
@@ -73,9 +73,9 @@ public final class OwnerShopUI {
         }));
 
         gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
-            meta.displayName(api.messages().owner().changeRateTitle());
+            meta.displayName(api.messages().owner().changeRate().title());
             meta.lore(new ArrayList<>() {{
-                add(api.messages().owner().amountPerClick(shop.quantity()));
+                add(api.messages().owner().changeRate().amount(shop.quantity()));
             }});
         }), c -> {
             //TODO: I could just use the wizard for this
@@ -86,7 +86,7 @@ public final class OwnerShopUI {
 
         api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LOGS, () -> {
             gui.setItem(0, 1, new SimpleItem(GuiHelper.itemStack(Material.BOOK, (it, meta) -> {
-                meta.displayName(api.messages().owner().logsTitle());
+                meta.displayName(api.messages().owner().logs().title());
             }).get(), c -> LogShopUI.open(api, shopOwner, shop)));
         });
 
@@ -96,7 +96,7 @@ public final class OwnerShopUI {
             //TODO: update item after clicking
             if (shop.hasInventory()) {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.ENDER_CHEST, (it, meta) -> {
-                    meta.displayName(api.messages().owner().cancelChestLinkTitle());
+                    meta.displayName(api.messages().owner().inventory().cancel().title());
                 }).get(), c -> {
                     try {
                         shop.inventory(null, null, null, null);
@@ -111,16 +111,16 @@ public final class OwnerShopUI {
                         shop.logs().add(log);
 
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
-                        shopOwner.sendMessage(api.messages().owner().cancelChestLinkingMessage());
+                        shopOwner.sendMessage(api.messages().owner().inventory().cancel().message());
                     } catch (final Exception ignored) {
                         //TODO: notify uniqueId
                     }
                 }));
             } else {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
-                    meta.displayName(api.messages().owner().chestLinkTitle());
+                    meta.displayName(api.messages().owner().inventory().title());
                     meta.lore(new ArrayList<>() {{
-                        add(api.messages().owner().chestLinkDescription());
+                        add(api.messages().owner().inventory().description());
                     }});
                 }).get(), c -> {
                     api.operations()
@@ -128,7 +128,7 @@ public final class OwnerShopUI {
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
 
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
-                    shopOwner.sendMessage(api.messages().owner().chestLinkMessage());
+                    shopOwner.sendMessage(api.messages().owner().inventory().message());
                     gui.closeForAllViewers();
                 }));
             }
@@ -137,14 +137,14 @@ public final class OwnerShopUI {
         gui.setItem(6, 0, commandBlock(api, shop, itemStack));
 
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
-            meta.displayName(api.messages().owner().modifyShopTitle());
+            meta.displayName(api.messages().owner().modify().title());
         }).get(), c -> {
             ModifyShopUI.open(api, shopOwner, api.operations().wizardFrom(shopOwner.getUniqueId(), shop));
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.OAK_SIGN, (it, meta) -> {
-            meta.displayName(api.messages().owner().viewAsCustomerTitle());
+            meta.displayName(api.messages().owner().customer().title());
         }).get(), c -> {
             ClientShopUI.open(api, shopOwner, shop);
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
