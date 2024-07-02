@@ -30,66 +30,66 @@ public final class ModifyShopUI {
 
         gui.setItem(0, 0, new SimpleItem(Bukkit.getItemFactory().createItemStack(wizard.item())));
         gui.setItem(1, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
-            meta.displayName(api.messages().modify().sellersNote());
+            meta.displayName(api.messages().modify().sellersNote().title());
             meta.lore(new ArrayList<>() {{
                 add(Component.text(wizard.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_NOTE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(api.messages().modify().requestNote());
+            shopOwner.sendMessage(api.messages().modify().sellersNote().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(3, 0, new SimpleItem(itemStack(Material.GREEN_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(api.messages().modify().buyPriceTitle());
+            meta.displayName(api.messages().modify().buy().title());
             meta.lore(new ArrayList<>() {{
                 final var buyPrice = wizard.buyPrice() == null ? -1d : wizard.buyPrice();
-                add(api.messages().modify().buyPriceAmount(buyPrice));
+                add(api.messages().modify().buy().amount(buyPrice));
                 add(api.messages().modify().clickToSet());
-                add(api.messages().modify().notForSale());
+                add(api.messages().modify().buy().notForSale());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_BUY_PRICE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(api.messages().modify().requestBuyPrice());
+            shopOwner.sendMessage(api.messages().modify().buy().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(4, 0, new SimpleItem(itemStack(Material.RED_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(api.messages().modify().sellPriceTitle());
+            meta.displayName(api.messages().modify().sell().title());
             meta.lore(new ArrayList<>() {{
                 final var sellPrice = wizard.sellPrice() == null ? -1d : wizard.sellPrice();
-                add(api.messages().modify().sellPriceAmount(sellPrice));
+                add(api.messages().modify().sell().amount(sellPrice));
                 add(api.messages().modify().clickToSet());
-                add(api.messages().modify().notBuying());
+                add(api.messages().modify().sell().notBuying());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_SELL_PRICE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(api.messages().modify().requestSellPrice());
+            shopOwner.sendMessage(api.messages().modify().sell().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(5, 0, new SimpleItem(itemStack(Material.YELLOW_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(api.messages().modify().quantityTitle());
+            meta.displayName(api.messages().modify().quantity().title());
             meta.lore(new ArrayList<>() {{
-                add(api.messages().modify().amountPerTransaction(wizard.quantity()));
+                add(api.messages().modify().quantity().amount(wizard.quantity()));
                 add(api.messages().modify().clickToSet());
-                add(api.messages().modify().amountPerTransactionDescription());
+                add(api.messages().modify().quantity().description());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_QUANTITY);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(api.messages().modify().requestQuantity());
+            shopOwner.sendMessage(api.messages().modify().quantity().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.NETHER_STAR, (it, meta) -> {
-            meta.displayName(api.messages().modify().confirmTitle());
+            meta.displayName(api.messages().modify().confirm().title());
             meta.lore(new ArrayList<>() {{
-                add(api.messages().modify().confirmDescription());
-                add(api.messages().modify().confirmLocation(wizard.world(), wizard.x(), wizard.y(), wizard.z()));
+                add(api.messages().modify().confirm().description());
+                add(api.messages().modify().confirm().location(wizard.world(), wizard.x(), wizard.y(), wizard.z()));
             }});
         }).get(), c -> {
             try {
@@ -152,7 +152,7 @@ public final class ModifyShopUI {
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
-            meta.displayName(api.messages().modify().cancelTitle());
+            meta.displayName(api.messages().modify().cancel().title());
         }).get(), c -> {
             api.operations().wizards().remove(shopOwner.getUniqueId());
             gui.closeForAllViewers();

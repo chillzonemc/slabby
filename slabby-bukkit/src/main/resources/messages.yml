@@ -65,44 +65,56 @@ log:
 modify:
   # Title for the shop modify interface
   title: '[Slabby] Editing Shop'
-  # Title for the sellers note item
-  sellers-note: '<green>Sellers note</green>'
-  # Message for requesting a note
-  request-note: 'Please enter your note.'
-  # Message for requesting a buy price
-  request-buy-price: 'Please enter your buy price.'
-  # Message for requesting a sell price
-  request-sell-price: 'Please enter your sell price.'
-  # Message for requesting a quantity
-  request-quantity: 'Please enter your quantity.'
-  # Title for the buy price button
-  buy-price-title: '<green>Buy price</green>'
-  # Format for the current buy price amount
-  buy-price-amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
   # Format for click to set
   click-to-set: '<dark_purple>Click to set</dark_purple>'
-  # Format for not for sale
-  not-for-sale: '<dark_purple>(-1 means not for sale)</dark_purple>'
-  # Format for not buying
-  not-buying: '<dark_purple>(-1 means not buying)</dark_purple>'
-  # Title for the sell price button
-  sell-price-title: '<red>Sell price</red>'
-  # Format for the current sell price amount
-  sell-price-amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
-  # Format for the quantity button
-  quantity-title: '<yellow>Quantity</yellow>'
-  # Format for amount per transaction
-  amount-per-transaction: '<dark_purple>Amount per transaction: <quantity></dark_purple>'
-  # Format for amount per transaction description
-  amount-per-transaction-description: '<dark_purple>(Amount of items per buy/sell)</dark_purple>'
-  # Title for the confirm button
-  confirm-title: '<green>Confirm</green>'
-  # Format for the save shop description
-  confirm-description: '<dark_purple>Save Shop</dark_purple>'
-  # Format for the location
-  confirm-location: '<dark_purple><world>, <x>, <y>, <z></dark_purple>'
-  # Title for the cancel button
-  cancel-title: '<red>Cancel</red>'
+  # Messages for shop modify sellers note button
+  sellers-note:
+    # Title for the sellers note item
+    title: '<green>Sellers note</green>'
+    # Message for requesting a note
+    request: 'Please enter your note.'
+  # Messages for shop modify buy button
+  buy:
+    # Title for the buy button
+    title: '<green>Buy price</green>'
+    # Format for the current buy amount
+    amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
+    # Format for not for sale
+    not-for-sale: '<dark_purple>(-1 means not for sale)</dark_purple>'
+    # Message for requesting a buy price
+    request: 'Please enter your buy price.'
+  # Messages for shop modify sell button
+  sell:
+    # Title for the sell button
+    title: '<red>Sell price</red>'
+    # Format for the current sell amount
+    amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
+    # Format for not buying
+    not-buying: '<dark_purple>(-1 means not buying)</dark_purple>'
+    # Message for requesting a sell price
+    request: 'Please enter your sell price.'
+  # Messages for shop modify quantity button
+  quantity:
+    # Format for the quantity button
+    title: '<yellow>Quantity</yellow>'
+    # Format for amount per transaction
+    amount: '<dark_purple>Amount per transaction: <quantity></dark_purple>'
+    # Format for amount per transaction description
+    description: '<dark_purple>(Amount of items per buy/sell)</dark_purple>'
+    # Message for requesting a quantity
+    request: 'Please enter your quantity.'
+  # Messages for shop modify confirm button
+  confirm:
+    # Title for the confirm button
+    title: '<green>Confirm</green>'
+    # Format for the save shop description
+    description: '<dark_purple>Save Shop</dark_purple>'
+    # Format for the location
+    location: '<dark_purple><world>, <x>, <y>, <z></dark_purple>'
+  # Messages for shop modify cancel button
+  cancel:
+    # Title for the cancel button
+    title: '<red>Cancel</red>'
 # Messages for the owner shop interface
 owner:
   # Title for the shop owner interface

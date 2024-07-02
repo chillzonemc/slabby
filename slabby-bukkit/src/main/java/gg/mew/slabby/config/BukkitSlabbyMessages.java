@@ -325,67 +325,201 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
+    @Accessors(fluent = true, chain = false)
+    @Getter
     final static class BukkitModify implements Modify {
+
+        @ConfigSerializable
+        final static class BukkitSellersNote implements Modify.SellersNote {
+            @Comment("Title for the sellers note item")
+            private String title;
+
+            @Comment("Message for requesting a note")
+            private String request;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component request() {
+                return MiniMessage.miniMessage().deserialize(this.request);
+            }
+
+        }
+
+        @ConfigSerializable
+        final static class BukkitBuy implements Buy {
+            @Comment("Title for the buy button")
+            private String title;
+
+            @Comment("Format for the current buy amount")
+            private String amount;
+
+            @Comment("Format for not for sale")
+            private String notForSale;
+
+            @Comment("Message for requesting a buy price")
+            private String request;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component notForSale() {
+                return MiniMessage.miniMessage().deserialize(this.notForSale);
+            }
+
+            @Override
+            public Component request() {
+                return MiniMessage.miniMessage().deserialize(this.request);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitSell implements Sell {
+
+            @Comment("Title for the sell price button")
+            private String title;
+
+            @Comment("Format for the current sell price amount")
+            private String amount;
+
+            @Comment("Format for not buying")
+            private String notBuying;
+
+            @Comment("Message for requesting a sell price")
+            private String request;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component notBuying() {
+                return MiniMessage.miniMessage().deserialize(this.notBuying);
+            }
+
+            @Override
+            public Component request() {
+                return MiniMessage.miniMessage().deserialize(this.request);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitQuantity implements Quantity {
+            @Comment("Format for the quantity button")
+            private String title;
+
+            @Comment("Format for amount per transaction")
+            private String amount;
+
+            @Comment("Format for amount per transaction description")
+            private String description;
+
+            @Comment("Message for requesting a quantity")
+            private String request;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final int quantity) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("quantity", quantity));
+            }
+
+            @Override
+            public Component description() {
+                return MiniMessage.miniMessage().deserialize(this.description);
+            }
+
+            @Override
+            public Component request() {
+                return MiniMessage.miniMessage().deserialize(this.request);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitConfirm implements Confirm {
+            @Comment("Title for the confirm button")
+            private String title;
+
+            @Comment("Format for the save shop description")
+            private String description;
+
+            @Comment("Format for the location")
+            private String location;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component description() {
+                return MiniMessage.miniMessage().deserialize(this.description);
+            }
+
+            @Override
+            public Component location(final String world, final int x, final int y, final int z) {
+                return MiniMessage.miniMessage().deserialize(this.location,
+                        Placeholder.unparsed("world", world),
+                        Formatter.number("x", x),
+                        Formatter.number("y", y),
+                        Formatter.number("z", z)
+                );
+            }
+        }
+
+        final static class BukkitCancel implements Cancel {
+            @Comment("Title for the cancel button")
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
 
         @Comment("Title for the shop modify interface")
         private String title;
 
-        @Comment("Title for the sellers note item")
-        private String sellersNote;
-
-        @Comment("Message for requesting a note")
-        private String requestNote;
-
-        @Comment("Message for requesting a buy price")
-        private String requestBuyPrice;
-
-        @Comment("Message for requesting a sell price")
-        private String requestSellPrice;
-
-        @Comment("Message for requesting a quantity")
-        private String requestQuantity;
-
-        @Comment("Title for the buy price button")
-        private String buyPriceTitle;
-
-        @Comment("Format for the current buy price amount")
-        private String buyPriceAmount;
-
         @Comment("Format for click to set")
         private String clickToSet;
 
-        @Comment("Format for not for sale")
-        private String notForSale;
+        @Comment("Messages for shop modify sellers note button")
+        private BukkitSellersNote sellersNote;
 
-        @Comment("Format for not buying")
-        private String notBuying;
+        @Comment("Messages for shop modify buy button")
+        private BukkitBuy buy;
 
-        @Comment("Title for the sell price button")
-        private String sellPriceTitle;
+        @Comment("Messages for shop modify sell button")
+        private BukkitSell sell;
 
-        @Comment("Format for the current sell price amount")
-        private String sellPriceAmount;
+        @Comment("Messages for shop modify quantity button")
+        private BukkitQuantity quantity;
 
-        @Comment("Format for the quantity button")
-        private String quantityTitle;
+        @Comment("Messages for shop modify confirm button")
+        private BukkitConfirm confirm;
 
-        @Comment("Format for amount per transaction")
-        private String amountPerTransaction;
-
-        @Comment("Format for amount per transaction description")
-        private String amountPerTransactionDescription;
-
-        @Comment("Title for the confirm button")
-        private String confirmTitle;
-
-        @Comment("Format for the save shop description")
-        private String confirmDescription;
-
-        @Comment("Format for the location")
-        private String confirmLocation;
-
-        @Comment("Title for the cancel button")
-        private String cancelTitle;
+        @Comment("Messages for shop modify cancel button")
+        private BukkitCancel cancel;
 
         @Override
         public Component title() {
@@ -393,103 +527,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         @Override
-        public Component sellersNote() {
-            return MiniMessage.miniMessage().deserialize(this.sellersNote);
-        }
-
-        @Override
-        public Component requestNote() {
-            return MiniMessage.miniMessage().deserialize(this.requestNote);
-        }
-
-        @Override
-        public Component requestBuyPrice() {
-            return MiniMessage.miniMessage().deserialize(this.requestBuyPrice);
-        }
-
-        @Override
-        public Component requestSellPrice() {
-            return MiniMessage.miniMessage().deserialize(this.requestSellPrice);
-        }
-
-        @Override
-        public Component buyPriceTitle() {
-            return MiniMessage.miniMessage().deserialize(this.buyPriceTitle);
-        }
-
-        @Override
-        public Component buyPriceAmount(final double amount) {
-            return MiniMessage.miniMessage().deserialize(this.buyPriceAmount, Formatter.number("amount", amount));
-        }
-
-        @Override
         public Component clickToSet() {
             return MiniMessage.miniMessage().deserialize(this.clickToSet);
-        }
-
-        @Override
-        public Component notForSale() {
-            return MiniMessage.miniMessage().deserialize(this.notForSale);
-        }
-
-        @Override
-        public Component notBuying() {
-            return MiniMessage.miniMessage().deserialize(this.notBuying);
-        }
-
-        @Override
-        public Component sellPriceTitle() {
-            return MiniMessage.miniMessage().deserialize(this.sellPriceTitle);
-        }
-
-        @Override
-        public Component sellPriceAmount(final double amount) {
-            return MiniMessage.miniMessage().deserialize(this.sellPriceAmount, Formatter.number("amount", amount));
-        }
-
-        @Override
-        public Component quantityTitle() {
-            return MiniMessage.miniMessage().deserialize(this.quantityTitle);
-        }
-
-        @Override
-        public Component amountPerTransaction(final int quantity) {
-            return MiniMessage.miniMessage().deserialize(this.amountPerTransaction, Formatter.number("quantity", quantity));
-        }
-
-        @Override
-        public Component amountPerTransactionDescription() {
-            return MiniMessage.miniMessage().deserialize(this.amountPerTransactionDescription);
-        }
-
-        @Override
-        public Component requestQuantity() {
-            return MiniMessage.miniMessage().deserialize(this.requestQuantity);
-        }
-
-        @Override
-        public Component confirmTitle() {
-            return MiniMessage.miniMessage().deserialize(this.confirmTitle);
-        }
-
-        @Override
-        public Component confirmDescription() {
-            return MiniMessage.miniMessage().deserialize(this.confirmDescription);
-        }
-
-        @Override
-        public Component confirmLocation(final String world, final int x, final int y, final int z) {
-            return MiniMessage.miniMessage().deserialize(this.confirmLocation,
-                    Placeholder.unparsed("world", world),
-                    Formatter.number("x", x),
-                    Formatter.number("y", y),
-                    Formatter.number("z", z)
-            );
-        }
-
-        @Override
-        public Component cancelTitle() {
-            return MiniMessage.miniMessage().deserialize(this.cancelTitle);
         }
     }
 

@@ -81,26 +81,52 @@ public interface SlabbyMessages {
     }
 
     interface Modify {
+
+        interface SellersNote {
+            Component title();
+            Component request();
+        }
+
+        interface Buy {
+            Component title();
+            Component amount(final double amount);
+            Component notForSale();
+            Component request();
+        }
+
+        interface Sell {
+            Component title();
+            Component amount(final double amount);
+            Component request();
+            Component notBuying();
+        }
+
+        interface Quantity {
+            Component title();
+            Component amount(final int quantity);
+            Component description();
+            Component request();
+        }
+
+        interface Confirm {
+            Component title();
+            Component description();
+            Component location(final String world, final int x, final int y, final int z);
+        }
+
+        interface Cancel {
+            Component title();
+        }
+
         Component title();
-        Component sellersNote();
-        Component requestNote();
-        Component requestBuyPrice();
-        Component requestSellPrice();
-        Component requestQuantity();
-        Component buyPriceTitle();
-        Component buyPriceAmount(final double amount);
         Component clickToSet();
-        Component notForSale();
-        Component notBuying();
-        Component sellPriceTitle();
-        Component sellPriceAmount(final double amount);
-        Component quantityTitle();
-        Component amountPerTransaction(final int quantity);
-        Component amountPerTransactionDescription();
-        Component confirmTitle();
-        Component confirmDescription();
-        Component confirmLocation(final String world, final int x, final int y, final int z);
-        Component cancelTitle();
+
+        SellersNote sellersNote();
+        Buy buy();
+        Sell sell();
+        Quantity quantity();
+        Confirm confirm();
+        Cancel cancel();
     }
 
     interface Owner {
