@@ -9,6 +9,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Comment;
 
+import java.util.Date;
+
 @ConfigSerializable
 @Accessors(fluent = true, chain = false)
 @Getter
@@ -253,7 +255,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
-    @Accessors(fluent = true, chain = true)
+    @Accessors(fluent = true, chain = false)
     @Getter
     final static class BukkitDestroy implements Destroy {
 
@@ -305,13 +307,313 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
+    @Accessors(fluent = true, chain = false)
+    @Getter
     final static class BukkitLog implements Log {
+
+        @ConfigSerializable
+        final static class BukkitBuy implements Buy {
+
+            private String title;
+            private String amount;
+            private String quantity;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component quantity(final int quantity) {
+                return MiniMessage.miniMessage().deserialize(this.quantity, Formatter.number("quantity", quantity));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitSell implements Sell {
+
+            private String title;
+            private String amount;
+            private String quantity;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component quantity(final int quantity) {
+                return MiniMessage.miniMessage().deserialize(this.quantity, Formatter.number("quantity", quantity));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitDeposit implements Deposit {
+
+            private String title;
+
+            private String amount;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final int amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitWithdraw implements Withdraw {
+
+            private String title;
+
+            private String amount;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component amount(final int amount) {
+                return MiniMessage.miniMessage().deserialize(this.amount, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitLocationChanged implements LocationChanged {
+
+            private String title;
+            private String x;
+            private String y;
+            private String z;
+            private String world;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component x(final int x) {
+                return MiniMessage.miniMessage().deserialize(this.x, Formatter.number("x", x));
+            }
+
+            @Override
+            public Component y(final int y) {
+                return MiniMessage.miniMessage().deserialize(this.y, Formatter.number("y", y));
+            }
+
+            @Override
+            public Component z(final int z) {
+                return MiniMessage.miniMessage().deserialize(this.z, Formatter.number("z", z));
+            }
+
+            @Override
+            public Component world(final String world) {
+                return MiniMessage.miniMessage().deserialize(this.world, Placeholder.unparsed("world", world));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitLinkedInventory implements LinkedInventory {
+
+            private String title;
+            private String x;
+            private String y;
+            private String z;
+            private String world;
+            private String removed;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component x(final int x) {
+                return MiniMessage.miniMessage().deserialize(this.x, Formatter.number("x", x));
+            }
+
+            @Override
+            public Component y(final int y) {
+                return MiniMessage.miniMessage().deserialize(this.y, Formatter.number("y", y));
+            }
+
+            @Override
+            public Component z(final int z) {
+                return MiniMessage.miniMessage().deserialize(this.z, Formatter.number("z", z));
+            }
+
+            @Override
+            public Component world(final String world) {
+                return MiniMessage.miniMessage().deserialize(this.world, Placeholder.unparsed("world", world));
+            }
+
+            @Override
+            public Component removed() {
+                return MiniMessage.miniMessage().deserialize(this.removed);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitBuyPriceChanged implements BuyPriceChanged {
+
+            private String title;
+            private String from;
+            private String to;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component from(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.from, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component to(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.to, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitSellPriceChanged implements SellPriceChanged {
+
+            private String title;
+            private String from;
+            private String to;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component from(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.from, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component to(final double amount) {
+                return MiniMessage.miniMessage().deserialize(this.to, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitQuantityChanged implements QuantityChanged {
+
+            private String title;
+            private String from;
+            private String to;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component from(final int amount) {
+                return MiniMessage.miniMessage().deserialize(this.from, Formatter.number("amount", amount));
+            }
+
+            @Override
+            public Component to(final int amount) {
+                return MiniMessage.miniMessage().deserialize(this.to, Formatter.number("amount", amount));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitNoteChanged implements NoteChanged {
+
+            private String title;
+            private String from;
+            private String to;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component from(final String note) {
+                return MiniMessage.miniMessage().deserialize(this.from, Placeholder.unparsed("note", note));
+            }
+
+            @Override
+            public Component to(final String note) {
+                return MiniMessage.miniMessage().deserialize(this.to, Placeholder.unparsed("note", note));
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitNameChanged implements NameChanged {
+
+            private String title;
+            private String from;
+            private String to;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component from(final String name) {
+                return MiniMessage.miniMessage().deserialize(this.from, Placeholder.unparsed("name", name));
+            }
+
+            @Override
+            public Component to(final String name) {
+                return MiniMessage.miniMessage().deserialize(this.to, Placeholder.unparsed("name", name));
+            }
+        }
+
+        private BukkitBuy buy;
+
+        private BukkitSell sell;
+
+        private BukkitDeposit deposit;
+
+        private BukkitWithdraw withdraw;
+
+        private BukkitLocationChanged locationChanged;
+
+        private BukkitLinkedInventory linkedInventory;
+
+        private BukkitBuyPriceChanged buyPriceChanged;
+
+        private BukkitSellPriceChanged sellPriceChanged;
+
+        private BukkitQuantityChanged quantityChanged;
+
+        private BukkitNoteChanged noteChanged;
+
+        private BukkitNameChanged nameChanged;
 
         @Comment("Title for the shop logs interface")
         private String title;
 
         @Comment("Format for the player name")
         private String player;
+
+        @Comment("Format for dates")
+        private String date;
 
         @Override
         public Component title() {
@@ -321,6 +623,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component player(final Component displayName) {
             return MiniMessage.miniMessage().deserialize(this.player, Placeholder.component("player", displayName));
+        }
+
+        @Override
+        public Component date(final Date date) {
+            return MiniMessage.miniMessage().deserialize(this.date, Formatter.date("created_on", date.toInstant()));
         }
     }
 

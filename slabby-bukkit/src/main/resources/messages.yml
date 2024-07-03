@@ -60,6 +60,55 @@ log:
   title: '[Slabby] Logs'
   # Format for the player name
   player: '<dark_purple>Player: <player></dark_purple>'
+  # Format for dates
+  date: '<dark_purple>Date: <created_on:''yyyy-MM-dd HH:mm:ss''></dark_purple>'
+  buy:
+    title: '<green>Buy</green>'
+    amount: '<dark_purple>Price: <amount></dark_purple>'
+    quantity: '<dark_purple>Quantity: <quantity></dark_purple>'
+  sell:
+    title: '<green>Sell</green>'
+    amount: '<dark_purple>Price: <amount></dark_purple>'
+    quantity: '<dark_purple>Quantity: <quantity></dark_purple>'
+  deposit:
+    title: '<green>Deposit</green>'
+    amount: '<dark_purple>Deposited: <amount></dark_purple>'
+  withdraw:
+    title: '<green>Withdraw</green>'
+    amount: '<dark_purple>Withdrew: <amount></dark_purple>'
+  location-changed:
+    title: '<green>Location Changed</green>'
+    x: '<dark_purple>X: <x></dark_purple>'
+    y: '<dark_purple>Y: <y></dark_purple>'
+    z: '<dark_purple>Z: <z></dark_purple>'
+    world: '<dark_purple>World: <world></dark_purple>'
+  linked-inventory:
+    title: '<green>Linked Inventory</green>'
+    x: '<dark_purple>X: <x></dark_purple>'
+    y: '<dark_purple>Y: <y></dark_purple>'
+    z: '<dark_purple>Z: <z></dark_purple>'
+    world: '<dark_purple>World: <world></dark_purple>'
+    removed: '<dark_purple>Linked inventory removed</dark_purple>'
+  buy-price-changed:
+    title: '<green>Buy Price Changed</green>'
+    from: '<dark_purple>From: <amount:''#.##''></dark_purple>'
+    to: '<dark_purple>To: <amount:''#.##''></dark_purple>'
+  sell-price-changed:
+    title: '<green>Sell Price Changed</green>'
+    from: '<dark_purple>From: <amount:''#.##''></dark_purple>'
+    to: '<dark_purple>To: <amount:''#.##''></dark_purple>'
+  quantity-changed:
+    title: '<green>Quantity Changed</green>'
+    from: '<dark_purple>From: <amount></dark_purple>'
+    to: '<dark_purple>To: <amount></dark_purple>'
+  note-changed:
+    title: '<green>Note Changed</green>'
+    from: '<dark_purple>From: <note></dark_purple>'
+    to: '<dark_purple>To: <note></dark_purple>'
+  name-changed:
+    title: '<green>Name Changed</green>'
+    from: '<dark_purple>From: <name></dark_purple>'
+    to: '<dark_purple>To: <name></dark_purple>'
 # Messages for the modify shop interface
 modify:
   # Title for the shop modify interface

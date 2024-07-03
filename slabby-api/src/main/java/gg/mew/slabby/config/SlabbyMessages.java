@@ -81,46 +81,87 @@ public interface SlabbyMessages {
 
         interface Buy {
             Component title();
-            Component price(final double buyPrice);
-            Component quantity(final int amount);
+            Component amount(final double amount);
+            Component quantity(final int quantity);
         }
 
         interface Sell {
             Component title();
-            Component price(final double buyPrice);
-            Component quantity(final int amount);
+            Component amount(final double amount);
+            Component quantity(final int quantity);
         }
 
         interface Deposit {
+            Component title();
             Component amount(final int amount);
         }
 
         interface Withdraw {
+            Component title();
             Component amount(final int amount);
         }
 
         interface LocationChanged {
-            Component x();
-            Component y();
-            Component z();
-            Component world();
+            Component title();
+            Component x(final int x);
+            Component y(final int y);
+            Component z(final int z);
+            Component world(final String world);
         }
 
         interface LinkedInventory {
-            Component x();
-            Component y();
-            Component z();
-            Component world();
+            Component title();
+            Component x(final int x);
+            Component y(final int y);
+            Component z(final int z);
+            Component world(final String world);
             Component removed();
         }
 
-        interface BuyPriceChanged {}
-        interface SellPriceChanged {}
-        interface QuantityChanged {}
-        interface NoteChanged {}
-        interface NameChanged {}
+        interface BuyPriceChanged {
+            Component title();
+            Component from(final double amount);
+            Component to(final double amount);
+        }
+
+        interface SellPriceChanged {
+            Component title();
+            Component from(final double amount);
+            Component to(final double amount);
+        }
+
+        interface QuantityChanged {
+            Component title();
+            Component from(final int quantity);
+            Component to(final int quantity);
+        }
+
+        interface NoteChanged {
+            Component title();
+            Component from(final String note);
+            Component to(final String note);
+        }
+
+        interface NameChanged {
+            Component title();
+            Component from(final String name);
+            Component to(final String name);
+        }
 
         Component title();
+
+        Buy buy();
+        Sell sell();
+        Deposit deposit();
+        Withdraw withdraw();
+        LocationChanged locationChanged();
+        LinkedInventory linkedInventory();
+        BuyPriceChanged buyPriceChanged();
+        SellPriceChanged sellPriceChanged();
+        QuantityChanged quantityChanged();
+        NoteChanged noteChanged();
+        NameChanged nameChanged();
+
         Component player(final Component displayName);
         Component date(final Date date);
     }

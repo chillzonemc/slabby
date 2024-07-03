@@ -19,11 +19,11 @@ public interface ShopLog extends Auditable {
     enum Action {
         //TODO: how does sqlite store enums? if it is by their ordinal, we're in trouble
         LOCATION_CHANGED(LocationChanged.class),
-        BUY_PRICE_CHANGED(DoubleValueChanged.class),
-        SELL_PRICE_CHANGED(DoubleValueChanged.class),
-        QUANTITY_CHANGED(IntValueChanged.class),
-        NOTE_CHANGED(StringValueChanged.class),
-        NAME_CHANGED(StringValueChanged.class),
+        BUY_PRICE_CHANGED(ValueChanged.Double.class),
+        SELL_PRICE_CHANGED(ValueChanged.Double.class),
+        QUANTITY_CHANGED(ValueChanged.Int.class),
+        NOTE_CHANGED(ValueChanged.String.class),
+        NAME_CHANGED(ValueChanged.String.class),
 
         LINKED_INVENTORY_CHANGED(LocationChanged.class),
 

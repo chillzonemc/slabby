@@ -1,18 +1,13 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyAPI;
-import gg.mew.slabby.shop.log.DoubleValueChanged;
-import gg.mew.slabby.shop.log.IntValueChanged;
-import gg.mew.slabby.shop.log.StringValueChanged;
 import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Accessors(fluent = true, chain = true)
 @Getter
@@ -78,7 +73,7 @@ public final class BukkitShopWizard implements ShopWizard {
     @Override
     public ShopWizard note(final String note) {
         if (!this.note.equals(note))
-            this.valueChanges.put(ShopLog.Action.NOTE_CHANGED, new StringValueChanged(this.note, note));
+            this.valueChanges.put(ShopLog.Action.NOTE_CHANGED, new ValueChanged.String(this.note, note));
         else
             this.valueChanges.remove(ShopLog.Action.NOTE_CHANGED);
 
@@ -91,7 +86,7 @@ public final class BukkitShopWizard implements ShopWizard {
     @Override
     public ShopWizard buyPrice(final Double buyPrice) {
         if (!this.buyPrice.equals(buyPrice))
-            this.valueChanges.put(ShopLog.Action.BUY_PRICE_CHANGED, new DoubleValueChanged(this.buyPrice, buyPrice));
+            this.valueChanges.put(ShopLog.Action.BUY_PRICE_CHANGED, new ValueChanged.Double(this.buyPrice, buyPrice));
         else
             this.valueChanges.remove(ShopLog.Action.BUY_PRICE_CHANGED);
 
@@ -102,7 +97,7 @@ public final class BukkitShopWizard implements ShopWizard {
     @Override
     public ShopWizard sellPrice(final Double sellPrice) {
         if (!this.sellPrice.equals(sellPrice))
-            this.valueChanges.put(ShopLog.Action.SELL_PRICE_CHANGED, new DoubleValueChanged(this.sellPrice, sellPrice));
+            this.valueChanges.put(ShopLog.Action.SELL_PRICE_CHANGED, new ValueChanged.Double(this.sellPrice, sellPrice));
         else
             this.valueChanges.remove(ShopLog.Action.SELL_PRICE_CHANGED);
 
@@ -113,7 +108,7 @@ public final class BukkitShopWizard implements ShopWizard {
     @Override
     public ShopWizard quantity(final int quantity) {
         if (this.quantity != quantity)
-            this.valueChanges.put(ShopLog.Action.QUANTITY_CHANGED, new IntValueChanged(this.quantity, quantity));
+            this.valueChanges.put(ShopLog.Action.QUANTITY_CHANGED, new ValueChanged.Int(this.quantity, quantity));
         else
             this.valueChanges.remove(ShopLog.Action.QUANTITY_CHANGED);
 
