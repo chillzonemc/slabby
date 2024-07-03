@@ -77,7 +77,7 @@ public final class ClientShopUI {
         gui.setItem(4, 0, new SimpleItem(item));
 
         gui.setItem(6, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
-            meta.displayName(api.messages().client().sellersNote().title());
+            meta.displayName(api.messages().client().note().title());
             meta.lore(new ArrayList<>() {{
                 add(Component.text(shop.note(), NamedTextColor.DARK_PURPLE));
             }});

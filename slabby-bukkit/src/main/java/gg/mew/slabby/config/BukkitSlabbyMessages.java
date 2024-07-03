@@ -155,8 +155,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         @ConfigSerializable
-        final static class BukkitSellersNote implements SellersNote {
-            @Comment("Title for the sellers note")
+        final static class BukkitNote implements Note {
+            @Comment("Title for the note")
             private String title;
 
             @Override
@@ -174,8 +174,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Comment("Messages for shop client funds button")
         private BukkitFunds funds;
 
-        @Comment("Messages for shop client sellers note button")
-        private BukkitSellersNote sellersNote;
+        @Comment("Messages for shop client note button")
+        private BukkitNote note;
 
         @Comment("Title for shop client interface")
         private String title;
@@ -330,8 +330,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     final static class BukkitModify implements Modify {
 
         @ConfigSerializable
-        final static class BukkitSellersNote implements SellersNote {
-            @Comment("Title for the sellers note item")
+        final static class BukkitNote implements Note {
+            @Comment("Title for the note item")
             private String title;
 
             @Comment("Message for requesting a note")
@@ -504,8 +504,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Comment("Format for click to set")
         private String clickToSet;
 
-        @Comment("Messages for shop modify sellers note button")
-        private BukkitSellersNote sellersNote;
+        @Comment("Messages for shop modify note button")
+        private BukkitNote note;
 
         @Comment("Messages for shop modify buy button")
         private BukkitBuy buy;

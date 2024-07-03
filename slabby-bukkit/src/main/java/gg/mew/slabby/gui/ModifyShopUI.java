@@ -30,14 +30,14 @@ public final class ModifyShopUI {
 
         gui.setItem(0, 0, new SimpleItem(Bukkit.getItemFactory().createItemStack(wizard.item())));
         gui.setItem(1, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
-            meta.displayName(api.messages().modify().sellersNote().title());
+            meta.displayName(api.messages().modify().note().title());
             meta.lore(new ArrayList<>() {{
                 add(Component.text(wizard.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_NOTE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(api.messages().modify().sellersNote().request());
+            shopOwner.sendMessage(api.messages().modify().note().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 

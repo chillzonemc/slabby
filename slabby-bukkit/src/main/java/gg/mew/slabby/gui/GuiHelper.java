@@ -34,6 +34,7 @@ public final class GuiHelper {
     }
 
     public Component localize(final ShopOperations.ShopOperationResult result) {
+        //TODO: localize.
         return switch (result.cause()) {
             case INSUFFICIENT_BALANCE_TO_WITHDRAW -> Component.text("You don't have enough funds!", NamedTextColor.RED);
             case INSUFFICIENT_BALANCE_TO_DEPOSIT ->

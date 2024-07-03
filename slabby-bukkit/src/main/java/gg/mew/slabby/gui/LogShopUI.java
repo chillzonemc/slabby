@@ -42,7 +42,8 @@ public final class LogShopUI {
 
             meta.lore(new ArrayList<>() {{
                 //TODO: use display name
-                add(api.messages().log().player(Component.text(Bukkit.getOfflinePlayer(it.uniqueId()).getName())));
+                final var player = Bukkit.getOfflinePlayer(it.uniqueId());
+                add(api.messages().log().player(Component.text(player.getName())));
 
                 switch (it.action()) {
                     case BUY, SELL -> {

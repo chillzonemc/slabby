@@ -108,7 +108,7 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
         @Comment("Default quantity for new shops.")
         private int quantity;
 
-        @Comment("Default sellers note for new shops.")
+        @Comment("Default note for new shops.")
         private String note;
 
     }

@@ -2,9 +2,9 @@
 client:
   # Title for a shops' client UI
   title: '[Slabby] Client'
-  # Messages for shop client sellers note button
-  sellers-note:
-    # Title for the sellers note
+  # Messages for shop client note button
+  note:
+    # Title for the note
     title: '<green>Sellers note</green>'
   # Messages for shop client funds button
   funds:
@@ -36,7 +36,7 @@ client:
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     # Success sell message
     message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
-# Messages for the create shop interface
+# Messages for the shop create interface
 create:
   # Title for the create shop UI
   title: '[Slabby] Create Shop'
@@ -66,9 +66,9 @@ modify:
   title: '[Slabby] Editing Shop'
   # Format for click to set
   click-to-set: '<dark_purple>Click to set</dark_purple>'
-  # Messages for shop modify sellers note button
-  sellers-note:
-    # Title for the sellers note item
+  # Messages for shop modify note button
+  note:
+    # Title for the note item
     title: '<green>Sellers note</green>'
     # Message for requesting a note
     request: 'Please enter your note.'

@@ -2,6 +2,8 @@ package gg.mew.slabby.config;
 
 import net.kyori.adventure.text.Component;
 
+import java.util.Date;
+
 public interface SlabbyMessages {
 
     Client client();
@@ -36,7 +38,7 @@ public interface SlabbyMessages {
             Component balance(final double balance);
         }
 
-        interface SellersNote {
+        interface Note {
             Component title();
         }
 
@@ -44,7 +46,7 @@ public interface SlabbyMessages {
         Sell sell();
         Funds funds();
         Component title();
-        SellersNote sellersNote();
+        Note note();
     }
 
     interface CommandBlock {
@@ -76,13 +78,56 @@ public interface SlabbyMessages {
     }
 
     interface Log {
+
+        interface Buy {
+            Component title();
+            Component price(final double buyPrice);
+            Component quantity(final int amount);
+        }
+
+        interface Sell {
+            Component title();
+            Component price(final double buyPrice);
+            Component quantity(final int amount);
+        }
+
+        interface Deposit {
+            Component amount(final int amount);
+        }
+
+        interface Withdraw {
+            Component amount(final int amount);
+        }
+
+        interface LocationChanged {
+            Component x();
+            Component y();
+            Component z();
+            Component world();
+        }
+
+        interface LinkedInventory {
+            Component x();
+            Component y();
+            Component z();
+            Component world();
+            Component removed();
+        }
+
+        interface BuyPriceChanged {}
+        interface SellPriceChanged {}
+        interface QuantityChanged {}
+        interface NoteChanged {}
+        interface NameChanged {}
+
         Component title();
         Component player(final Component displayName);
+        Component date(final Date date);
     }
 
     interface Modify {
 
-        interface SellersNote {
+        interface Note {
             Component title();
             Component request();
         }
@@ -121,7 +166,7 @@ public interface SlabbyMessages {
         Component title();
         Component clickToSet();
 
-        SellersNote sellersNote();
+        Note note();
         Buy buy();
         Sell sell();
         Quantity quantity();

@@ -20,7 +20,7 @@ defaults:
   sell-price: 0
   # Default quantity for new shops.
   quantity: 64
-  # Default sellers note for new shops.
+  # Default note for new shops.
   note: Let's trade!
 
 # Options for restocking shops.
