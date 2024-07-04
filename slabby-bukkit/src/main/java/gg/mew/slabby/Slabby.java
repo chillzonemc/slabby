@@ -13,6 +13,8 @@ import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
 import gg.mew.slabby.shop.ShopOperations;
+import gg.mew.slabby.wrapper.claim.ClaimWrapper;
+import gg.mew.slabby.wrapper.claim.LandsClaimWrapper;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.economy.VaultEconomyWrapper;
 import gg.mew.slabby.wrapper.permission.BukkitPermissionWrapper;
@@ -21,6 +23,7 @@ import gg.mew.slabby.wrapper.sound.BukkitSoundWrapper;
 import gg.mew.slabby.wrapper.sound.SoundWrapper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import me.angeschossen.lands.api.LandsIntegration;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
@@ -46,7 +49,8 @@ import java.util.Date;
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
 @ApiVersion(ApiVersion.Target.v1_20)
 @DependsOn(value = {
-        @Dependency("Vault")
+        @Dependency("Vault"),
+        @Dependency("Lands")
 })
 @Permissions(value = {
         @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
@@ -74,6 +78,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     @Getter
     private final SoundWrapper sound = new BukkitSoundWrapper();
+
+    @Getter
+    private ClaimWrapper claim;
 
     @Getter
     private SlabbyConfig configuration;
@@ -127,6 +134,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        if (this.getServer().getPluginManager().isPluginEnabled("Lands"))
+            this.claim = new LandsClaimWrapper(LandsIntegration.of(this));
 
         final var commandManager = new PaperCommandManager(this);
         commandManager.registerCommand(new SlabbyCommand(this));
