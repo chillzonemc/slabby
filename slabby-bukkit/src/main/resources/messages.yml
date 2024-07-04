@@ -11,12 +11,14 @@ client:
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Bought <quantity> <item> for a total of $<price:''#.##''></green>'
+    insufficient-balance: '<red>You don''t have enough funds!</red>'
   sell:
     title: '<gold>Sell ''<item>'' * <quantity></gold>'
     price: '<dark_purple>Sell for: $<price:''#.##''></dark_purple>'
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
+    insufficient-balance: '<red>The shop doesn''t have enough funds!</red>'
 create:
   title: '[Slabby] Create Shop'
 destroy:
@@ -111,9 +113,11 @@ owner:
   deposit:
     title: '<gold>Deposit ''<item>''</gold>'
     bulk: '<dark_purple>+Shift for bulk deposit</dark_purple>'
+    insufficient-stock: '<red>You don''t have enough items</red>'
   withdraw:
     title: '<gold>Withdraw ''<item>''</gold>'
     bulk: '<dark_purple>+Shift for bulk withdraw</dark_purple>'
+    insufficient-stock: '<red>This shop is out of stock!</red>'
   change-rate:
     title: '<gold>Change rate</gold>'
     amount: '<dark_purple>Amount per click: <amount><dark_purple>'

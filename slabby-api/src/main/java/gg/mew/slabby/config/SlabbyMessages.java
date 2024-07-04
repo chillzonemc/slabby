@@ -23,6 +23,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double buyPrice);
+            Component insufficientBalance();
         }
 
         interface Sell {
@@ -31,6 +32,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double sellPrice);
+            Component insufficientBalance();
         }
 
         interface Funds {
@@ -220,11 +222,13 @@ public interface SlabbyMessages {
         interface Deposit {
             Component title(final Component displayName);
             Component bulk();
+            Component insufficientStock();
         }
 
         interface Withdraw {
             Component title(final Component displayName);
             Component bulk();
+            Component insufficientStock();
         }
 
         interface ChangeRate {

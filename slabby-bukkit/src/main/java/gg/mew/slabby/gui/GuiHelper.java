@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.SlabbyHelper;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopOperations;
 import lombok.experimental.UtilityClass;
@@ -33,17 +34,18 @@ public final class GuiHelper {
         };
     }
 
+    //TODO: Cleanup
     public Component localize(final ShopOperations.ShopOperationResult result) {
-        //TODO: localize.
         return switch (result.cause()) {
-            case INSUFFICIENT_BALANCE_TO_WITHDRAW -> Component.text("You don't have enough funds!", NamedTextColor.RED);
-            case INSUFFICIENT_BALANCE_TO_DEPOSIT ->
-                    Component.text("The shop doesn't have enough funds!", NamedTextColor.RED);
-            case INSUFFICIENT_STOCK_TO_WITHDRAW -> Component.text("This shop is out of stock!", NamedTextColor.RED);
-            case INSUFFICIENT_STOCK_TO_DEPOSIT -> Component.text("You don't have enough items", NamedTextColor.RED);
-            case OPERATION_NO_PERMISSION -> Component.text("You don't have permission to do this!", NamedTextColor.RED);
-            case OPERATION_NOT_ALLOWED, OPERATION_FAILED, NONE ->
-                    Component.text("Something went wrong!", NamedTextColor.RED);
+            case INSUFFICIENT_BALANCE_TO_BUY -> SlabbyHelper.api().messages().client().buy().insufficientBalance();
+            case INSUFFICIENT_BALANCE_TO_SELL -> SlabbyHelper.api().messages().client().sell().insufficientBalance();
+            case INSUFFICIENT_STOCK_TO_WITHDRAW -> SlabbyHelper.api().messages().owner().withdraw().insufficientStock();
+            case INSUFFICIENT_STOCK_TO_DEPOSIT -> SlabbyHelper.api().messages().owner().deposit().insufficientStock();
+            case OPERATION_NO_PERMISSION -> Bukkit.permissionMessage();
+            //TODO: Technically never happens, edge case.
+            case OPERATION_FAILED, NONE -> Component.text("Something went wrong!", NamedTextColor.RED);
+            //TODO: Technically never happens, edge case.
+            case OPERATION_NOT_ALLOWED -> Bukkit.permissionMessage();
         };
     }
 

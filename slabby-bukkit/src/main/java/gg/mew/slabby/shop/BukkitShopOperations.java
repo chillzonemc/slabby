@@ -78,7 +78,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_WITHDRAW);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_BUY);
 
         final var stock = shop.stock();
 
@@ -135,7 +135,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         for (final var entry : cost.entrySet()) {
             if (!api.economy().hasAmount(entry.getKey(), entry.getValue()))
-                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_DEPOSIT);
+                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_SELL);
         }
 
         final var stock = shop.stock();

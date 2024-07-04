@@ -36,6 +36,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String insufficientBalance;
 
             @Override
             public Component title(final Component displayName, final int quantity) {
@@ -64,6 +65,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
                         Formatter.number("quantity", quantity),
                         Formatter.number("price", buyPrice));
             }
+
+            @Override
+            public Component insufficientBalance() {
+                return MiniMessage.miniMessage().deserialize(this.insufficientBalance);
+            }
         }
 
         @ConfigSerializable
@@ -74,6 +80,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String insufficientBalance;
 
             @Override
             public Component title(final Component displayName, final int quantity) {
@@ -101,6 +108,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
                         Placeholder.component("item", displayName),
                         Formatter.number("quantity", quantity),
                         Formatter.number("price", sellPrice));
+            }
+
+            @Override
+            public Component insufficientBalance() {
+                return MiniMessage.miniMessage().deserialize(this.insufficientBalance);
             }
         }
 
@@ -732,6 +744,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
             private String title;
             private String bulk;
+            private String insufficientStock;
 
             @Override
             public Component title(final Component displayName) {
@@ -741,6 +754,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             @Override
             public Component bulk() {
                 return MiniMessage.miniMessage().deserialize(this.bulk);
+            }
+
+            @Override
+            public Component insufficientStock() {
+                return MiniMessage.miniMessage().deserialize(this.insufficientStock);
             }
         }
 
@@ -749,6 +767,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
             private String title;
             private String bulk;
+            private String insufficientStock;
 
             @Override
             public Component title(final Component displayName) {
@@ -758,6 +777,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             @Override
             public Component bulk() {
                 return MiniMessage.miniMessage().deserialize(this.bulk);
+            }
+
+            @Override
+            public Component insufficientStock() {
+                return MiniMessage.miniMessage().deserialize(this.insufficientStock);
             }
         }
 

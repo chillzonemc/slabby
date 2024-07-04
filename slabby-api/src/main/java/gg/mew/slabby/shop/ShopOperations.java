@@ -21,11 +21,12 @@ public interface ShopOperations {
 
     Map<UUID, Double> splitCost(final double amount, final Shop shop);
 
+    //TODO: We need something better than this. Custom exception?
     record ShopOperationResult(boolean success, Cause cause) {}
 
     enum Cause {
-        INSUFFICIENT_BALANCE_TO_WITHDRAW,
-        INSUFFICIENT_BALANCE_TO_DEPOSIT,
+        INSUFFICIENT_BALANCE_TO_BUY,
+        INSUFFICIENT_BALANCE_TO_SELL,
 
         INSUFFICIENT_STOCK_TO_WITHDRAW,
         INSUFFICIENT_STOCK_TO_DEPOSIT,
