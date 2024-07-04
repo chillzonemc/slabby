@@ -67,21 +67,21 @@ public final class LogShopUI {
                     case WITHDRAW -> {
                         meta.displayName(api.messages().log().withdraw().title());
                         final var data = api.gson().fromJson(it.data(), ValueChanged.Int.class);
-                        final var deposited = data.to() - data.from();
+                        final var deposited = data.from() - data.to();
                         add(api.messages().log().withdraw().amount(deposited));
                     }
-                    case LINKED_INVENTORY_CHANGED -> {
-                        meta.displayName(api.messages().log().linkedInventory().title());
+                    case INVENTORY_LINK_CHANGED -> {
+                        meta.displayName(api.messages().log().inventoryLinkChanged().title());
 
                         final var data = api.gson().fromJson(it.data(), LocationChanged.class);
 
                         if (data.isRemoved()) {
-                            add(api.messages().log().linkedInventory().removed());
+                            add(api.messages().log().inventoryLinkChanged().removed());
                         } else {
-                            add(api.messages().log().linkedInventory().x(data.x()));
-                            add(api.messages().log().linkedInventory().y(data.y()));
-                            add(api.messages().log().linkedInventory().z(data.z()));
-                            add(api.messages().log().linkedInventory().world(data.world()));
+                            add(api.messages().log().inventoryLinkChanged().x(data.x()));
+                            add(api.messages().log().inventoryLinkChanged().y(data.y()));
+                            add(api.messages().log().inventoryLinkChanged().z(data.z()));
+                            add(api.messages().log().inventoryLinkChanged().world(data.world()));
                         }
                     }
                     case LOCATION_CHANGED -> {

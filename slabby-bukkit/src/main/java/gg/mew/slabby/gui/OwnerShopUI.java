@@ -96,14 +96,14 @@ public final class OwnerShopUI {
             //TODO: update item after clicking
             if (shop.hasInventory()) {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.ENDER_CHEST, (it, meta) -> {
-                    meta.displayName(api.messages().owner().inventory().cancel().title());
+                    meta.displayName(api.messages().owner().inventoryLink().cancel().title());
                 }).get(), c -> {
                     try {
                         shop.inventory(null, null, null, null);
                         api.repository().update(shop);
 
                         final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
+                                .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
                                 .uniqueId(shopOwner.getUniqueId())
                                 .serialized(new LocationChanged(null, null, null, null))
                                 .build();
@@ -111,16 +111,16 @@ public final class OwnerShopUI {
                         shop.logs().add(log);
 
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
-                        shopOwner.sendMessage(api.messages().owner().inventory().cancel().message());
+                        shopOwner.sendMessage(api.messages().owner().inventoryLink().cancel().message());
                     } catch (final Exception ignored) {
                         //TODO: notify uniqueId
                     }
                 }));
             } else {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
-                    meta.displayName(api.messages().owner().inventory().title());
+                    meta.displayName(api.messages().owner().inventoryLink().title());
                     meta.lore(new ArrayList<>() {{
-                        add(api.messages().owner().inventory().description());
+                        add(api.messages().owner().inventoryLink().description());
                     }});
                 }).get(), c -> {
                     api.operations()
@@ -128,7 +128,7 @@ public final class OwnerShopUI {
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
 
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
-                    shopOwner.sendMessage(api.messages().owner().inventory().message());
+                    shopOwner.sendMessage(api.messages().owner().inventoryLink().message());
                     gui.closeForAllViewers();
                 }));
             }

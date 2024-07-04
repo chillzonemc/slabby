@@ -50,13 +50,13 @@ log:
     y: '<dark_purple>Y: <y></dark_purple>'
     z: '<dark_purple>Z: <z></dark_purple>'
     world: '<dark_purple>World: <world></dark_purple>'
-  linked-inventory:
-    title: '<green>Linked Inventory</green>'
+  inventory-link-changed:
+    title: '<green>Inventory Link</green>'
     x: '<dark_purple>X: <x></dark_purple>'
     y: '<dark_purple>Y: <y></dark_purple>'
     z: '<dark_purple>Z: <z></dark_purple>'
     world: '<dark_purple>World: <world></dark_purple>'
-    removed: '<dark_purple>Linked inventory removed</dark_purple>'
+    removed: '<dark_purple>Inventory link removed</dark_purple>'
   buy-price-changed:
     title: '<green>Buy Price Changed</green>'
     from: '<dark_purple>From: $<amount:''#.##''></dark_purple>'
@@ -119,13 +119,13 @@ owner:
     amount: '<dark_purple>Amount per click: <amount><dark_purple>'
   logs:
     title: '<gold>Logs</gold>'
-  inventory:
+  inventory-link:
     cancel:
-      title: '<gold>Cancel chest link</gold>'
+      title: '<gold>Cancel inventory link</gold>'
       message: '<green>Shop linking has been removed</green>'
-    title: '<gold>Link chest</gold>'
-    description: '<green>Link a chest for refilling!</green>'
-    message: '<green>Please crouch and punch the chest you want to link.</green>'
+    title: '<gold>Link inventory</gold>'
+    description: '<green>Link an inventory for refilling!</green>'
+    message: '<green>Please crouch and punch the inventory you want to link.</green>'
   modify:
     title: '<gold>Modify Shop</gold>'
   customer:

@@ -17,7 +17,6 @@ public interface ShopLog extends Auditable {
     @Getter
     @Accessors(fluent = true, chain = false)
     enum Action {
-        //TODO: how does sqlite store enums? if it is by their ordinal, we're in trouble
         LOCATION_CHANGED(LocationChanged.class),
         BUY_PRICE_CHANGED(ValueChanged.Double.class),
         SELL_PRICE_CHANGED(ValueChanged.Double.class),
@@ -25,7 +24,7 @@ public interface ShopLog extends Auditable {
         NOTE_CHANGED(ValueChanged.String.class),
         NAME_CHANGED(ValueChanged.String.class),
 
-        LINKED_INVENTORY_CHANGED(LocationChanged.class),
+        INVENTORY_LINK_CHANGED(LocationChanged.class),
 
         OWNER_ADDED(Void.class),
         OWNER_REMOVED(Void.class),

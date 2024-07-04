@@ -109,7 +109,7 @@ public interface SlabbyMessages {
             Component world(final String world);
         }
 
-        interface LinkedInventory {
+        interface InventoryLinkChanged {
             Component title();
             Component x(final int x);
             Component y(final int y);
@@ -155,7 +155,7 @@ public interface SlabbyMessages {
         Deposit deposit();
         Withdraw withdraw();
         LocationChanged locationChanged();
-        LinkedInventory linkedInventory();
+        InventoryLinkChanged inventoryLinkChanged();
         BuyPriceChanged buyPriceChanged();
         SellPriceChanged sellPriceChanged();
         QuantityChanged quantityChanged();
@@ -236,7 +236,7 @@ public interface SlabbyMessages {
             Component title();
         }
 
-        interface Inventory {
+        interface InventoryLink {
 
             interface Cancel {
                 Component title();
@@ -266,7 +266,7 @@ public interface SlabbyMessages {
         Withdraw withdraw();
         ChangeRate changeRate();
         Logs logs();
-        Inventory inventory();
+        InventoryLink inventoryLink();
         Modify modify();
         Customer customer();
     }

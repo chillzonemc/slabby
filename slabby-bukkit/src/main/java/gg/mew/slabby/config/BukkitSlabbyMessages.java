@@ -7,7 +7,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Formatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
-import org.spongepowered.configurate.objectmapping.meta.Comment;
 
 import java.util.Date;
 
@@ -367,7 +366,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         @ConfigSerializable
-        final static class BukkitLinkedInventory implements LinkedInventory {
+        final static class BukkitInventoryLinkChanged implements InventoryLinkChanged {
 
             private String title;
             private String x;
@@ -527,7 +526,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitDeposit deposit;
         private BukkitWithdraw withdraw;
         private BukkitLocationChanged locationChanged;
-        private BukkitLinkedInventory linkedInventory;
+        private BukkitInventoryLinkChanged inventoryLinkChanged;
         private BukkitBuyPriceChanged buyPriceChanged;
         private BukkitSellPriceChanged sellPriceChanged;
         private BukkitQuantityChanged quantityChanged;
@@ -793,7 +792,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @ConfigSerializable
         @Accessors(fluent = true, chain = false)
         @Getter
-        final static class BukkitInventory implements Inventory {
+        final static class BukkitInventoryLink implements InventoryLink {
 
             @ConfigSerializable
             final static class BukkitCancel implements Cancel {
@@ -863,7 +862,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitWithdraw withdraw;
         private BukkitChangeRate changeRate;
         private BukkitLogs logs;
-        private BukkitInventory inventory;
+        private BukkitInventoryLink inventoryLink;
         private BukkitModify modify;
         private BukkitCustomer customer;
 

@@ -119,7 +119,7 @@ public final class SlabbyListener implements Listener {
                                     api.repository().update(shop);
 
                                     final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                            .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
+                                            .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
                                             .uniqueId(player.getUniqueId())
                                             .serialized(new LocationChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
                                             .build();
@@ -161,7 +161,8 @@ public final class SlabbyListener implements Listener {
     private void onInventoryClose(final InventoryCloseEvent event) {
         if (event.getReason() == InventoryCloseEvent.Reason.PLAYER) {
             api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
-                if (wizard.state() == ShopWizard.WizardState.AWAITING_CONFIRMATION)
+                if (wizard.state() == ShopWizard.WizardState.AWAITING_CONFIRMATION
+                        || wizard.state() == ShopWizard.WizardState.AWAITING_ITEM)
                     api.operations().wizards().remove(event.getPlayer().getUniqueId());
             });
         }
