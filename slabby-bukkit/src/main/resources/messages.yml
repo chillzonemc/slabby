@@ -1,74 +1,42 @@
-# Messages for the client shop interface
 client:
-  # Title for a shops' client UI
   title: '[Slabby] Client'
-  # Messages for shop client note button
   note:
-    # Title for the note
     title: '<green>Sellers note</green>'
-  # Messages for shop client funds button
   funds:
-    # Title for the current funds
     title: '<gold>Current funds</gold>'
-    #
     balance: '<dark_purple>Funds: $<balance:''#.##''></dark_purple>'
-  # Messages for shop client buy button
   buy:
-    # Title for the buy button
     title: '<gold>Buy ''<item>'' * <quantity></gold>'
-    # Price for the buy button
     price: '<dark_purple>Buy for: $<price:''#.##''></dark_purple>'
-    # Stock for the buy button
     stock: '<dark_purple>In stock: <stock></dark_purple>'
-    # Stacks for the buy button
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
-    # Success buy message
     message: '<green>Bought <quantity> <item> for a total of $<price:''#.##''></green>'
-  # Messages for shop client sell button
   sell:
-    # Title for the sell button
     title: '<gold>Sell ''<item>'' * <quantity></gold>'
-    # Price for the sell button
     price: '<dark_purple>Sell for: $<price:''#.##''></dark_purple>'
-    # Stock for the sell button
     stock: '<dark_purple>In stock: <stock></dark_purple>'
-    # Stacks for the sell button
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
-    # Success sell message
     message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
-# Messages for the shop create interface
 create:
-  # Title for the create shop UI
   title: '[Slabby] Create Shop'
-# Messages for the destroy shop interface
 destroy:
-  # Title for the destroy shop UI
   title: '[Slabby] Destroy Shop'
-  # Messages for shop destroy confirm button
   confirm:
-    # Title for the destroy shop button
     title: '<green>Destroy Shop</green>'
-    # Warning text for the destroy shop button
     description: '<red>This will destroy your items.</red>'
-  # Messages for shop destroy cancel button
   cancel:
-    # Title for the cancel button
     title: '<red>Cancel</red>'
-# Messages for the shop logs interface
 log:
-  # Title for the shop logs interface
   title: '[Slabby] Logs'
-  # Format for the player name
   player: '<dark_purple>Player: <player></dark_purple>'
-  # Format for dates
   date: '<dark_purple>Date: <created_on:''yyyy-MM-dd HH:mm:ss''></dark_purple>'
   buy:
     title: '<green>Buy</green>'
-    amount: '<dark_purple>Price: <amount></dark_purple>'
+    amount: '<dark_purple>Price: $<amount></dark_purple>'
     quantity: '<dark_purple>Quantity: <quantity></dark_purple>'
   sell:
     title: '<green>Sell</green>'
-    amount: '<dark_purple>Price: <amount></dark_purple>'
+    amount: '<dark_purple>Price: $<amount></dark_purple>'
     quantity: '<dark_purple>Quantity: <quantity></dark_purple>'
   deposit:
     title: '<green>Deposit</green>'
@@ -91,12 +59,12 @@ log:
     removed: '<dark_purple>Linked inventory removed</dark_purple>'
   buy-price-changed:
     title: '<green>Buy Price Changed</green>'
-    from: '<dark_purple>From: <amount:''#.##''></dark_purple>'
-    to: '<dark_purple>To: <amount:''#.##''></dark_purple>'
+    from: '<dark_purple>From: $<amount:''#.##''></dark_purple>'
+    to: '<dark_purple>To: $<amount:''#.##''></dark_purple>'
   sell-price-changed:
     title: '<green>Sell Price Changed</green>'
-    from: '<dark_purple>From: <amount:''#.##''></dark_purple>'
-    to: '<dark_purple>To: <amount:''#.##''></dark_purple>'
+    from: '<dark_purple>From: $<amount:''#.##''></dark_purple>'
+    to: '<dark_purple>To: $<amount:''#.##''></dark_purple>'
   quantity-changed:
     title: '<green>Quantity Changed</green>'
     from: '<dark_purple>From: <amount></dark_purple>'
@@ -109,120 +77,62 @@ log:
     title: '<green>Name Changed</green>'
     from: '<dark_purple>From: <name></dark_purple>'
     to: '<dark_purple>To: <name></dark_purple>'
-# Messages for the modify shop interface
 modify:
-  # Title for the shop modify interface
   title: '[Slabby] Editing Shop'
-  # Format for click to set
   click-to-set: '<dark_purple>Click to set</dark_purple>'
-  # Messages for shop modify note button
   note:
-    # Title for the note item
     title: '<green>Sellers note</green>'
-    # Message for requesting a note
     request: 'Please enter your note.'
-  # Messages for shop modify buy button
   buy:
-    # Title for the buy button
     title: '<green>Buy price</green>'
-    # Format for the current buy amount
     amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
-    # Format for not for sale
     not-for-sale: '<dark_purple>(-1 means not for sale)</dark_purple>'
-    # Message for requesting a buy price
     request: 'Please enter your buy price.'
-  # Messages for shop modify sell button
   sell:
-    # Title for the sell button
     title: '<red>Sell price</red>'
-    # Format for the current sell amount
     amount: '<dark_purple>$<amount:''#.##''></dark_purple>'
-    # Format for not buying
     not-buying: '<dark_purple>(-1 means not buying)</dark_purple>'
-    # Message for requesting a sell price
     request: 'Please enter your sell price.'
-  # Messages for shop modify quantity button
   quantity:
-    # Format for the quantity button
     title: '<yellow>Quantity</yellow>'
-    # Format for amount per transaction
     amount: '<dark_purple>Amount per transaction: <quantity></dark_purple>'
-    # Format for amount per transaction description
     description: '<dark_purple>(Amount of items per buy/sell)</dark_purple>'
-    # Message for requesting a quantity
     request: 'Please enter your quantity.'
-  # Messages for shop modify confirm button
   confirm:
-    # Title for the confirm button
     title: '<green>Confirm</green>'
-    # Format for the save shop description
     description: '<dark_purple>Save Shop</dark_purple>'
-    # Format for the location
     location: '<dark_purple><world>, <x>, <y>, <z></dark_purple>'
-  # Messages for shop modify cancel button
   cancel:
-    # Title for the cancel button
     title: '<red>Cancel</red>'
-# Messages for the owner shop interface
 owner:
-  # Title for the shop owner interface
   title: '[Slabby] Owner'
-  # Format for the stock message
   stock: '<dark_purple>In stock <stock></dark_purple>'
-  # Format for the stacks message
   stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
-  # Messages for shop owner deposit button
   deposit:
-    # Title for the shop deposit button
     title: '<gold>Deposit ''<item>''</gold>'
-    # Format for the shift bulk deposit message
     bulk: '<dark_purple>+Shift for bulk deposit</dark_purple>'
-  # Messages for shop owner deposit button
   withdraw:
-    # Title for the shop withdraw button
     title: '<gold>Withdraw ''<item>''</gold>'
-    # Format for the shift bulk withdraw message
     bulk: '<dark_purple>+Shift for bulk withdraw</dark_purple>'
-  # Messages for shop owner change rate button
   change-rate:
-    # Title for the change rate button
     title: '<gold>Change rate</gold>'
-    # Format for the amount per click message
     amount: '<dark_purple>Amount per click: <amount><dark_purple>'
-  # Messages for shop owner logs button
   logs:
-    # Title for the shop logs button
     title: '<gold>Logs</gold>'
-  # Messages for shop owner inventory button
   inventory:
-    # Messages for shop owner inventory cancel button
     cancel:
-      # Title for the cancel chest link button
       title: '<gold>Cancel chest link</gold>'
-      # Format for the cancel chest linking message
       message: '<green>Shop linking has been removed</green>'
-    # Title for the chest link button
     title: '<gold>Link chest</gold>'
-    # Format for the chest link description
     description: '<green>Link a chest for refilling!</green>'
-    # Format for the chest link message
     message: '<green>Please crouch and punch the chest you want to link.</green>'
-  # Messages for shop owner modify button
   modify:
-    # Title for the modify shop button
     title: '<gold>Modify Shop</gold>'
   customer:
-    # Title for the view as customer button
     title: '<gold>View as customer</gold>'
-# Messages for the command block interface item
 command-block:
-  # Title for the command block item
   title: '<gold>Slabby Shop</gold>'
-  # Owners of the shop
   owners: '<green>Owned by <names></green>'
-  # Item being sold
   selling: '<dark_purple>Selling: <item></dark_purple>'
-  # Buy price of the item being sold
   buy-price: '<dark_purple>Buy <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'
-  # Sell price of the item being sold
   sell-price: '<dark_purple>Sell <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'

@@ -16,25 +16,12 @@ import java.util.Date;
 @Getter
 public final class BukkitSlabbyMessages implements SlabbyMessages {
 
-    @Comment("Messages for the client shop interface")
     private BukkitClient client;
-
-    @Comment("Messages for the create shop interface")
     private BukkitCreate create;
-
-    @Comment("Messages for the destroy shop interface")
     private BukkitDestroy destroy;
-
-    @Comment("Messages for the command block interface item")
     private BukkitCommandBlock commandBlock;
-
-    @Comment("Messages for the shop logs interface")
     private BukkitLog log;
-
-    @Comment("Messages for the modify shop interface")
     private BukkitModify modify;
-
-    @Comment("Messages for the owner shop interface")
     private BukkitOwner owner;
 
     @ConfigSerializable
@@ -45,19 +32,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @ConfigSerializable
         final static class BukkitBuy implements Buy {
 
-            @Comment("Title for the buy button")
             private String title;
-
-            @Comment("Price for the buy button")
             private String price;
-
-            @Comment("Stock for the buy button")
             private String stock;
-
-            @Comment("Stacks for the buy button")
             private String stacks;
-
-            @Comment("Success buy message")
             private String message;
 
             @Override
@@ -92,19 +70,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @ConfigSerializable
         final static class BukkitSell implements Sell {
 
-            @Comment("Title for the sell button")
             private String title;
-
-            @Comment("Price for the sell button")
             private String price;
-
-            @Comment("Stock for the sell button")
             private String stock;
-
-            @Comment("Stacks for the sell button")
             private String stacks;
-
-            @Comment("Success sell message")
             private String message;
 
             @Override
@@ -139,10 +108,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @ConfigSerializable
         final static class BukkitFunds implements Funds {
 
-            @Comment("Title for the current funds")
             private String title;
-
-            @Comment("Current funds")
             private String balance;
 
             @Override
@@ -158,7 +124,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitNote implements Note {
-            @Comment("Title for the note")
+
             private String title;
 
             @Override
@@ -167,19 +133,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
-        @Comment("Messages for shop client buy button")
         private BukkitBuy buy;
-
-        @Comment("Messages for shop client sell button")
         private BukkitSell sell;
-
-        @Comment("Messages for shop client funds button")
         private BukkitFunds funds;
-
-        @Comment("Messages for shop client note button")
         private BukkitNote note;
-
-        @Comment("Title for shop client interface")
         private String title;
 
         @Override
@@ -192,19 +149,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     @ConfigSerializable
     final static class BukkitCommandBlock implements CommandBlock {
 
-        @Comment("Title for the command block item")
         private String title;
-
-        @Comment("Owners of the shop")
         private String owners;
-
-        @Comment("Item being sold")
         private String selling;
-
-        @Comment("Buy price of the item being sold")
         private String buyPrice;
-
-        @Comment("Sell price of the item being sold")
         private String sellPrice;
 
         @Override
@@ -245,7 +193,6 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     @ConfigSerializable
     final static class BukkitCreate implements Create {
 
-        @Comment("Title for the create shop UI")
         private String title;
 
         @Override
@@ -261,10 +208,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitConfirm implements Confirm {
-            @Comment("Title for the destroy shop button")
-            private String title;
 
-            @Comment("Warning text for the destroy shop button")
+            private String title;
             private String description;
 
             @Override
@@ -281,7 +226,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitCancel implements Cancel {
-            @Comment("Title for the cancel button")
+
             private String title;
 
             @Override
@@ -290,13 +235,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
-        @Comment("Title for the destroy shop UI")
         private String title;
-
-        @Comment("Messages for shop destroy confirm button")
         private BukkitConfirm confirm;
-
-        @Comment("Messages for shop destroy cancel button")
         private BukkitCancel cancel;
 
         @Override
@@ -361,7 +301,6 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         final static class BukkitDeposit implements Deposit {
 
             private String title;
-
             private String amount;
 
             @Override
@@ -379,7 +318,6 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         final static class BukkitWithdraw implements Withdraw {
 
             private String title;
-
             private String amount;
 
             @Override
@@ -585,34 +523,19 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         }
 
         private BukkitBuy buy;
-
         private BukkitSell sell;
-
         private BukkitDeposit deposit;
-
         private BukkitWithdraw withdraw;
-
         private BukkitLocationChanged locationChanged;
-
         private BukkitLinkedInventory linkedInventory;
-
         private BukkitBuyPriceChanged buyPriceChanged;
-
         private BukkitSellPriceChanged sellPriceChanged;
-
         private BukkitQuantityChanged quantityChanged;
-
         private BukkitNoteChanged noteChanged;
-
         private BukkitNameChanged nameChanged;
 
-        @Comment("Title for the shop logs interface")
         private String title;
-
-        @Comment("Format for the player name")
         private String player;
-
-        @Comment("Format for dates")
         private String date;
 
         @Override
@@ -638,10 +561,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitNote implements Note {
-            @Comment("Title for the note item")
-            private String title;
 
-            @Comment("Message for requesting a note")
+            private String title;
             private String request;
 
             @Override
@@ -658,16 +579,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitBuy implements Buy {
-            @Comment("Title for the buy button")
+
             private String title;
-
-            @Comment("Format for the current buy amount")
             private String amount;
-
-            @Comment("Format for not for sale")
             private String notForSale;
-
-            @Comment("Message for requesting a buy price")
             private String request;
 
             @Override
@@ -694,16 +609,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @ConfigSerializable
         final static class BukkitSell implements Sell {
 
-            @Comment("Title for the sell price button")
             private String title;
-
-            @Comment("Format for the current sell price amount")
             private String amount;
-
-            @Comment("Format for not buying")
             private String notBuying;
-
-            @Comment("Message for requesting a sell price")
             private String request;
 
             @Override
@@ -729,16 +637,10 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitQuantity implements Quantity {
-            @Comment("Format for the quantity button")
+
             private String title;
-
-            @Comment("Format for amount per transaction")
             private String amount;
-
-            @Comment("Format for amount per transaction description")
             private String description;
-
-            @Comment("Message for requesting a quantity")
             private String request;
 
             @Override
@@ -764,13 +666,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitConfirm implements Confirm {
-            @Comment("Title for the confirm button")
+
             private String title;
-
-            @Comment("Format for the save shop description")
             private String description;
-
-            @Comment("Format for the location")
             private String location;
 
             @Override
@@ -796,7 +694,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitCancel implements Cancel {
-            @Comment("Title for the cancel button")
+
             private String title;
 
             @Override
@@ -805,28 +703,13 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
-        @Comment("Title for the shop modify interface")
         private String title;
-
-        @Comment("Format for click to set")
         private String clickToSet;
-
-        @Comment("Messages for shop modify note button")
         private BukkitNote note;
-
-        @Comment("Messages for shop modify buy button")
         private BukkitBuy buy;
-
-        @Comment("Messages for shop modify sell button")
         private BukkitSell sell;
-
-        @Comment("Messages for shop modify quantity button")
         private BukkitQuantity quantity;
-
-        @Comment("Messages for shop modify confirm button")
         private BukkitConfirm confirm;
-
-        @Comment("Messages for shop modify cancel button")
         private BukkitCancel cancel;
 
         @Override
@@ -847,10 +730,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitDeposit implements Deposit {
-            @Comment("Title for the shop deposit button")
-            private String title;
 
-            @Comment("Format for the shift bulk deposit message")
+            private String title;
             private String bulk;
 
             @Override
@@ -866,10 +747,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitWithdraw implements Withdraw {
-            @Comment("Title for the shop withdraw button")
-            private String title;
 
-            @Comment("Format for the shift bulk withdraw message")
+            private String title;
             private String bulk;
 
             @Override
@@ -885,10 +764,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitChangeRate implements ChangeRate {
-            @Comment("Title for the change rate button")
-            private String title;
 
-            @Comment("Format for the amount per click message")
+            private String title;
             private String amount;
 
             @Override
@@ -904,7 +781,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitLogs implements Logs {
-            @Comment("Title for the shop logs button")
+
             private String title;
 
             @Override
@@ -920,10 +797,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
             @ConfigSerializable
             final static class BukkitCancel implements Cancel {
-                @Comment("Title for the cancel chest link button")
-                private String title;
 
-                @Comment("Format for the cancel chest linking message")
+                private String title;
                 private String message;
 
                 @Override
@@ -938,16 +813,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
             }
 
-            @Comment("Title for the chest link button")
             private String title;
-
-            @Comment("Format for the chest link description")
             private String description;
-
-            @Comment("Format for the chest link message")
             private String message;
-
-            @Comment("Messages for shop owner inventory-link cancel button")
             private BukkitCancel cancel;
 
             @Override
@@ -964,12 +832,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             public Component message() {
                 return MiniMessage.miniMessage().deserialize(this.message);
             }
-
         }
 
         @ConfigSerializable
         final static class BukkitModify implements Modify {
-            @Comment("Title for the modify shop button")
+
             private String title;
 
             @Override
@@ -980,7 +847,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         @ConfigSerializable
         final static class BukkitCustomer implements Customer {
-            @Comment("Title for the view as customer button")
+
             private String title;
 
             @Override
@@ -989,34 +856,15 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
-        @Comment("Title for the shop owner interface")
         private String title;
-
-        @Comment("Format for the stock message")
         private String stock;
-
-        @Comment("Format for the stacks message")
         private String stacks;
-
-        @Comment("Messages for shop owner deposit button")
         private BukkitDeposit deposit;
-
-        @Comment("Messages for shop owner deposit button")
         private BukkitWithdraw withdraw;
-
-        @Comment("Messages for shop owner change rate button")
         private BukkitChangeRate changeRate;
-
-        @Comment("Messages for shop owner logs button")
         private BukkitLogs logs;
-
-        @Comment("Messages for shop owner inventory button")
         private BukkitInventory inventory;
-
-        @Comment("Messages for shop owner modify button")
         private BukkitModify modify;
-
-        @Comment("Title for the view as customer button")
         private BukkitCustomer customer;
 
         @Override
@@ -1033,7 +881,6 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         public Component stacks(final int stacks) {
             return MiniMessage.miniMessage().deserialize(this.stacks, Formatter.number("stacks", stacks));
         }
-
     }
 
 }
