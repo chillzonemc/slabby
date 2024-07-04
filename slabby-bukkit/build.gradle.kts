@@ -28,6 +28,8 @@ dependencies {
     // Library for creating item UIs
     implementation("xyz.xenondevs.invui:invui:1.30")
 
+    compileOnly("com.github.angeschossen:LandsAPI:6.44.10")
+
     implementation(project(":slabby-api"))
     implementation(project(":slabby-sqlite3"))
 }

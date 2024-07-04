@@ -6,6 +6,7 @@ import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.ShopOperations;
 import gg.mew.slabby.shop.ShopRepository;
+import gg.mew.slabby.wrapper.claim.ClaimWrapper;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.permission.PermissionWrapper;
 import gg.mew.slabby.wrapper.sound.SoundWrapper;
@@ -22,6 +23,8 @@ public interface SlabbyAPI {
     PermissionWrapper permission();
 
     SoundWrapper sound();
+
+    ClaimWrapper claim();
 
     ShopRepository repository();
 

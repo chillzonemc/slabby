@@ -73,7 +73,14 @@ public final class SlabbyListener implements Listener {
                         ClientShopUI.open(api, player, shop);
                     }
                 }, () -> {
-                    if (hasConfigurationItem) {
+                    final var canAccessClaim = api.claim() == null ||
+                            api.claim().canCreateShop(player.getUniqueId(),
+                                    event.getClickedBlock().getX(),
+                                    event.getClickedBlock().getY(),
+                                    event.getClickedBlock().getZ(),
+                                    event.getClickedBlock().getWorld().getName());
+
+                    if (canAccessClaim && hasConfigurationItem) {
                         api.permission().ifPermission(player.getUniqueId(), SlabbyPermissions.SHOP_MODIFY, () -> CreateShopUI.open(api, player, block));
                     }
                 });
