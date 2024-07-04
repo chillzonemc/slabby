@@ -3,17 +3,16 @@ package gg.mew.slabby.gui;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.audit.Auditable;
 import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.log.IntValueChanged;
-import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.shop.log.Transaction;
 import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
 import xyz.xenondevs.invui.item.Item;
@@ -37,47 +36,108 @@ public final class LogShopUI {
             final var item = new ItemStack(Material.PAPER);
             final var meta = item.getItemMeta();
 
-            meta.displayName(Component.text(it.action().name(), NamedTextColor.GOLD));
-
             meta.lore(new ArrayList<>() {{
-                add(Component.text("Player: %s".formatted(Bukkit.getOfflinePlayer(it.uniqueId()).getName())));
+                //TODO: use display name
+                final var player = Bukkit.getOfflinePlayer(it.uniqueId());
+                add(api.messages().log().player(Component.text(player.getName())));
 
                 switch (it.action()) {
-                    case BUY, SELL -> {
+                    case BUY -> {
+                        meta.displayName(api.messages().log().buy().title());
+
                         final var data = api.gson().fromJson(it.data(), Transaction.class);
-                        add(Component.text("Price: $%s".formatted(data.price())));
-                        add(Component.text("Quantity: %d".formatted(data.quantity())));
+
+                        add(api.messages().log().buy().amount(data.amount()));
+                        add(api.messages().log().buy().quantity(data.quantity()));
+                    }
+                    case SELL -> {
+                        meta.displayName(api.messages().log().sell().title());
+
+                        final var data = api.gson().fromJson(it.data(), Transaction.class);
+
+                        add(api.messages().log().sell().amount(data.amount()));
+                        add(api.messages().log().sell().quantity(data.quantity()));
                     }
                     case DEPOSIT -> {
-                        final var data = api.gson().fromJson(it.data(), IntValueChanged.class);
+                        meta.displayName(api.messages().log().deposit().title());
+                        final var data = api.gson().fromJson(it.data(), ValueChanged.Int.class);
                         final var deposited = data.to() - data.from();
-                        add(Component.text("Deposited: %s".formatted(api.decimalFormat().format(deposited))));
+                        add(api.messages().log().deposit().amount(deposited));
                     }
                     case WITHDRAW -> {
-                        final var data = api.gson().fromJson(it.data(), IntValueChanged.class);
-                        final var withdrew = data.from() - data.to();
-                        add(Component.text("Withdrew: %s".formatted(api.decimalFormat().format(withdrew))));
+                        meta.displayName(api.messages().log().withdraw().title());
+                        final var data = api.gson().fromJson(it.data(), ValueChanged.Int.class);
+                        final var deposited = data.from() - data.to();
+                        add(api.messages().log().withdraw().amount(deposited));
                     }
-                    case LINKED_INVENTORY_CHANGED -> {
-                        final var data = api.gson().fromJson(it.data(), LinkedInventoryChanged.class);
+                    case INVENTORY_LINK_CHANGED -> {
+                        meta.displayName(api.messages().log().inventoryLinkChanged().title());
+
+                        final var data = api.gson().fromJson(it.data(), LocationChanged.class);
+
                         if (data.isRemoved()) {
-                            add(Component.text("Inventory Link removed"));
+                            add(api.messages().log().inventoryLinkChanged().removed());
                         } else {
-                            add(Component.text("X: %d".formatted(data.x())));
-                            add(Component.text("Y: %d".formatted(data.y())));
-                            add(Component.text("Z: %d".formatted(data.z())));
-                            add(Component.text("World: %s".formatted(data.world())));
+                            add(api.messages().log().inventoryLinkChanged().x(data.x()));
+                            add(api.messages().log().inventoryLinkChanged().y(data.y()));
+                            add(api.messages().log().inventoryLinkChanged().z(data.z()));
+                            add(api.messages().log().inventoryLinkChanged().world(data.world()));
                         }
                     }
-                    case LOCATION_CHANGED, BUY_PRICE_CHANGED, SELL_PRICE_CHANGED, QUANTITY_CHANGED, NOTE_CHANGED, NAME_CHANGED -> {
-                        final var data = (ValueChanged<?>) api.gson().fromJson(it.data(), it.action().dataClass());
-                        add(Component.text("From: %s".formatted(data.from().toString())));
-                        add(Component.text("To: %s".formatted(data.to().toString())));
+                    case LOCATION_CHANGED -> {
+                        meta.displayName(api.messages().log().locationChanged().title());
+
+                        final var data = api.gson().fromJson(it.data(), LocationChanged.class);
+
+                        add(api.messages().log().locationChanged().x(data.x()));
+                        add(api.messages().log().locationChanged().y(data.y()));
+                        add(api.messages().log().locationChanged().z(data.z()));
+                        add(api.messages().log().locationChanged().world(data.world()));
+                    }
+                    case NAME_CHANGED -> {
+                        meta.displayName(api.messages().log().nameChanged().title());
+
+                        final var data = (ValueChanged.String) api.gson().fromJson(it.data(), it.action().dataClass());
+
+                        add(api.messages().log().nameChanged().from(data.from()));
+                        add(api.messages().log().nameChanged().to(data.to()));
+                    }
+                    case NOTE_CHANGED -> {
+                        meta.displayName(api.messages().log().noteChanged().title());
+
+                        final var data = (ValueChanged.String) api.gson().fromJson(it.data(), it.action().dataClass());
+
+                        add(api.messages().log().noteChanged().from(data.from()));
+                        add(api.messages().log().noteChanged().to(data.to()));
+                    }
+                    case QUANTITY_CHANGED -> {
+                        meta.displayName(api.messages().log().quantityChanged().title());
+
+                        final var data = (ValueChanged.Int) api.gson().fromJson(it.data(), it.action().dataClass());
+
+                        add(api.messages().log().quantityChanged().from(data.from()));
+                        add(api.messages().log().quantityChanged().to(data.to()));
+                    }
+                    case SELL_PRICE_CHANGED -> {
+                        meta.displayName(api.messages().log().sellPriceChanged().title());
+
+                        final var data = (ValueChanged.Double) api.gson().fromJson(it.data(), it.action().dataClass());
+
+                        add(api.messages().log().sellPriceChanged().from(data.from()));
+                        add(api.messages().log().sellPriceChanged().to(data.to()));
+                    }
+                    case BUY_PRICE_CHANGED -> {
+                        meta.displayName(api.messages().log().buyPriceChanged().title());
+
+                        final var data = (ValueChanged.Double) api.gson().fromJson(it.data(), it.action().dataClass());
+
+                        add(api.messages().log().buyPriceChanged().from(data.from()));
+                        add(api.messages().log().buyPriceChanged().to(data.to()));
                     }
                     default -> add(Component.text(it.data()));
                 }
 
-                add(Component.text(it.createdOn().toString()));
+                add(api.messages().log().date(it.createdOn()));
             }});
 
             item.setItemMeta(meta);
@@ -111,7 +171,7 @@ public final class LogShopUI {
 
         final var window = Window.single()
                 .setViewer(shopOwner)
-                .setTitle("[Slabby] Logs")
+                .setTitle(new AdventureComponentWrapper(api.messages().log().title()))
                 .setGui(gui)
                 .build();
 

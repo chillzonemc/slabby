@@ -2,11 +2,10 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.permission.SlabbyPermissions;
-import gg.mew.slabby.shop.BukkitShopWizard;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
-import gg.mew.slabby.shop.log.LinkedInventoryChanged;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
@@ -14,6 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
@@ -33,14 +33,11 @@ public final class OwnerShopUI {
         final var gui = Gui.empty(9, 2);
 
         gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
-            meta.displayName(Component.text("Deposit '", NamedTextColor.GOLD)
-                    .append(itemStack.displayName()) //TODO: reset?
-                    .append(Component.text("'"))
-            );
+            meta.displayName(api.messages().owner().deposit().title(itemStack.displayName()));
             meta.lore(new ArrayList<>() {{
-                add(Component.text("+Shift for bulk deposit", NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+                add(api.messages().owner().deposit().bulk());
+                add(api.messages().owner().stock(shop.stock()));
+                add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
             }});
         }), c -> {
             final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
@@ -56,14 +53,11 @@ public final class OwnerShopUI {
         }));
 
         gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
-            meta.displayName(Component.text("Withdraw '", NamedTextColor.GOLD)
-                    .append(itemStack.displayName()) //TODO: reset?
-                    .append(Component.text("'"))
-            );
+            meta.displayName(api.messages().owner().withdraw().title(itemStack.displayName()));
             meta.lore(new ArrayList<>() {{
-                add(Component.text("+Shift for bulk withdrawal", NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("In stock: %d", shop.stock()), NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("(%d stacks)", shop.stock() / itemStack.getMaxStackSize()), NamedTextColor.DARK_PURPLE));
+                add(api.messages().owner().withdraw().bulk());
+                add(api.messages().owner().stock(shop.stock()));
+                add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
             }});
         }), c -> {
             final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
@@ -79,11 +73,12 @@ public final class OwnerShopUI {
         }));
 
         gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
-            meta.displayName(Component.text("Change rate", NamedTextColor.GOLD));
+            meta.displayName(api.messages().owner().changeRate().title());
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("Amount per click: %d", shop.quantity()), NamedTextColor.DARK_PURPLE));
+                add(api.messages().owner().changeRate().amount(shop.quantity()));
             }});
         }), c -> {
+            //TODO: I could just use the wizard for this
             shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
 
             return false;
@@ -91,7 +86,7 @@ public final class OwnerShopUI {
 
         api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LOGS, () -> {
             gui.setItem(0, 1, new SimpleItem(GuiHelper.itemStack(Material.BOOK, (it, meta) -> {
-                meta.displayName(Component.text("Logs", NamedTextColor.GOLD));
+                meta.displayName(api.messages().owner().logs().title());
             }).get(), c -> LogShopUI.open(api, shopOwner, shop)));
         });
 
@@ -101,31 +96,31 @@ public final class OwnerShopUI {
             //TODO: update item after clicking
             if (shop.hasInventory()) {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.ENDER_CHEST, (it, meta) -> {
-                    meta.displayName(Component.text("Cancel chest link", NamedTextColor.GOLD));
+                    meta.displayName(api.messages().owner().inventoryLink().cancel().title());
                 }).get(), c -> {
                     try {
                         shop.inventory(null, null, null, null);
                         api.repository().update(shop);
 
                         final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                .action(ShopLog.Action.LINKED_INVENTORY_CHANGED)
+                                .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
                                 .uniqueId(shopOwner.getUniqueId())
-                                .serialized(new LinkedInventoryChanged(null, null, null, null))
+                                .serialized(new LocationChanged(null, null, null, null))
                                 .build();
 
                         shop.logs().add(log);
 
                         api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
-                        shopOwner.sendMessage(Component.text("Shop linking has been removed", NamedTextColor.GREEN));
+                        shopOwner.sendMessage(api.messages().owner().inventoryLink().cancel().message());
                     } catch (final Exception ignored) {
                         //TODO: notify uniqueId
                     }
                 }));
             } else {
                 gui.setItem(5, 0, new SimpleItem(itemStack(Material.CHEST, (it, meta) -> {
-                    meta.displayName(Component.text("Link chest", NamedTextColor.GOLD));
+                    meta.displayName(api.messages().owner().inventoryLink().title());
                     meta.lore(new ArrayList<>() {{
-                        add(Component.text("Link a chest for refilling!", NamedTextColor.GREEN));
+                        add(api.messages().owner().inventoryLink().description());
                     }});
                 }).get(), c -> {
                     api.operations()
@@ -133,7 +128,7 @@ public final class OwnerShopUI {
                             .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
 
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
-                    shopOwner.sendMessage(Component.text("Please crouch and punch the chest you want to link.", NamedTextColor.GREEN));
+                    shopOwner.sendMessage(api.messages().owner().inventoryLink().message());
                     gui.closeForAllViewers();
                 }));
             }
@@ -142,14 +137,14 @@ public final class OwnerShopUI {
         gui.setItem(6, 0, commandBlock(api, shop, itemStack));
 
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
-            meta.displayName(Component.text("Modify Shop", NamedTextColor.GOLD));
+            meta.displayName(api.messages().owner().modify().title());
         }).get(), c -> {
             ModifyShopUI.open(api, shopOwner, api.operations().wizardFrom(shopOwner.getUniqueId(), shop));
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.OAK_SIGN, (it, meta) -> {
-            meta.displayName(Component.text("View as customer", NamedTextColor.GOLD));
+            meta.displayName(api.messages().owner().customer().title());
         }).get(), c -> {
             ClientShopUI.open(api, shopOwner, shop);
             api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
@@ -157,7 +152,7 @@ public final class OwnerShopUI {
 
         final var window = Window.single()
                 .setViewer(shopOwner)
-                .setTitle("[Slabby] Owner") //TODO: translate
+                .setTitle(new AdventureComponentWrapper(api.messages().owner().title()))
                 .setGui(gui)
                 .build();
 

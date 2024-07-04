@@ -13,7 +13,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
@@ -30,65 +30,66 @@ public final class ModifyShopUI {
 
         gui.setItem(0, 0, new SimpleItem(Bukkit.getItemFactory().createItemStack(wizard.item())));
         gui.setItem(1, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
-            meta.displayName(Component.text("Sellers note", NamedTextColor.GREEN));
+            meta.displayName(api.messages().modify().note().title());
             meta.lore(new ArrayList<>() {{
                 add(Component.text(wizard.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_NOTE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(Component.text("Please enter your note."));
+            shopOwner.sendMessage(api.messages().modify().note().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(3, 0, new SimpleItem(itemStack(Material.GREEN_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(Component.text("Buy price", NamedTextColor.GREEN));
+            meta.displayName(api.messages().modify().buy().title());
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("$%.2f", wizard.buyPrice() == null ? -1d : wizard.buyPrice()), NamedTextColor.DARK_PURPLE));
-                add(Component.text("Click to set", NamedTextColor.DARK_PURPLE));
-                add(Component.text("(-1 means not for sale)", NamedTextColor.DARK_PURPLE));
+                final var buyPrice = wizard.buyPrice() == null ? -1d : wizard.buyPrice();
+                add(api.messages().modify().buy().amount(buyPrice));
+                add(api.messages().modify().clickToSet());
+                add(api.messages().modify().buy().notForSale());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_BUY_PRICE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(Component.text("Please enter your buy price."));
+            shopOwner.sendMessage(api.messages().modify().buy().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(4, 0, new SimpleItem(itemStack(Material.RED_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(Component.text("Sell price", NamedTextColor.RED));
+            meta.displayName(api.messages().modify().sell().title());
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("$%.2f", wizard.sellPrice() == null ? -1d : wizard.sellPrice()), NamedTextColor.DARK_PURPLE));
-                add(Component.text("Click to set", NamedTextColor.DARK_PURPLE));
-                add(Component.text("(-1 means not buying)", NamedTextColor.DARK_PURPLE));
+                final var sellPrice = wizard.sellPrice() == null ? -1d : wizard.sellPrice();
+                add(api.messages().modify().sell().amount(sellPrice));
+                add(api.messages().modify().clickToSet());
+                add(api.messages().modify().sell().notBuying());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_SELL_PRICE);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(Component.text("Please enter your sell price."));
+            shopOwner.sendMessage(api.messages().modify().sell().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(5, 0, new SimpleItem(itemStack(Material.YELLOW_STAINED_GLASS_PANE, (it, meta) -> {
-            meta.displayName(Component.text("Quantity", NamedTextColor.YELLOW));
+            meta.displayName(api.messages().modify().quantity().title());
             meta.lore(new ArrayList<>() {{
-                add(Component.text(String.format("Amount per transaction: %d", wizard.quantity()), NamedTextColor.DARK_PURPLE));
-                add(Component.text("Click to set", NamedTextColor.DARK_PURPLE));
-                add(Component.text("(Amount of items per buy/sell)", NamedTextColor.DARK_PURPLE));
+                add(api.messages().modify().quantity().amount(wizard.quantity()));
+                add(api.messages().modify().clickToSet());
+                add(api.messages().modify().quantity().description());
             }});
         }).get(), c -> {
             wizard.state(ShopWizard.WizardState.AWAITING_QUANTITY);
             gui.closeForAllViewers();
-            shopOwner.sendMessage(Component.text("Please enter your quantity."));
+            shopOwner.sendMessage(api.messages().modify().quantity().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.NETHER_STAR, (it, meta) -> {
-            meta.displayName(Component.text("Confirm", NamedTextColor.GREEN));
+            meta.displayName(api.messages().modify().confirm().title());
             meta.lore(new ArrayList<>() {{
-                //TODO: not really new in this case
-                add(Component.text("New Shop", NamedTextColor.DARK_PURPLE));
-                add(Component.text(String.format("%s,%d,%d,%d", wizard.world(), wizard.x(), wizard.y(), wizard.z()), NamedTextColor.DARK_PURPLE));
+                add(api.messages().modify().confirm().description());
+                add(api.messages().modify().confirm().location(wizard.world(), wizard.x(), wizard.y(), wizard.z()));
             }});
         }).get(), c -> {
             try {
@@ -151,7 +152,7 @@ public final class ModifyShopUI {
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
-            meta.displayName(Component.text("Cancel", NamedTextColor.RED));
+            meta.displayName(api.messages().modify().cancel().title());
         }).get(), c -> {
             api.operations().wizards().remove(shopOwner.getUniqueId());
             gui.closeForAllViewers();
@@ -160,7 +161,7 @@ public final class ModifyShopUI {
 
         final var window = Window.single()
                 .setViewer(shopOwner)
-                .setTitle("[Slabby] Editing Shop") //TODO: translate
+                .setTitle(new AdventureComponentWrapper(api.messages().modify().title()))
                 .setGui(gui)
                 .build();
 

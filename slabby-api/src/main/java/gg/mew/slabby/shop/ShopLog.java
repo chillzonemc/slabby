@@ -17,14 +17,14 @@ public interface ShopLog extends Auditable {
     @Getter
     @Accessors(fluent = true, chain = false)
     enum Action {
-        LOCATION_CHANGED(StringValueChanged.class),
-        BUY_PRICE_CHANGED(DoubleValueChanged.class),
-        SELL_PRICE_CHANGED(DoubleValueChanged.class),
-        QUANTITY_CHANGED(IntValueChanged.class),
-        NOTE_CHANGED(StringValueChanged.class),
-        NAME_CHANGED(StringValueChanged.class),
+        LOCATION_CHANGED(LocationChanged.class),
+        BUY_PRICE_CHANGED(ValueChanged.Double.class),
+        SELL_PRICE_CHANGED(ValueChanged.Double.class),
+        QUANTITY_CHANGED(ValueChanged.Int.class),
+        NOTE_CHANGED(ValueChanged.String.class),
+        NAME_CHANGED(ValueChanged.String.class),
 
-        LINKED_INVENTORY_CHANGED(LinkedInventoryChanged.class),
+        INVENTORY_LINK_CHANGED(LocationChanged.class),
 
         OWNER_ADDED(Void.class),
         OWNER_REMOVED(Void.class),

@@ -2,8 +2,8 @@ package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.permission.SlabbyPermissions;
-import gg.mew.slabby.shop.log.IntValueChanged;
 import gg.mew.slabby.shop.log.Transaction;
+import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -78,7 +78,7 @@ public final class BukkitShopOperations implements ShopOperations {
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_WITHDRAW);
+            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_BUY);
 
         final var stock = shop.stock();
 
@@ -135,7 +135,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         for (final var entry : cost.entrySet()) {
             if (!api.economy().hasAmount(entry.getKey(), entry.getValue()))
-                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_DEPOSIT);
+                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_SELL);
         }
 
         final var stock = shop.stock();
@@ -200,7 +200,7 @@ public final class BukkitShopOperations implements ShopOperations {
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
                     .action(ShopLog.Action.WITHDRAW)
                     .uniqueId(uniqueId)
-                    .serialized(new IntValueChanged(stock, shop.stock()))
+                    .serialized(new ValueChanged.Int(stock, shop.stock()))
                     .build();
 
             shop.logs().add(log);
@@ -242,7 +242,7 @@ public final class BukkitShopOperations implements ShopOperations {
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
                     .action(ShopLog.Action.DEPOSIT)
                     .uniqueId(uniqueId)
-                    .serialized(new IntValueChanged(stock, shop.stock()))
+                    .serialized(new ValueChanged.Int(stock, shop.stock()))
                     .build();
 
             shop.logs().add(log);
