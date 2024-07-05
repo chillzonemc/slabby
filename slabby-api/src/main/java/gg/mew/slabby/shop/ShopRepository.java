@@ -21,6 +21,8 @@ public interface ShopRepository {
     void refresh(final Shop shop) throws Exception;
     void refresh(final ShopOwner shopOwner) throws Exception;
 
+    void markAsDeleted(final Shop shop) throws Exception;
+
     Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception;
 
     Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception;

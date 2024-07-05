@@ -34,7 +34,7 @@ public final class DestroyShopUI {
             }});
         }).get(), c -> {
             try {
-                api.repository().delete(shop);
+                api.repository().markAsDeleted(shop);
                 api.sound().play(shopOwner.getUniqueId(), shop, Sounds.DESTROY);
                 gui.closeForAllViewers();
             } catch (final Exception e) {

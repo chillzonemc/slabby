@@ -157,10 +157,25 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public void markAsDeleted(final Shop shop) throws Exception {
+        try {
+            shop.state(Shop.State.DELETED);
+            shop.location(null, null, null, null);
+
+            this.shopDao.update((SQLiteShop) shop);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
+        }
+    }
+
+    @Override
     public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
+                    .eq(Shop.Names.STATE, Shop.State.ACTIVE)
+                    .and()
                     .eq(Shop.Names.X, x)
                     .and()
                     .eq(Shop.Names.Y, y)
@@ -181,6 +196,8 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
+                    .eq(Shop.Names.STATE, Shop.State.ACTIVE)
+                    .and()
                     .eq(Shop.Names.INVENTORY_X, x)
                     .and()
                     .eq(Shop.Names.INVENTORY_Y, y)
