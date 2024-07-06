@@ -18,5 +18,6 @@ public final class SlabbyPermissions {
 
     public final String ADMIN_BASE = BASE + ".admin.";
     public final String ADMIN_RELOAD = ADMIN_BASE + "reload";
+    public final String ADMIN_TOGGLE = ADMIN_BASE + "toggle";
 
 }

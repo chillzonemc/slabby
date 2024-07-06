@@ -140,3 +140,9 @@ command-block:
   selling: '<dark_purple>Selling: <item></dark_purple>'
   buy-price: '<dark_purple>Buy <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'
   sell-price: '<dark_purple>Sell <quantity> for $<price:''#.##''> ($<each:''#.##''> each)</dark_purple>'
+command:
+  reload:
+    message: '<yellow>[Slabby]</yellow> <gray>Slabby reloaded</gray>'
+  admin:
+    enabled: '<yellow>[Slabby]</yellow> <green>Enabled</green> <gray>admin mode</gray>'
+    disabled: '<yellow>[Slabby]</yellow> <red>Disabled</red> <gray>admin mode</gray>'

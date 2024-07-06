@@ -14,6 +14,7 @@ public interface SlabbyMessages {
     Owner owner();
 
     CommandBlock commandBlock();
+    Command command();
 
     interface Client {
 
@@ -273,6 +274,22 @@ public interface SlabbyMessages {
         InventoryLink inventoryLink();
         Modify modify();
         Customer customer();
+    }
+
+    interface Command {
+
+        interface Reload {
+            Component message();
+        }
+
+        interface Admin {
+            Component enabled();
+            Component disabled();
+        }
+
+        Reload reload();
+        Admin admin();
+
     }
 
 }

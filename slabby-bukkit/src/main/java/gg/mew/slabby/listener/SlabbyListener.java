@@ -62,8 +62,7 @@ public final class SlabbyListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK -> {
                 shopOpt.ifPresentOrElse(shop -> {
-                    //TODO: need a way for SHOP_MODIFY_OTHERS to express intent. command? /slabby admin
-                    if (shop.isOwner(player.getUniqueId())) {
+                    if (shop.isOwner(player.getUniqueId()) || api.isAdminMode(player.getUniqueId())) {
                         if (hasConfigurationItem) {
                             DestroyShopUI.open(api, player, shop);
                         } else {

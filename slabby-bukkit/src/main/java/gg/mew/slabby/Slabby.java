@@ -32,6 +32,8 @@ import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
@@ -44,13 +46,15 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.*;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
 @ApiVersion(ApiVersion.Target.v1_20)
 @DependsOn(value = {
-        @Dependency("Vault"),
-        @Dependency("Lands")
+        @Dependency("Vault")
+})
+@SoftDependsOn(value = {
+        @SoftDependency("Lands")
 })
 @Permissions(value = {
         @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
@@ -109,6 +113,8 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
             .create();
+
+    private final Map<UUID, Boolean> adminMode = new HashMap();
 
     @Override
     public void reload() {
@@ -216,4 +222,21 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
         return getDataFolder();
     }
 
+    @Override
+    public boolean isAdminMode(final UUID uniqueId) {
+        if (!permission.hasPermission(uniqueId, SlabbyPermissions.ADMIN_TOGGLE))
+            return false;
+
+        return adminMode.getOrDefault(uniqueId, false);
+    }
+
+    @Override
+    public boolean setAdminMode(final UUID uniqueId, final boolean adminMode) {
+        if (!permission.hasPermission(uniqueId, SlabbyPermissions.ADMIN_TOGGLE))
+            return false;
+
+        this.adminMode.put(uniqueId, adminMode);
+
+        return adminMode;
+    }
 }

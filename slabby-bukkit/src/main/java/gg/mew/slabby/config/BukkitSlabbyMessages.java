@@ -22,6 +22,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     private BukkitLog log;
     private BukkitModify modify;
     private BukkitOwner owner;
+    private BukkitCommand command;
 
     @ConfigSerializable
     @Accessors(fluent = true, chain = false)
@@ -904,6 +905,44 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         public Component stacks(final int stacks) {
             return MiniMessage.miniMessage().deserialize(this.stacks, Formatter.number("stacks", stacks));
         }
+    }
+
+    @ConfigSerializable
+    @Accessors(fluent = true, chain = false)
+    @Getter
+    final static class BukkitCommand implements Command {
+
+        @ConfigSerializable
+        final static class BukkitReload implements Reload {
+
+            private String message;
+
+            @Override
+            public Component message() {
+                return MiniMessage.miniMessage().deserialize(this.message);
+            }
+        }
+
+        @ConfigSerializable
+        final static class BukkitAdmin implements Admin {
+
+            private String enabled;
+            private String disabled;
+
+            @Override
+            public Component enabled() {
+                return MiniMessage.miniMessage().deserialize(this.enabled);
+            }
+
+            @Override
+            public Component disabled() {
+                return MiniMessage.miniMessage().deserialize(this.disabled);
+            }
+        }
+
+        private BukkitReload reload;
+        private BukkitAdmin admin;
+
     }
 
 }

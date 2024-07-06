@@ -2,7 +2,6 @@ package gg.mew.slabby.shop;
 
 import gg.mew.slabby.shop.log.ValueChanged;
 
-import java.util.Collection;
 import java.util.Map;
 
 @SuppressWarnings("UnusedReturnValue")
@@ -38,6 +37,7 @@ public interface ShopWizard {
         AWAITING_SELL_PRICE,
         AWAITING_QUANTITY,
         AWAITING_INVENTORY_LINK,
+        AWAITING_LOCATION,
         AWAITING_CONFIRMATION;
 
         public boolean awaitingTextInput() {
