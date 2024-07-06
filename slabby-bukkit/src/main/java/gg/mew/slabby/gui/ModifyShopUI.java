@@ -41,6 +41,18 @@ public final class ModifyShopUI {
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
+        gui.setItem(2, 0, new SimpleItem(itemStack(Material.ENDER_PEARL, (it, meta) -> {
+            meta.displayName(api.messages().modify().move().title());
+            meta.lore(new ArrayList<>() {{
+                add(api.messages().modify().move().location(wizard.x(), wizard.y(), wizard.z(), wizard.world()));
+            }});
+        }).get(), c -> {
+            wizard.state(ShopWizard.WizardState.AWAITING_LOCATION);
+            gui.closeForAllViewers();
+            shopOwner.sendMessage(api.messages().modify().move().message());
+            api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
+        }));
+
         gui.setItem(3, 0, new SimpleItem(itemStack(Material.GREEN_STAINED_GLASS_PANE, (it, meta) -> {
             meta.displayName(api.messages().modify().buy().title());
             meta.lore(new ArrayList<>() {{
@@ -94,13 +106,17 @@ public final class ModifyShopUI {
         }).get(), c -> {
             try {
                 api.repository().transaction(() -> {
-                    final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+                    //TODO: this logic does not work when moving a shop
+                    final var shopOpt = api.repository().shopById(wizard.id());
 
                     shopOpt.ifPresentOrElse(shop -> {
                         shop.buyPrice(wizard.buyPrice());
                         shop.sellPrice(wizard.sellPrice());
                         shop.quantity(wizard.quantity());
                         shop.note(wizard.note());
+
+                        //TODO: I'd need to change the display item as well
+                        shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
                         for (final var entry : wizard.valueChanges().entrySet()) {
                             final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)

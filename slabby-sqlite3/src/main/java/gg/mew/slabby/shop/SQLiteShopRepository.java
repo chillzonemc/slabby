@@ -214,6 +214,16 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public Optional<Shop> shopById(final int id) {
+        try {
+            return Optional.ofNullable(this.shopDao.queryForId(id));
+        } catch (SQLException e) {
+            api.exceptionService().log(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public <T> T transaction(final Callable<T> transaction) throws Exception {
         try {
             return TransactionManager.callInTransaction(this.connectionSource, transaction);

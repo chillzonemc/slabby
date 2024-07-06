@@ -1,11 +1,11 @@
 package gg.mew.slabby.shop;
 
-import gg.mew.slabby.shop.log.ValueChanged;
-
 import java.util.Map;
 
 @SuppressWarnings("UnusedReturnValue")
 public interface ShopWizard {
+
+    <T> T id();
 
     WizardState state();
     int x();
@@ -17,7 +17,7 @@ public interface ShopWizard {
     Double buyPrice();
     Double sellPrice();
     int quantity();
-    Map<ShopLog.Action, ValueChanged<?>> valueChanges();
+    Map<ShopLog.Action, Object> valueChanges();
 
     ShopWizard state(final WizardState state);
 

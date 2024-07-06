@@ -23,6 +23,8 @@ public interface ShopRepository {
 
     void markAsDeleted(final Shop shop) throws Exception;
 
+    Optional<Shop> shopById(final int id);
+
     Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception;
 
     Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception;

@@ -207,6 +207,12 @@ public interface SlabbyMessages {
             Component title();
         }
 
+        interface Move {
+            Component title();
+            Component location(final int x, final int y, final int z, final String world);
+            Component message();
+        }
+
         Component title();
         Component clickToSet();
 
@@ -216,6 +222,7 @@ public interface SlabbyMessages {
         Quantity quantity();
         Confirm confirm();
         Cancel cancel();
+        Move move();
     }
 
     interface Owner {

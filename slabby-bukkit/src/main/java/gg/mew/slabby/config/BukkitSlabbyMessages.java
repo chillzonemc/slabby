@@ -715,6 +715,33 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
+        @ConfigSerializable
+        final static class BukkitMove implements Move {
+
+            private String title;
+            private String location;
+            private String message;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+
+            @Override
+            public Component location(final int x, final int y, final int z, final String world) {
+                return MiniMessage.miniMessage().deserialize(this.location,
+                        Formatter.number("x", x),
+                        Formatter.number("y", y),
+                        Formatter.number("z", z),
+                        Placeholder.unparsed("world", world));
+            }
+
+            @Override
+            public Component message() {
+                return MiniMessage.miniMessage().deserialize(this.message);
+            }
+        }
+
         private String title;
         private String clickToSet;
         private BukkitNote note;
@@ -723,6 +750,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitQuantity quantity;
         private BukkitConfirm confirm;
         private BukkitCancel cancel;
+        private BukkitMove move;
 
         @Override
         public Component title() {

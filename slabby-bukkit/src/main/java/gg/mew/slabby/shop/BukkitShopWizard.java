@@ -1,6 +1,7 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.shop.log.ValueChanged;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,10 @@ public final class BukkitShopWizard implements ShopWizard {
 
     private final SlabbyAPI api;
 
-    private final Map<ShopLog.Action, ValueChanged<?>> valueChanges = new HashMap<>();
+    private final Map<ShopLog.Action, Object> valueChanges = new HashMap<>();
+
+    @Getter
+    private final Integer id;
 
     @Setter
     private WizardState state;
@@ -35,6 +39,8 @@ public final class BukkitShopWizard implements ShopWizard {
     public BukkitShopWizard(final SlabbyAPI api) {
         this.api = api;
 
+        this.id = null;
+
         this.note = this.api.configuration().defaults().note();
         this.buyPrice = this.api.configuration().defaults().buyPrice();
         this.sellPrice = this.api.configuration().defaults().sellPrice();
@@ -43,6 +49,9 @@ public final class BukkitShopWizard implements ShopWizard {
 
     public BukkitShopWizard(final SlabbyAPI api, final Shop shop) {
         this.api = api;
+
+        //TODO: this is not great, tbh
+        this.id = ((SQLiteShop)shop).id();
 
         this.x = shop.x();
         this.y = shop.y();
@@ -57,10 +66,16 @@ public final class BukkitShopWizard implements ShopWizard {
 
     @Override
     public ShopWizard location(final int x, final int y, final int z, final String world) {
+        if (this.x != x && this.y != y && this.z != z && !this.world.equals(world))
+            this.valueChanges.put(ShopLog.Action.LOCATION_CHANGED, new LocationChanged(x, y, z, world));
+        else
+            this.valueChanges.remove(ShopLog.Action.LOCATION_CHANGED);
+
         this.x = x;
         this.y = y;
         this.z = z;
         this.world = world;
+
         return this;
     }
 

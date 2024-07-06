@@ -106,6 +106,10 @@ modify:
     location: '<dark_purple><world>, <x>, <y>, <z></dark_purple>'
   cancel:
     title: '<red>Cancel</red>'
+  move:
+    title: '<gold>Move Shop</gold>'
+    location: '<dark_purple><x>, <y>, <z>, <world></dark_purple>'
+    message: 'Right click with a stick on the shop''s new location.'
 owner:
   title: '[Slabby] Owner'
   stock: '<dark_purple>In stock <stock></dark_purple>'
