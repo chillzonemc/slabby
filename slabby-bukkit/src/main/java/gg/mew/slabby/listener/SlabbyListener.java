@@ -88,9 +88,9 @@ public final class SlabbyListener implements Listener {
 
                     if (canAccessClaim && hasConfigurationItem) {
                         api.operations().ifWizardOrElse(uniqueId, w -> {
-                            if (w.state() == ShopWizard.WizardState.AWAITING_LOCATION) {
+                            if (w.wizardState() == ShopWizard.WizardState.AWAITING_LOCATION) {
                                 w.location(blockX, blockY, blockZ, blockWorld);
-                                w.state(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+                                w.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
                                 api.sound().play(uniqueId, w.x(), w.y(), w.z(), w.world(), Sounds.MODIFY_SUCCESS);
                                 ModifyShopUI.open(api, player, w);
                             }
@@ -127,7 +127,7 @@ public final class SlabbyListener implements Listener {
                 });
 
                 api.operations().ifWizard(uniqueId, wizard -> {
-                    if (wizard.state() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
+                    if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
                         if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
                             try {
                                 final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
@@ -164,10 +164,10 @@ public final class SlabbyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClick(final InventoryClickEvent event) {
         api.operations().ifWizard(event.getWhoClicked().getUniqueId(), wizard -> {
-            if (wizard.state() == ShopWizard.WizardState.AWAITING_ITEM) {
+            if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_ITEM) {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
-                wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION)
+                wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION)
                         .item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
 
                 ModifyShopUI.open(api, (Player) event.getWhoClicked(), wizard);
@@ -181,8 +181,8 @@ public final class SlabbyListener implements Listener {
     private void onInventoryClose(final InventoryCloseEvent event) {
         if (event.getReason() == InventoryCloseEvent.Reason.PLAYER) {
             api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
-                if (wizard.state() == ShopWizard.WizardState.AWAITING_CONFIRMATION
-                        || wizard.state() == ShopWizard.WizardState.AWAITING_ITEM)
+                if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_CONFIRMATION
+                        || wizard.wizardState() == ShopWizard.WizardState.AWAITING_ITEM)
                     api.operations().wizards().remove(event.getPlayer().getUniqueId());
             });
         }
@@ -191,7 +191,7 @@ public final class SlabbyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onChatMessage(final AsyncChatEvent event) {
         api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
-            if (!wizard.state().awaitingTextInput())
+            if (!wizard.wizardState().awaitingTextInput())
                 return;
 
             final var serializer = PlainTextComponentSerializer.plainText();
@@ -201,7 +201,7 @@ public final class SlabbyListener implements Listener {
             //TODO: min/max constraints
 
             try {
-                switch (wizard.state()) {
+                switch (wizard.wizardState()) {
                     case AWAITING_NOTE -> wizard.note(text);
                     case AWAITING_BUY_PRICE -> {
                         final var buyPrice = Double.parseDouble(text);
@@ -222,7 +222,7 @@ public final class SlabbyListener implements Listener {
                 event.getPlayer().sendMessage(Component.text("That's not a valid number!", NamedTextColor.RED));
             }
 
-            wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
 
             ModifyShopUI.open(api, event.getPlayer(), wizard);
 

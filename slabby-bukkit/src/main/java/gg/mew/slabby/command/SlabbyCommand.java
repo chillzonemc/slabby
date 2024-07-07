@@ -1,13 +1,16 @@
 package gg.mew.slabby.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.gui.RestoreShopUI;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+
+import java.awt.*;
 
 @RequiredArgsConstructor
 @CommandAlias("slabby")
@@ -32,5 +35,14 @@ public final class SlabbyCommand extends BaseCommand {
             player.sendMessage(api.messages().command().admin().disabled());
     }
 
+    @Subcommand("restore")
+    @CommandPermission(SlabbyPermissions.SHOP_RESTORE)
+    private void onRestore(final Player player, final @Optional OfflinePlayer target) {
+        if (target != null && !player.hasPermission(SlabbyPermissions.ADMIN_RESTORE)) {
+            player.sendMessage(Bukkit.permissionMessage());
+            return;
+        }
+        RestoreShopUI.open(api, player, target != null ? target.getUniqueId() : player.getUniqueId());
+    }
 
 }

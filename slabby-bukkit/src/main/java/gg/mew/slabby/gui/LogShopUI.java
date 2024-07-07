@@ -143,7 +143,7 @@ public final class LogShopUI {
             item.setItemMeta(meta);
 
             return (Item) new SimpleItem(item);
-        }).collect(Collectors.toList());
+        }).toList();
 
         final var gui = PagedGui.items()
                 .setStructure(

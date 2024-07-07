@@ -35,7 +35,7 @@ public final class ModifyShopUI {
                 add(Component.text(wizard.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_NOTE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_NOTE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().note().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -47,7 +47,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().move().location(wizard.x(), wizard.y(), wizard.z(), wizard.world()));
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_LOCATION);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_LOCATION);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().move().message());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -62,7 +62,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().buy().notForSale());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_BUY_PRICE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_BUY_PRICE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().buy().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -77,7 +77,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().sell().notBuying());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_SELL_PRICE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_SELL_PRICE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().sell().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -91,7 +91,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().quantity().description());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_QUANTITY);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_QUANTITY);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().quantity().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -114,6 +114,7 @@ public final class ModifyShopUI {
                         shop.sellPrice(wizard.sellPrice());
                         shop.quantity(wizard.quantity());
                         shop.note(wizard.note());
+                        shop.state(wizard.state());
 
                         //TODO: I'd need to change the display item as well
                         shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());

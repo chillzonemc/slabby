@@ -12,7 +12,14 @@ public final class BukkitSoundWrapper implements SoundWrapper {
 
     @Override
     public void play(final UUID uniqueId, final Shop shop, final Sounds sound) {
-        play(uniqueId, shop.x(), shop.y(), shop.z(), shop.world(), sound);
+        final var player = Bukkit.getPlayer(uniqueId);
+
+        final var x = shop.x() != null ? shop.x() : player.getLocation().getBlockX();
+        final var y = shop.y() != null ? shop.y() : player.getLocation().getBlockY();
+        final var z = shop.z() != null ? shop.z() : player.getLocation().getBlockZ();
+        final var world = shop.world() != null ? shop.world() : player.getLocation().getWorld().getName();
+
+        play(uniqueId, x, y, z, world, sound);
     }
 
     @Override

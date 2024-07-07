@@ -7,10 +7,11 @@ public interface ShopWizard {
 
     <T> T id();
 
-    WizardState state();
-    int x();
-    int y();
-    int z();
+    WizardState wizardState();
+    Shop.State state();
+    Integer x();
+    Integer y();
+    Integer z();
     String world();
     String item();
     String note();
@@ -19,9 +20,9 @@ public interface ShopWizard {
     int quantity();
     Map<ShopLog.Action, Object> valueChanges();
 
-    ShopWizard state(final WizardState state);
+    ShopWizard wizardState(final WizardState state);
 
-    ShopWizard location(final int x, final int y, final int z, final String world);
+    ShopWizard location(final Integer x, final Integer y, final Integer z, final String world);
 
     ShopWizard item(final String item);
     ShopWizard note(final String note);
@@ -29,6 +30,7 @@ public interface ShopWizard {
     ShopWizard buyPrice(final Double buyPrice);
     ShopWizard sellPrice(final Double sellPrice);
     ShopWizard quantity(final int quantity);
+    ShopWizard state(final Shop.State state);
 
     enum WizardState {
         AWAITING_ITEM,

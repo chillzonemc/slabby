@@ -29,6 +29,8 @@ public interface Shop extends Auditable {
         public final String STATE = "state";
     }
 
+    <T> T id();
+
     String item();
 
     Integer x();

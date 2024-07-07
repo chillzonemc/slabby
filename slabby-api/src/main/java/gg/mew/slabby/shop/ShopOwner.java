@@ -1,10 +1,17 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.audit.Auditable;
+import lombok.experimental.UtilityClass;
 
 import java.util.UUID;
 
 public interface ShopOwner extends Auditable {
+
+    @UtilityClass
+    final class Names {
+        public final String UNIQUE_ID = "uniqueId";
+        public final String SHARE = "share";
+    }
 
     UUID uniqueId();
 

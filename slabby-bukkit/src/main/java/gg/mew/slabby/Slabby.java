@@ -1,5 +1,6 @@
 package gg.mew.slabby;
 
+import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,6 +26,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import me.angeschossen.lands.api.LandsIntegration;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -59,11 +61,15 @@ import java.util.*;
 @Permissions(value = {
         @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
         @Permission(name = SlabbyPermissions.SHOP_MODIFY, desc = "Allows for creation, modification and deletion of new shops"),
-        @Permission(name = SlabbyPermissions.SHOP_MODIFY_OTHERS, desc = "Allows for creation, modification and deletion of any shop"),
-        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops"),
-        @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking chests to shops"),
+        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops from other plugins"),
+        @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking inventories to shops"),
         @Permission(name = SlabbyPermissions.SHOP_NOTIFY, desc = "Allows shop owners to receive notifications"),
-        @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs")
+        @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs"),
+        @Permission(name = SlabbyPermissions.SHOP_RESTORE, desc = "Allows shop owners to restore their deleted shops"),
+
+        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to reload Slabby"),
+        @Permission(name = SlabbyPermissions.ADMIN_TOGGLE, desc = "Allows admins to interact with any shop as if it was their own"),
+        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own")
 })
 @Commands(value = {
         @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
@@ -114,7 +120,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             .serializeNulls()
             .create();
 
-    private final Map<UUID, Boolean> adminMode = new HashMap();
+    private final Map<UUID, Boolean> adminMode = new HashMap<>();
 
     @Override
     public void reload() {
@@ -145,6 +151,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             this.claim = new LandsClaimWrapper(LandsIntegration.of(this));
 
         final var commandManager = new PaperCommandManager(this);
+
         commandManager.registerCommand(new SlabbyCommand(this));
 
         SlabbyHelper.init(this);

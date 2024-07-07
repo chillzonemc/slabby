@@ -30,7 +30,7 @@ public final class CreateShopUI {
         window.open();
 
         api.operations().wizard(shopOwner.getUniqueId())
-                .state(ShopWizard.WizardState.AWAITING_ITEM)
+                .wizardState(ShopWizard.WizardState.AWAITING_ITEM)
                 .location(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
     }
 

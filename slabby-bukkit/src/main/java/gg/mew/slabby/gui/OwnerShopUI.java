@@ -125,7 +125,7 @@ public final class OwnerShopUI {
                 }).get(), c -> {
                     api.operations()
                             .wizardFrom(shopOwner.getUniqueId(), shop)
-                            .state(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
+                            .wizardState(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
 
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
                     shopOwner.sendMessage(api.messages().owner().inventoryLink().message());

@@ -11,11 +11,9 @@ import gg.mew.slabby.SlabbyAPI;
 
 import java.io.Closeable;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -214,12 +212,33 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public Optional<Shop> shopById(final int id) {
+    public <T> Optional<Shop> shopById(final T id) throws Exception {
+        if (id == null)
+            return Optional.empty();
+
         try {
-            return Optional.ofNullable(this.shopDao.queryForId(id));
+            return Optional.ofNullable(this.shopDao.queryForId((int)id));
         } catch (SQLException e) {
             api.exceptionService().log(e);
-            throw new RuntimeException(e);
+            throw e;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception {
+        try {
+            final var result = this.shopOwnerDao.queryBuilder()
+                    .join(this.shopDao.queryBuilder().where().eq(Shop.Names.STATE, state).queryBuilder())
+                    .where().eq(ShopOwner.Names.UNIQUE_ID, uniqueId)
+                    .query()
+                    .stream()
+                    .map(SQLiteShopOwner::shop)
+                    .toList();
+            return (Collection<Shop>) (Collection<? extends Shop>) result;
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
         }
     }
 

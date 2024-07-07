@@ -26,6 +26,12 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(generatedId = true)
     private int id;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T id() {
+        return (T) (Integer) this.id;
+    }
+
     @DatabaseField(canBeNull = false, index = true)
     private String item;
 
