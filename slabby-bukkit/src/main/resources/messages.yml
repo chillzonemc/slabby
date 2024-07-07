@@ -1,3 +1,6 @@
+general:
+  next-page: 'Next Page'
+  previous-page: 'Previous Page'
 client:
   title: '[Slabby] Client'
   note:
@@ -138,6 +141,15 @@ owner:
     title: '<gold>Modify Shop</gold>'
   customer:
     title: '<gold>View as customer</gold>'
+restore:
+  title: '[Slabby] Restore'
+  message: 'Right click with a stick to restore this shop at the clicked location.'
+  buy-price: '<dark_purple>Buy Price: $<price:''#.##''></dark_purple>'
+  sell-price: '<dark_purple>Sell Price: $<price:''#.##''></dark_purple>'
+  quantity: '<dark_purple>Quantity: <quantity></dark_purple>'
+  stock: '<dark_purple>Stock: <stock></dark_purple>'
+  note: '<dark_purple>Note: <note></dark_purple>'
+  owners: '<dark_purple>Owners: <owners></dark_purple>'
 command-block:
   title: '<gold>Slabby Shop</gold>'
   owners: '<green>Owned by <names></green>'

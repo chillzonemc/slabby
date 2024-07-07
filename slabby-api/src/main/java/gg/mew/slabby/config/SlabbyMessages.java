@@ -12,7 +12,9 @@ public interface SlabbyMessages {
     Log log();
     Modify modify();
     Owner owner();
+    Restore restore();
 
+    General general();
     CommandBlock commandBlock();
     Command command();
 
@@ -297,6 +299,22 @@ public interface SlabbyMessages {
         Reload reload();
         Admin admin();
 
+    }
+
+    interface Restore {
+        Component title();
+        Component message();
+        Component buyPrice(final double price);
+        Component sellPrice(final double price);
+        Component quantity(final int quantity);
+        Component stock(final int stock);
+        Component note(final String note);
+        Component owners(final String[] owners);
+    }
+
+    interface General {
+        Component nextPage();
+        Component previousPage();
     }
 
 }

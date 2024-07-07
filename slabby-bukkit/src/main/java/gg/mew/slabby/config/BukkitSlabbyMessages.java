@@ -18,10 +18,13 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     private BukkitClient client;
     private BukkitCreate create;
     private BukkitDestroy destroy;
-    private BukkitCommandBlock commandBlock;
     private BukkitLog log;
     private BukkitModify modify;
     private BukkitOwner owner;
+    private BukkitRestore restore;
+
+    private BukkitGeneral general;
+    private BukkitCommandBlock commandBlock;
     private BukkitCommand command;
 
     @ConfigSerializable
@@ -936,6 +939,59 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
     }
 
     @ConfigSerializable
+    final static class BukkitRestore implements Restore {
+
+        private String title;
+        private String message;
+        private String buyPrice;
+        private String sellPrice;
+        private String quantity;
+        private String stock;
+        private String note;
+        private String owners;
+
+        @Override
+        public Component title() {
+            return MiniMessage.miniMessage().deserialize(this.title);
+        }
+
+        @Override
+        public Component message() {
+            return MiniMessage.miniMessage().deserialize(this.message);
+        }
+
+        @Override
+        public Component buyPrice(final double price) {
+            return MiniMessage.miniMessage().deserialize(this.buyPrice, Formatter.number("price", price));
+        }
+
+        @Override
+        public Component sellPrice(final double price) {
+            return MiniMessage.miniMessage().deserialize(this.sellPrice, Formatter.number("price", price));
+        }
+
+        @Override
+        public Component quantity(final int quantity) {
+            return MiniMessage.miniMessage().deserialize(this.quantity, Formatter.number("quantity", quantity));
+        }
+
+        @Override
+        public Component stock(final int stock) {
+            return MiniMessage.miniMessage().deserialize(this.stock, Formatter.number("stock", stock));
+        }
+
+        @Override
+        public Component note(final String note) {
+            return MiniMessage.miniMessage().deserialize(this.note, Placeholder.unparsed("note", note));
+        }
+
+        @Override
+        public Component owners(final String[] owners) {
+            return MiniMessage.miniMessage().deserialize(this.owners, Placeholder.unparsed("owners", String.join(", ", owners)));
+        }
+    }
+
+    @ConfigSerializable
     @Accessors(fluent = true, chain = false)
     @Getter
     final static class BukkitCommand implements Command {
@@ -971,6 +1027,23 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitReload reload;
         private BukkitAdmin admin;
 
+    }
+
+    @ConfigSerializable
+    final static class BukkitGeneral implements General {
+
+        private String nextPage;
+        private String previousPage;
+
+        @Override
+        public Component nextPage() {
+            return MiniMessage.miniMessage().deserialize(this.nextPage);
+        }
+
+        @Override
+        public Component previousPage() {
+            return MiniMessage.miniMessage().deserialize(this.previousPage);
+        }
     }
 
 }

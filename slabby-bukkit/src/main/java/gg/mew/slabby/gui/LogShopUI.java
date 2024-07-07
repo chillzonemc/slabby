@@ -157,13 +157,13 @@ public final class LogShopUI {
                 .addIngredient('<', new PageItem(false) {
                     @Override
                     public ItemProvider getItemProvider(PagedGui<?> pagedGui) {
-                        return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Previous Page");
+                        return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(api.messages().general().previousPage()));
                     }
                 })
                 .addIngredient('>', new PageItem(true) {
                     @Override
                     public ItemProvider getItemProvider(PagedGui<?> pagedGui) {
-                        return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Next Page");
+                        return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(api.messages().general().nextPage()));
                     }
                 })
                 .setContent(items)

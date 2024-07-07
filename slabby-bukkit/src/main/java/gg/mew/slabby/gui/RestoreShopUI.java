@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
 import xyz.xenondevs.invui.item.Item;
@@ -25,7 +27,6 @@ import java.util.UUID;
 @UtilityClass
 public final class RestoreShopUI {
 
-    //TODO: localize
     public void open(final SlabbyAPI api, final Player viewer, final UUID uniqueId) {
         try {
             final var deletedShops = api.repository()
@@ -41,12 +42,12 @@ public final class RestoreShopUI {
                                 .toArray(String[]::new);
 
                         itemStack.lore(new ArrayList<>() {{
-                            add(Component.text("Buy Price: $%.2f".formatted(it.buyPrice())));
-                            add(Component.text("Sell Price: $%.2f".formatted(it.sellPrice())));
-                            add(Component.text("Quantity: %d".formatted(it.quantity())));
-                            add(Component.text("Stock: %d".formatted(it.stock())));
-                            add(Component.text("Note: %s".formatted(it.note())));
-                            add(Component.text("Owners: %s".formatted(String.join(", ", owners))));
+                            add(api.messages().restore().buyPrice(it.buyPrice()));
+                            add(api.messages().restore().sellPrice(it.sellPrice()));
+                            add(api.messages().restore().quantity(it.quantity()));
+                            add(api.messages().restore().stock(it.stock()));
+                            add(api.messages().restore().note(it.note()));
+                            add(api.messages().restore().owners(owners));
                         }});
 
                         return (Item) new SimpleItem(itemStack, c -> {
@@ -55,7 +56,9 @@ public final class RestoreShopUI {
                                     .state(Shop.State.ACTIVE)
                                     .wizardState(ShopWizard.WizardState.AWAITING_LOCATION);
 
-                            //TODO: close ui
+                            viewer.closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+
+                            viewer.sendMessage(api.messages().restore().message());
                         });
                     })
                     .toList();
@@ -72,13 +75,13 @@ public final class RestoreShopUI {
                     .addIngredient('<', new PageItem(false) {
                         @Override
                         public ItemProvider getItemProvider(PagedGui<?> pagedGui) {
-                            return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Previous Page");
+                            return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(api.messages().general().previousPage()));
                         }
                     })
                     .addIngredient('>', new PageItem(true) {
                         @Override
                         public ItemProvider getItemProvider(PagedGui<?> pagedGui) {
-                            return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName("Next Page");
+                            return new ItemBuilder(Material.RED_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(api.messages().general().nextPage()));
                         }
                     })
                     .setContent(deletedShops)
@@ -86,7 +89,7 @@ public final class RestoreShopUI {
 
             final var window = Window.single()
                     .setViewer(viewer)
-                    .setTitle("[Slabby] Deleted Shops")
+                    .setTitle(new AdventureComponentWrapper(api.messages().restore().title()))
                     .setGui(gui)
                     .build();
 
