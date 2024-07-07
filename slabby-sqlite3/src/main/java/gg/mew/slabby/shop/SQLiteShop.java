@@ -26,19 +26,25 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(generatedId = true)
     private int id;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T id() {
+        return (T) (Integer) this.id;
+    }
+
     @DatabaseField(canBeNull = false, index = true)
     private String item;
 
-    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
-    private int x;
+    @DatabaseField(canBeNull = true, uniqueIndexName = "location")
+    private Integer x;
 
-    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
-    private int y;
+    @DatabaseField(canBeNull = true, uniqueIndexName = "location")
+    private Integer y;
 
-    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
-    private int z;
+    @DatabaseField(canBeNull = true, uniqueIndexName = "location")
+    private Integer z;
 
-    @DatabaseField(canBeNull = false, uniqueIndexName = "location")
+    @DatabaseField(canBeNull = true, uniqueIndexName = "location")
     private String world;
 
     @DatabaseField(canBeNull = true)
@@ -82,6 +88,17 @@ public final class SQLiteShop implements Shop {
 
     @DatabaseField(canBeNull = true)
     private Date lastModifiedOn;
+
+    @DatabaseField(canBeNull = false, defaultValue = "ACTIVE")
+    private State state;
+
+    @Override
+    public void location(final Integer x, final Integer y, final Integer z, final String world) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.world = world;
+    }
 
     @Override
     public void inventory(final Integer x, final Integer y, final Integer z, final String world) {

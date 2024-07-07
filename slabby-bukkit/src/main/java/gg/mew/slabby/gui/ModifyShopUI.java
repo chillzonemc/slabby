@@ -35,9 +35,21 @@ public final class ModifyShopUI {
                 add(Component.text(wizard.note(), NamedTextColor.DARK_PURPLE));
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_NOTE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_NOTE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().note().request());
+            api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
+        }));
+
+        gui.setItem(2, 0, new SimpleItem(itemStack(Material.ENDER_PEARL, (it, meta) -> {
+            meta.displayName(api.messages().modify().move().title());
+            meta.lore(new ArrayList<>() {{
+                add(api.messages().modify().move().location(wizard.x(), wizard.y(), wizard.z(), wizard.world()));
+            }});
+        }).get(), c -> {
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_LOCATION);
+            gui.closeForAllViewers();
+            shopOwner.sendMessage(api.messages().modify().move().message());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
         }));
 
@@ -50,7 +62,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().buy().notForSale());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_BUY_PRICE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_BUY_PRICE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().buy().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -65,7 +77,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().sell().notBuying());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_SELL_PRICE);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_SELL_PRICE);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().sell().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -79,7 +91,7 @@ public final class ModifyShopUI {
                 add(api.messages().modify().quantity().description());
             }});
         }).get(), c -> {
-            wizard.state(ShopWizard.WizardState.AWAITING_QUANTITY);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_QUANTITY);
             gui.closeForAllViewers();
             shopOwner.sendMessage(api.messages().modify().quantity().request());
             api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
@@ -94,13 +106,18 @@ public final class ModifyShopUI {
         }).get(), c -> {
             try {
                 api.repository().transaction(() -> {
-                    final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+                    //TODO: this logic does not work when moving a shop
+                    final var shopOpt = api.repository().shopById(wizard.id());
 
                     shopOpt.ifPresentOrElse(shop -> {
                         shop.buyPrice(wizard.buyPrice());
                         shop.sellPrice(wizard.sellPrice());
                         shop.quantity(wizard.quantity());
                         shop.note(wizard.note());
+                        shop.state(wizard.state());
+
+                        //TODO: I'd need to change the display item as well
+                        shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
                         for (final var entry : wizard.valueChanges().entrySet()) {
                             final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)

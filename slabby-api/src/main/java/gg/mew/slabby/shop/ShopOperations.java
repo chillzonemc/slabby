@@ -11,7 +11,8 @@ public interface ShopOperations {
     ShopWizard wizard(final UUID uniqueId);
     ShopWizard wizardFrom(final UUID uniqueId, final Shop shop);
 
-    void ifWizard(final UUID uniqueId, Consumer<ShopWizard> action);
+    void ifWizard(final UUID uniqueId, final Consumer<ShopWizard> action);
+    void ifWizardOrElse(final UUID uniqueId, final Consumer<ShopWizard> action, final Runnable orElse);
 
     ShopOperationResult buy(final UUID uniqueId, final Shop shop);
     ShopOperationResult sell(final UUID uniqueId, final Shop shop);

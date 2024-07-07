@@ -11,11 +11,9 @@ import gg.mew.slabby.SlabbyAPI;
 
 import java.io.Closeable;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -157,10 +155,25 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public void markAsDeleted(final Shop shop) throws Exception {
+        try {
+            shop.state(Shop.State.DELETED);
+            shop.location(null, null, null, null);
+
+            this.shopDao.update((SQLiteShop) shop);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
+        }
+    }
+
+    @Override
     public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
+                    .eq(Shop.Names.STATE, Shop.State.ACTIVE)
+                    .and()
                     .eq(Shop.Names.X, x)
                     .and()
                     .eq(Shop.Names.Y, y)
@@ -181,6 +194,8 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
+                    .eq(Shop.Names.STATE, Shop.State.ACTIVE)
+                    .and()
                     .eq(Shop.Names.INVENTORY_X, x)
                     .and()
                     .eq(Shop.Names.INVENTORY_Y, y)
@@ -190,6 +205,37 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .eq(Shop.Names.INVENTORY_WORLD, world)
                     .queryForFirst();
             return Optional.ofNullable(result);
+        } catch (final SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
+        }
+    }
+
+    @Override
+    public <T> Optional<Shop> shopById(final T id) throws Exception {
+        if (id == null)
+            return Optional.empty();
+
+        try {
+            return Optional.ofNullable(this.shopDao.queryForId((int)id));
+        } catch (SQLException e) {
+            api.exceptionService().log(e);
+            throw e;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception {
+        try {
+            final var result = this.shopOwnerDao.queryBuilder()
+                    .join(this.shopDao.queryBuilder().where().eq(Shop.Names.STATE, state).queryBuilder())
+                    .where().eq(ShopOwner.Names.UNIQUE_ID, uniqueId)
+                    .query()
+                    .stream()
+                    .map(SQLiteShopOwner::shop)
+                    .toList();
+            return (Collection<Shop>) (Collection<? extends Shop>) result;
         } catch (final SQLException e) {
             api.exceptionService().log(e);
             throw e;

@@ -26,17 +26,26 @@ public interface Shop extends Auditable {
         public final String INVENTORY_Y = "inventoryY";
         public final String INVENTORY_Z = "inventoryZ";
         public final String INVENTORY_WORLD = "inventoryWorld";
+        public final String STATE = "state";
     }
+
+    <T> T id();
 
     String item();
 
-    int x();
+    Integer x();
 
-    int y();
+    Integer y();
 
-    int z();
+    Integer z();
 
     String world();
+
+    void location(final Integer x, final Integer y, final Integer z, final String world);
+
+    default boolean hasLocation() {
+        return x() != null && y() != null && z() != null && world() != null;
+    }
 
     Double buyPrice();
 
@@ -71,6 +80,10 @@ public interface Shop extends Auditable {
 
     String inventoryWorld();
 
+    State state();
+
+    void state(final State state);
+
     void inventory(final Integer x, final Integer y, final Integer z, final String world);
 
     default boolean hasInventory() {
@@ -86,10 +99,10 @@ public interface Shop extends Auditable {
     interface Builder {
 
          Builder item(final String item);
-         Builder x(final int x);
-         Builder y(final int y);
-         Builder z(final int z);
-         Builder world(final String dimension);
+         Builder x(final Integer x);
+         Builder y(final Integer y);
+         Builder z(final Integer z);
+         Builder world(final String world);
          Builder buyPrice(final Double buyPrice);
          Builder sellPrice(final Double sellPrice);
          Builder quantity(final int quantity);
@@ -100,4 +113,8 @@ public interface Shop extends Auditable {
 
      }
 
+     enum State {
+         ACTIVE,
+         DELETED,
+     }
 }

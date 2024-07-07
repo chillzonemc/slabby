@@ -44,6 +44,16 @@ public final class BukkitShopOperations implements ShopOperations {
     }
 
     @Override
+    public void ifWizardOrElse(final UUID uniqueId, final Consumer<ShopWizard> action, final Runnable orElse) {
+        final var wizard = this.wizards.get(uniqueId);
+
+        if (wizard != null)
+            action.accept(wizard);
+        else
+            orElse.run();
+    }
+
+    @Override
     public Map<UUID, Double> splitCost(final double amount, final Shop shop) {
         final var result = new HashMap<UUID, Double>();
 

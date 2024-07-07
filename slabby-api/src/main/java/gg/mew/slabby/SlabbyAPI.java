@@ -15,6 +15,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.UUID;
 
 public interface SlabbyAPI {
 
@@ -48,5 +49,9 @@ public interface SlabbyAPI {
     SlabbyMessages messages();
 
     void reload();
+
+    boolean isAdminMode(final UUID uniqueId);
+
+    boolean setAdminMode(final UUID uniqueId, final boolean adminMode);
 
 }

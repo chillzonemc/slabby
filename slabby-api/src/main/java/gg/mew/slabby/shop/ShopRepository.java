@@ -21,9 +21,15 @@ public interface ShopRepository {
     void refresh(final Shop shop) throws Exception;
     void refresh(final ShopOwner shopOwner) throws Exception;
 
+    void markAsDeleted(final Shop shop) throws Exception;
+
+    <T> Optional<Shop> shopById(final T id) throws Exception;
+
     Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception;
 
     Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception;
+
+    Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception;
 
     @SuppressWarnings("UnusedReturnValue")
     <T> T transaction(final Callable<T> transaction) throws Exception;

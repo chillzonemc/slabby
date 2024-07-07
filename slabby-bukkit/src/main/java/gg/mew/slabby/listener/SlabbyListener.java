@@ -45,13 +45,20 @@ public final class SlabbyListener implements Listener {
         if (block == null || block.getType() == Material.AIR || event.getHand() != EquipmentSlot.HAND)
             return;
 
+        final var uniqueId = player.getUniqueId();
+
+        final int blockX = block.getX();
+        final int blockY = block.getY();
+        final int blockZ = block.getZ();
+        final String blockWorld = block.getWorld().getName();
+
         final Optional<Shop> shopOpt;
 
         try {
-            shopOpt = api.repository().shopAt(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
+            shopOpt = api.repository().shopAt(blockX, blockY, blockZ, blockWorld);
         } catch (final Exception e) {
             final var location = player.getLocation();
-            api.sound().play(player.getUniqueId(), location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), Sounds.BLOCKED);
+            api.sound().play(uniqueId, location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), Sounds.BLOCKED);
             //TODO: notify uniqueId
             return;
         }
@@ -62,8 +69,7 @@ public final class SlabbyListener implements Listener {
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK -> {
                 shopOpt.ifPresentOrElse(shop -> {
-                    //TODO: need a way for SHOP_MODIFY_OTHERS to express intent. command? /slabby admin
-                    if (shop.isOwner(player.getUniqueId())) {
+                    if (shop.isOwner(uniqueId) || api.isAdminMode(uniqueId)) {
                         if (hasConfigurationItem) {
                             DestroyShopUI.open(api, player, shop);
                         } else {
@@ -74,20 +80,27 @@ public final class SlabbyListener implements Listener {
                     }
                 }, () -> {
                     final var canAccessClaim = api.claim() == null ||
-                            api.claim().canCreateShop(player.getUniqueId(),
-                                    event.getClickedBlock().getX(),
-                                    event.getClickedBlock().getY(),
-                                    event.getClickedBlock().getZ(),
+                            api.claim().canCreateShop(uniqueId,
+                                    blockX,
+                                    blockY,
+                                    blockZ,
                                     event.getClickedBlock().getWorld().getName());
 
                     if (canAccessClaim && hasConfigurationItem) {
-                        api.permission().ifPermission(player.getUniqueId(), SlabbyPermissions.SHOP_MODIFY, () -> CreateShopUI.open(api, player, block));
+                        api.operations().ifWizardOrElse(uniqueId, w -> {
+                            if (w.wizardState() == ShopWizard.WizardState.AWAITING_LOCATION) {
+                                w.location(blockX, blockY, blockZ, blockWorld);
+                                w.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+                                api.sound().play(uniqueId, w.x(), w.y(), w.z(), w.world(), Sounds.MODIFY_SUCCESS);
+                                ModifyShopUI.open(api, player, w);
+                            }
+                        }, () -> api.permission().ifPermission(uniqueId, SlabbyPermissions.SHOP_MODIFY, () -> CreateShopUI.open(api, player, block)));
                     }
                 });
             }
             case LEFT_CLICK_BLOCK -> {
                 shopOpt.ifPresent(shop -> {
-                    if (!shop.isOwner(player.getUniqueId()))
+                    if (!shop.isOwner(uniqueId) && !api.isAdminMode(uniqueId))
                         return;
 
                     if (api.configuration().restock().punch().enabled()) {
@@ -104,17 +117,17 @@ public final class SlabbyListener implements Listener {
                                     .sum()
                                     : shop.quantity();
 
-                            final var result = api.operations().deposit(player.getUniqueId(), shop, toDeposit);
+                            final var result = api.operations().deposit(uniqueId, shop, toDeposit);
 
                             if (result.success()) {
-                                api.sound().play(player.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                                api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
                             }
                         }
                     }
                 });
 
-                api.operations().ifWizard(player.getUniqueId(), wizard -> {
-                    if (wizard.state() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
+                api.operations().ifWizard(uniqueId, wizard -> {
+                    if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
                         if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
                             try {
                                 final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
@@ -127,20 +140,20 @@ public final class SlabbyListener implements Listener {
 
                                     final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
                                             .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
-                                            .uniqueId(player.getUniqueId())
+                                            .uniqueId(uniqueId)
                                             .serialized(new LocationChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
                                             .build();
 
                                     shop.logs().add(log);
 
-                                    api.sound().play(player.getUniqueId(), shop, Sounds.SUCCESS);
+                                    api.sound().play(uniqueId, shop, Sounds.SUCCESS);
                                     //TODO: message player
                                 }
                             } catch (final Exception e) {
                                 //TODO: notify uniqueId
                                 //TODO: if an inventory is already being used, it'll cause an exception here. we need to check an inventory isn't already linked.
                             }
-                            api.operations().wizards().remove(player.getUniqueId());
+                            api.operations().wizards().remove(uniqueId);
                         }
                     }
                 });
@@ -151,10 +164,10 @@ public final class SlabbyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onInventoryClick(final InventoryClickEvent event) {
         api.operations().ifWizard(event.getWhoClicked().getUniqueId(), wizard -> {
-            if (wizard.state() == ShopWizard.WizardState.AWAITING_ITEM) {
+            if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_ITEM) {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
-                wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION)
+                wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION)
                         .item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
 
                 ModifyShopUI.open(api, (Player) event.getWhoClicked(), wizard);
@@ -168,8 +181,8 @@ public final class SlabbyListener implements Listener {
     private void onInventoryClose(final InventoryCloseEvent event) {
         if (event.getReason() == InventoryCloseEvent.Reason.PLAYER) {
             api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
-                if (wizard.state() == ShopWizard.WizardState.AWAITING_CONFIRMATION
-                        || wizard.state() == ShopWizard.WizardState.AWAITING_ITEM)
+                if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_CONFIRMATION
+                        || wizard.wizardState() == ShopWizard.WizardState.AWAITING_ITEM)
                     api.operations().wizards().remove(event.getPlayer().getUniqueId());
             });
         }
@@ -178,7 +191,7 @@ public final class SlabbyListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onChatMessage(final AsyncChatEvent event) {
         api.operations().ifWizard(event.getPlayer().getUniqueId(), wizard -> {
-            if (!wizard.state().awaitingTextInput())
+            if (!wizard.wizardState().awaitingTextInput())
                 return;
 
             final var serializer = PlainTextComponentSerializer.plainText();
@@ -188,7 +201,7 @@ public final class SlabbyListener implements Listener {
             //TODO: min/max constraints
 
             try {
-                switch (wizard.state()) {
+                switch (wizard.wizardState()) {
                     case AWAITING_NOTE -> wizard.note(text);
                     case AWAITING_BUY_PRICE -> {
                         final var buyPrice = Double.parseDouble(text);
@@ -209,7 +222,7 @@ public final class SlabbyListener implements Listener {
                 event.getPlayer().sendMessage(Component.text("That's not a valid number!", NamedTextColor.RED));
             }
 
-            wizard.state(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
 
             ModifyShopUI.open(api, event.getPlayer(), wizard);
 

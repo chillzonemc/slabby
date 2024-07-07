@@ -1,14 +1,16 @@
 package gg.mew.slabby.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.gui.RestoreShopUI;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.command.CommandExecutor;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+
+import java.awt.*;
 
 @RequiredArgsConstructor
 @CommandAlias("slabby")
@@ -21,7 +23,26 @@ public final class SlabbyCommand extends BaseCommand {
     private void onReload(final Player player) {
         api.reload();
 
-        player.sendMessage("Slabby reloaded.");
+        player.sendMessage(api.messages().command().reload().message());
+    }
+
+    @Subcommand("admin")
+    @CommandPermission(SlabbyPermissions.ADMIN_TOGGLE)
+    private void onAdminToggle(final Player player) {
+        if (api.setAdminMode(player.getUniqueId(), !api.isAdminMode(player.getUniqueId())))
+            player.sendMessage(api.messages().command().admin().enabled());
+        else
+            player.sendMessage(api.messages().command().admin().disabled());
+    }
+
+    @Subcommand("restore")
+    @CommandPermission(SlabbyPermissions.SHOP_RESTORE)
+    private void onRestore(final Player player, final @Optional OfflinePlayer target) {
+        if (target != null && !player.hasPermission(SlabbyPermissions.ADMIN_RESTORE)) {
+            player.sendMessage(Bukkit.permissionMessage());
+            return;
+        }
+        RestoreShopUI.open(api, player, target != null ? target.getUniqueId() : player.getUniqueId());
     }
 
 }

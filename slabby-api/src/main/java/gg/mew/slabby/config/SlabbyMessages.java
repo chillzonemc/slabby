@@ -12,8 +12,11 @@ public interface SlabbyMessages {
     Log log();
     Modify modify();
     Owner owner();
+    Restore restore();
 
+    General general();
     CommandBlock commandBlock();
+    Command command();
 
     interface Client {
 
@@ -206,6 +209,12 @@ public interface SlabbyMessages {
             Component title();
         }
 
+        interface Move {
+            Component title();
+            Component location(final int x, final int y, final int z, final String world);
+            Component message();
+        }
+
         Component title();
         Component clickToSet();
 
@@ -215,6 +224,7 @@ public interface SlabbyMessages {
         Quantity quantity();
         Confirm confirm();
         Cancel cancel();
+        Move move();
     }
 
     interface Owner {
@@ -273,6 +283,38 @@ public interface SlabbyMessages {
         InventoryLink inventoryLink();
         Modify modify();
         Customer customer();
+    }
+
+    interface Command {
+
+        interface Reload {
+            Component message();
+        }
+
+        interface Admin {
+            Component enabled();
+            Component disabled();
+        }
+
+        Reload reload();
+        Admin admin();
+
+    }
+
+    interface Restore {
+        Component title();
+        Component message();
+        Component buyPrice(final double price);
+        Component sellPrice(final double price);
+        Component quantity(final int quantity);
+        Component stock(final int stock);
+        Component note(final String note);
+        Component owners(final String[] owners);
+    }
+
+    interface General {
+        Component nextPage();
+        Component previousPage();
     }
 
 }

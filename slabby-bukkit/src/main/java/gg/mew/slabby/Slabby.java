@@ -1,5 +1,6 @@
 package gg.mew.slabby;
 
+import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,6 +26,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import me.angeschossen.lands.api.LandsIntegration;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,6 +34,8 @@ import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
 import org.bukkit.plugin.java.annotation.dependency.Dependency;
 import org.bukkit.plugin.java.annotation.dependency.DependsOn;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
+import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
 import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
@@ -44,22 +48,28 @@ import java.nio.file.Path;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.*;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
 @ApiVersion(ApiVersion.Target.v1_20)
 @DependsOn(value = {
-        @Dependency("Vault"),
-        @Dependency("Lands")
+        @Dependency("Vault")
+})
+@SoftDependsOn(value = {
+        @SoftDependency("Lands")
 })
 @Permissions(value = {
         @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
         @Permission(name = SlabbyPermissions.SHOP_MODIFY, desc = "Allows for creation, modification and deletion of new shops"),
-        @Permission(name = SlabbyPermissions.SHOP_MODIFY_OTHERS, desc = "Allows for creation, modification and deletion of any shop"),
-        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops"),
-        @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking chests to shops"),
+        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops from other plugins"),
+        @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking inventories to shops"),
         @Permission(name = SlabbyPermissions.SHOP_NOTIFY, desc = "Allows shop owners to receive notifications"),
-        @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs")
+        @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs"),
+        @Permission(name = SlabbyPermissions.SHOP_RESTORE, desc = "Allows shop owners to restore their deleted shops"),
+
+        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to reload Slabby"),
+        @Permission(name = SlabbyPermissions.ADMIN_TOGGLE, desc = "Allows admins to interact with any shop as if it was their own"),
+        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own")
 })
 @Commands(value = {
         @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
@@ -110,6 +120,8 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             .serializeNulls()
             .create();
 
+    private final Map<UUID, Boolean> adminMode = new HashMap<>();
+
     @Override
     public void reload() {
         setupConfig();
@@ -139,6 +151,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             this.claim = new LandsClaimWrapper(LandsIntegration.of(this));
 
         final var commandManager = new PaperCommandManager(this);
+
         commandManager.registerCommand(new SlabbyCommand(this));
 
         SlabbyHelper.init(this);
@@ -216,4 +229,21 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
         return getDataFolder();
     }
 
+    @Override
+    public boolean isAdminMode(final UUID uniqueId) {
+        if (!permission.hasPermission(uniqueId, SlabbyPermissions.ADMIN_TOGGLE))
+            return false;
+
+        return adminMode.getOrDefault(uniqueId, false);
+    }
+
+    @Override
+    public boolean setAdminMode(final UUID uniqueId, final boolean adminMode) {
+        if (!permission.hasPermission(uniqueId, SlabbyPermissions.ADMIN_TOGGLE))
+            return false;
+
+        this.adminMode.put(uniqueId, adminMode);
+
+        return adminMode;
+    }
 }
