@@ -435,12 +435,17 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
 
             @Override
-            public Component from(final double amount) {
+            public Component from(Double amount) {
+                if (amount == null)
+                    amount = -1D;
+
                 return MiniMessage.miniMessage().deserialize(this.from, Formatter.number("amount", amount));
             }
 
             @Override
-            public Component to(final double amount) {
+            public Component to(Double amount) {
+                if (amount == null)
+                    amount = -1D;
                 return MiniMessage.miniMessage().deserialize(this.to, Formatter.number("amount", amount));
             }
         }
@@ -458,12 +463,18 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
 
             @Override
-            public Component from(final double amount) {
+            public Component from(Double amount) {
+                if (amount == null)
+                    amount = -1D;
+
                 return MiniMessage.miniMessage().deserialize(this.from, Formatter.number("amount", amount));
             }
 
             @Override
-            public Component to(final double amount) {
+            public Component to(Double amount) {
+                if (amount == null)
+                    amount = -1D;
+
                 return MiniMessage.miniMessage().deserialize(this.to, Formatter.number("amount", amount));
             }
         }

@@ -59,10 +59,9 @@ public interface Shop extends Auditable {
 
     void quantity(final int quantity);
 
-    //TODO: allow null stock, null stock is infinite stock
-    int stock();
+    Integer stock();
 
-    void stock(final int stock);
+    void stock(final Integer stock);
 
     String note();
 
@@ -90,6 +89,10 @@ public interface Shop extends Auditable {
         return inventoryX() != null && inventoryY() != null && inventoryZ() != null && inventoryWorld() != null;
     }
 
+    default boolean hasStock(final int quantity) {
+        return stock() == null || stock() >= quantity;
+    }
+
     Collection<ShopOwner> owners();
 
     Collection<ShopLog> logs();
@@ -106,7 +109,7 @@ public interface Shop extends Auditable {
          Builder buyPrice(final Double buyPrice);
          Builder sellPrice(final Double sellPrice);
          Builder quantity(final int quantity);
-         Builder stock(final int stock);
+         Builder stock(final Integer stock);
          Builder note(final String note);
          Builder name(final String name);
          Shop build();

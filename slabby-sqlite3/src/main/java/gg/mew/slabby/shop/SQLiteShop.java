@@ -21,8 +21,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public final class SQLiteShop implements Shop {
 
-    //TODO: Store money as integer? money * 100 for store, money * 0.01 for retrieve
-
     @DatabaseField(generatedId = true)
     private int id;
 
@@ -56,8 +54,8 @@ public final class SQLiteShop implements Shop {
     @DatabaseField(canBeNull = false)
     private int quantity; //TODO: > 0
 
-    @DatabaseField(canBeNull = false)
-    private int stock;
+    @DatabaseField(canBeNull = true)
+    private Integer stock;
 
     @DatabaseField(canBeNull = true)
     private String note;

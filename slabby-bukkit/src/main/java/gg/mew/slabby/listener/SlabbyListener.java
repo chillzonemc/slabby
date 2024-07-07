@@ -100,7 +100,7 @@ public final class SlabbyListener implements Listener {
             }
             case LEFT_CLICK_BLOCK -> {
                 shopOpt.ifPresent(shop -> {
-                    if (!shop.isOwner(uniqueId) && !api.isAdminMode(uniqueId))
+                    if (!shop.isOwner(uniqueId) && !api.isAdminMode(uniqueId) || shop.stock() == null)
                         return;
 
                     if (api.configuration().restock().punch().enabled()) {

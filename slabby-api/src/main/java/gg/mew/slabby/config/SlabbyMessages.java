@@ -125,14 +125,14 @@ public interface SlabbyMessages {
 
         interface BuyPriceChanged {
             Component title();
-            Component from(final double amount);
-            Component to(final double amount);
+            Component from(final Double amount);
+            Component to(final Double amount);
         }
 
         interface SellPriceChanged {
             Component title();
-            Component from(final double amount);
-            Component to(final double amount);
+            Component from(final Double amount);
+            Component to(final Double amount);
         }
 
         interface QuantityChanged {

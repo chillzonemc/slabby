@@ -80,7 +80,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
-        if (shop.stock() < shop.quantity())
+        if (!shop.hasStock(shop.quantity()))
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
 
         //TODO: check for space
@@ -90,9 +90,8 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!result.success())
             return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_BUY);
 
-        final var stock = shop.stock();
-
-        shop.stock(stock - shop.quantity());
+        if (shop.stock() != null)
+            shop.stock(shop.stock() - shop.quantity());
 
         try {
             api.repository().update(shop);
@@ -148,9 +147,8 @@ public final class BukkitShopOperations implements ShopOperations {
                 return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_SELL);
         }
 
-        final var stock = shop.stock();
-
-        shop.stock(stock + shop.quantity());
+        if (shop.stock() != null)
+            shop.stock(shop.stock() - shop.quantity());
 
         try {
             api.repository().update(shop);
@@ -184,6 +182,8 @@ public final class BukkitShopOperations implements ShopOperations {
     public ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount) {
         if (amount < 1)
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
+
+        //TODO: do not allow if stock is null
 
         try {
             api.repository().refresh(shop);
@@ -227,6 +227,8 @@ public final class BukkitShopOperations implements ShopOperations {
     public ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount) {
         if (amount < 1)
             return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
+
+        //TODO: do not allow if stock is null
 
         try {
             api.repository().refresh(shop);
