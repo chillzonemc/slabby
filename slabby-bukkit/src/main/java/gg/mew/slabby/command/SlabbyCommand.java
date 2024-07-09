@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.gui.RestoreShopUI;
+import gg.mew.slabby.importer.slabbo.SlabboImporter;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -43,6 +44,14 @@ public final class SlabbyCommand extends BaseCommand {
             return;
         }
         RestoreShopUI.open(api, player, target != null ? target.getUniqueId() : player.getUniqueId());
+    }
+
+    @Subcommand("import")
+    @CommandPermission(SlabbyPermissions.ADMIN_IMPORT)
+    private void onImport(final Player player) {
+        new SlabboImporter().onImport(api);
+
+        player.sendMessage("import complete");
     }
 
 }

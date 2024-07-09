@@ -42,10 +42,17 @@ public final class RestoreShopUI {
                                 .toArray(String[]::new);
 
                         itemStack.lore(new ArrayList<>() {{
-                            add(api.messages().restore().buyPrice(it.buyPrice()));
-                            add(api.messages().restore().sellPrice(it.sellPrice()));
+                            if (it.buyPrice() != null)
+                                add(api.messages().restore().buyPrice(it.buyPrice()));
+
+                            if (it.sellPrice() != null)
+                                add(api.messages().restore().sellPrice(it.sellPrice()));
+
                             add(api.messages().restore().quantity(it.quantity()));
-                            add(api.messages().restore().stock(it.stock()));
+
+                            if (it.stock() != null)
+                                add(api.messages().restore().stock(it.stock()));
+
                             add(api.messages().restore().note(it.note()));
                             add(api.messages().restore().owners(owners));
                         }});
