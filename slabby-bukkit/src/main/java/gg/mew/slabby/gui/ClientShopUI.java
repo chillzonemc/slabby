@@ -33,8 +33,10 @@ public final class ClientShopUI {
                 meta.displayName(api.messages().client().buy().title(item.displayName(), shop.quantity()));
                 meta.lore(new ArrayList<>() {{
                     add(api.messages().client().buy().price(shop.buyPrice()));
-                    add(api.messages().client().buy().stock(shop.stock()));
-                    add(api.messages().client().buy().stacks(shop.stock() / item.getMaxStackSize()));
+                    if (shop.stock() != null) {
+                        add(api.messages().client().buy().stock(shop.stock()));
+                        add(api.messages().client().buy().stacks(shop.stock() / item.getMaxStackSize()));
+                    }
                 }});
             }), c -> {
                 final var result = api.operations().buy(client.getUniqueId(), shop);
@@ -57,8 +59,10 @@ public final class ClientShopUI {
                 meta.displayName(api.messages().client().sell().title(item.displayName(), shop.quantity()));
                 meta.lore(new ArrayList<>() {{
                     add(api.messages().client().sell().price(shop.buyPrice()));
-                    add(api.messages().client().sell().stock(shop.stock()));
-                    add(api.messages().client().sell().stacks(shop.stock() / item.getMaxStackSize()));
+                    if (shop.stock() != null) {
+                        add(api.messages().client().sell().stock(shop.stock()));
+                        add(api.messages().client().sell().stacks(shop.stock() / item.getMaxStackSize()));
+                    }
                 }});
             }), c -> {
                 final var result = api.operations().sell(client.getUniqueId(), shop);

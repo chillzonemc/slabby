@@ -21,6 +21,8 @@ import java.util.function.Supplier;
 @UtilityClass
 public final class GuiHelper {
 
+    public static final String INFINITY = "∞";
+
     public Supplier<? extends ItemProvider> itemStack(final Material material, final BiConsumer<ItemStack, ItemMeta> action) {
         return () -> s -> {
             final var itemStack = new ItemStack(material);

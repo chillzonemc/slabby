@@ -133,6 +133,7 @@ public final class ModifyShopUI {
                             api.repository().update(shop);
                         } catch (final Exception ignored) {}
                     }, () -> {
+                        //TODO: move to operations
                         final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
                                 .x(wizard.x())
                                 .y(wizard.y())
@@ -143,6 +144,7 @@ public final class ModifyShopUI {
                                 .sellPrice(wizard.sellPrice())
                                 .quantity(wizard.quantity())
                                 .note(wizard.note())
+                                .stock(api.isAdminMode(shopOwner.getUniqueId()) ? null : 0)
                                 .build();
 
                         try {
