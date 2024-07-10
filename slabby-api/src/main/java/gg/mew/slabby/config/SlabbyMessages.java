@@ -296,8 +296,13 @@ public interface SlabbyMessages {
             Component disabled();
         }
 
+        interface Importer {
+            Component message();
+        }
+
         Reload reload();
         Admin admin();
+        Importer importer();
 
     }
 
