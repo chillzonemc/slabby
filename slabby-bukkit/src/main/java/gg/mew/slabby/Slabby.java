@@ -1,6 +1,5 @@
 package gg.mew.slabby;
 
-import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -26,7 +25,7 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import me.angeschossen.lands.api.LandsIntegration;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,6 +41,7 @@ import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
+import gg.mew.slabby.importer.slabbo.SlabboShop;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -61,7 +61,6 @@ import java.util.*;
 @Permissions(value = {
         @Permission(name = SlabbyPermissions.SHOP_INTERACT, desc = "Allows for interacting with shops"),
         @Permission(name = SlabbyPermissions.SHOP_MODIFY, desc = "Allows for creation, modification and deletion of new shops"),
-        @Permission(name = SlabbyPermissions.SHOP_IMPORT, desc = "Allows for importing of shops from other plugins"),
         @Permission(name = SlabbyPermissions.SHOP_LINK, desc = "Allows for linking inventories to shops"),
         @Permission(name = SlabbyPermissions.SHOP_NOTIFY, desc = "Allows shop owners to receive notifications"),
         @Permission(name = SlabbyPermissions.SHOP_LOGS, desc = "Allows shop owners to view their shop logs"),
@@ -69,13 +68,18 @@ import java.util.*;
 
         @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to reload Slabby"),
         @Permission(name = SlabbyPermissions.ADMIN_TOGGLE, desc = "Allows admins to interact with any shop as if it was their own"),
-        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own")
+        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own"),
+        @Permission(name = SlabbyPermissions.ADMIN_IMPORT, desc = "Allows admins to import shops from other plugins"),
 })
 @Commands(value = {
         @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
 })
 @Accessors(fluent = true)
 public final class Slabby extends JavaPlugin implements SlabbyAPI {
+
+    static {
+        ConfigurationSerialization.registerClass(SlabboShop.class, "Shop");
+    }
 
     @Getter
     private SQLiteShopRepository repository;
