@@ -37,6 +37,8 @@ public final class OwnerShopUI {
 
         final var gui = Gui.empty(9, 2);
 
+        //TODO: allow bulk withdraw/deposit
+
         if (shop.stock() != null) {
             gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().deposit().title(itemStack.displayName()));
