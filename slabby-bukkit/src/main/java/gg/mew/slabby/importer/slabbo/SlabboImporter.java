@@ -56,6 +56,10 @@ public final class SlabboImporter implements Importer {
                                 .build();
 
                         shop.owners().add(owner);
+
+                        api.operations().removeAndSpawnDisplayItem(shop);
+
+                        api.repository().update(shop);
                     } catch (IllegalAccessException | NoSuchFieldException e) {
                         api.exceptionService().log(e);
                     }

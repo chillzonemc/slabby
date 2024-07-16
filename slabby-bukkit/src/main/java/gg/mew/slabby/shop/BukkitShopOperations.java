@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.Location;
+import org.bukkit.entity.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -268,6 +269,99 @@ public final class BukkitShopOperations implements ShopOperations {
         player.getInventory().removeItem(itemStack);
 
         return new ShopOperationResult(true, Cause.NONE);
+    }
+
+    @Override
+    public void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws Exception {
+        final var success = api.repository().transaction(() -> {
+            final var shopOpt = api.repository().shopById(wizard.id());
+
+            if (shopOpt.isPresent()) {
+                final var shop = shopOpt.get();
+
+                shop.buyPrice(wizard.buyPrice());
+                shop.sellPrice(wizard.sellPrice());
+                shop.quantity(wizard.quantity());
+                shop.note(wizard.note());
+                shop.state(wizard.state());
+
+                shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+
+                for (final var entry : wizard.valueChanges().entrySet()) {
+                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                            .action(entry.getKey())
+                            .uniqueId(uniqueId)
+                            .serialized(entry.getValue())
+                            .build();
+
+                    shop.logs().add(log);
+                }
+
+                api.repository().update(shop);
+            } else {
+                final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
+                        .x(wizard.x())
+                        .y(wizard.y())
+                        .z(wizard.z())
+                        .world(wizard.world())
+                        .item(wizard.item())
+                        .buyPrice(wizard.buyPrice())
+                        .sellPrice(wizard.sellPrice())
+                        .quantity(wizard.quantity())
+                        .note(wizard.note())
+                        .stock(api.isAdminMode(uniqueId) ? null : 0)
+                        .build();
+
+                api.repository().createOrUpdate(shop);
+
+                shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                        .uniqueId(uniqueId)
+                        .share(100)
+                        .build());
+            }
+
+            return true;
+        });
+
+        if (success) {
+            final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+
+            if (shopOpt.isPresent()) {
+                final var shop = shopOpt.get();
+
+                removeAndSpawnDisplayItem(shop);
+
+                api.repository().update(shop);
+            }
+        }
+    }
+
+    @Override
+    public void removeShop(final Shop shop) throws Exception {
+        if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)
+            e.remove();
+
+        api.repository().markAsDeleted(shop);
+    }
+
+    @Override
+    public void removeAndSpawnDisplayItem(final Shop shop) {
+        final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var world = Bukkit.getWorld(shop.world());
+
+        if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)
+            e.remove();
+
+        final var block = world.getBlockAt(shop.x(), shop.y(), shop.z());
+
+        final var itemDisplay = (ItemDisplay) world.spawnEntity(new Location(world, block.getBoundingBox().getCenterX(), block.getBoundingBox().getMaxY(), block.getBoundingBox().getCenterZ()), EntityType.ITEM_DISPLAY);
+
+        itemDisplay.setBillboard(Display.Billboard.VERTICAL);
+
+        itemDisplay.setItemStack(item);
+        itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
+
+        shop.displayEntityId(itemDisplay.getUniqueId());
     }
 
     private static void addItemToInventory(final Shop shop, final Player player) {

@@ -2,9 +2,6 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
-import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.ShopLog;
-import gg.mew.slabby.shop.ShopOwner;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -105,63 +102,10 @@ public final class ModifyShopUI {
             }});
         }).get(), c -> {
             try {
-                api.repository().transaction(() -> {
-                    //TODO: this logic does not work when moving a shop
-                    final var shopOpt = api.repository().shopById(wizard.id());
 
-                    shopOpt.ifPresentOrElse(shop -> {
-                        shop.buyPrice(wizard.buyPrice());
-                        shop.sellPrice(wizard.sellPrice());
-                        shop.quantity(wizard.quantity());
-                        shop.note(wizard.note());
-                        shop.state(wizard.state());
-
-                        //TODO: I'd need to change the display item as well
-                        shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
-
-                        for (final var entry : wizard.valueChanges().entrySet()) {
-                            final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                    .action(entry.getKey())
-                                    .uniqueId(shopOwner.getUniqueId())
-                                    .serialized(entry.getValue())
-                                    .build();
-
-                            shop.logs().add(log);
-                        }
-
-                        try {
-                            api.repository().update(shop);
-                        } catch (final Exception ignored) {}
-                    }, () -> {
-                        //TODO: move to operations
-                        final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
-                                .x(wizard.x())
-                                .y(wizard.y())
-                                .z(wizard.z())
-                                .world(wizard.world())
-                                .item(wizard.item())
-                                .buyPrice(wizard.buyPrice())
-                                .sellPrice(wizard.sellPrice())
-                                .quantity(wizard.quantity())
-                                .note(wizard.note())
-                                .stock(api.isAdminMode(shopOwner.getUniqueId()) ? null : 0)
-                                .build();
-
-                        try {
-                            api.repository().createOrUpdate(shop);
-
-                            shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
-                                    .uniqueId(shopOwner.getUniqueId())
-                                    .share(100)
-                                    .build());
-                        } catch (final Exception ignored) {}
-                    });
-
-                    return null;
-                });
+                api.operations().createOrUpdateShop(shopOwner.getUniqueId(), wizard);
 
                 api.operations().wizards().remove(shopOwner.getUniqueId());
-
                 gui.closeForAllViewers();
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
             } catch (final Exception e) {
@@ -186,5 +130,7 @@ public final class ModifyShopUI {
 
         Bukkit.getScheduler().runTask((Slabby)api, window::open);
     }
+
+
 
 }

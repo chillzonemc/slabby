@@ -1,7 +1,6 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.audit.Auditable;
-import lombok.experimental.FieldNameConstants;
 import lombok.experimental.UtilityClass;
 
 import java.util.Collection;
@@ -93,6 +92,10 @@ public interface Shop extends Auditable {
         return stock() == null || stock() >= quantity;
     }
 
+    UUID displayEntityId();
+
+    void displayEntityId(final UUID displayEntityId);
+
     Collection<ShopOwner> owners();
 
     Collection<ShopLog> logs();
@@ -100,7 +103,6 @@ public interface Shop extends Auditable {
     boolean isOwner(final UUID uniqueId);
 
     interface Builder {
-
          Builder item(final String item);
          Builder x(final Integer x);
          Builder y(final Integer y);
@@ -112,6 +114,7 @@ public interface Shop extends Auditable {
          Builder stock(final Integer stock);
          Builder note(final String note);
          Builder name(final String name);
+         Builder displayEntityId(final UUID displayEntityId);
          Shop build();
 
      }
