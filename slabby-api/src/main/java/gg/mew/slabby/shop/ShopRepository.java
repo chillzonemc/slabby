@@ -1,5 +1,6 @@
 package gg.mew.slabby.shop;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,6 +33,6 @@ public interface ShopRepository {
     Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception;
 
     @SuppressWarnings("UnusedReturnValue")
-    <T> T transaction(final Callable<T> transaction) throws Exception;
+    <T> T transaction(final Callable<T> transaction) throws SQLException;
 
 }

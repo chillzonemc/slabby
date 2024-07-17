@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -39,16 +40,14 @@ public final class ClientShopUI {
                     }
                 }});
             }), c -> {
-                final var result = api.operations().buy(client.getUniqueId(), shop);
-
-                if (!result.success()) {
-                    client.sendMessage(localize(result));
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
+                try {
+                    api.operations().buy(client.getUniqueId(), shop);
                     api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
 
                     client.sendMessage(api.messages().client().buy().message(item.displayName(), shop.quantity(), shop.buyPrice()));
                     //TODO: notify sellers
+                } catch (final SlabbyException e) {
+                    api.exceptionService().logToPlayer(client.getUniqueId(), e);
                 }
                 return true;
             }));
@@ -65,14 +64,12 @@ public final class ClientShopUI {
                     }
                 }});
             }), c -> {
-                final var result = api.operations().sell(client.getUniqueId(), shop);
-
-                if (!result.success()) {
-                    client.sendMessage(localize(result));
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
+                try {
+                    api.operations().sell(client.getUniqueId(), shop);
                     client.sendMessage(api.messages().client().sell().message(item.displayName(), shop.quantity(), shop.sellPrice()));
                     //TODO: notify sellers
+                } catch (final SlabbyException e) {
+                    api.exceptionService().logToPlayer(client.getUniqueId(), e);
                 }
                 return true;
             }));

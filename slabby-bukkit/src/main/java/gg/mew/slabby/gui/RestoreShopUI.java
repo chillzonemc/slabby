@@ -102,6 +102,7 @@ public final class RestoreShopUI {
 
             window.open();
         } catch (Exception e) {
+            //TODO: fix this
             throw new RuntimeException(e);
         }
     }

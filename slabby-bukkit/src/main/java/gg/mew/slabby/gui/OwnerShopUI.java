@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopLog;
@@ -48,15 +49,12 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
             }), c -> {
-                final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
-
-                if (!result.success()) {
-                    shopOwner.sendMessage(localize(result));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
+                try {
+                    api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                } catch (final SlabbyException e) {
+                    api.exceptionService().logToPlayer(shopOwner.getUniqueId(), e);
                 }
-
                 return true;
             }));
 
@@ -68,15 +66,12 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
             }), c -> {
-                final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
-
-                if (!result.success()) {
-                    shopOwner.sendMessage(localize(result));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
+                try {
+                    api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
                     api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                } catch (final SlabbyException e) {
+                    api.exceptionService().logToPlayer(shopOwner.getUniqueId(), e);
                 }
-
                 return true;
             }));
 

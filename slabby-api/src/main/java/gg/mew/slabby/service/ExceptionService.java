@@ -1,8 +1,13 @@
 package gg.mew.slabby.service;
 
-@FunctionalInterface
+import gg.mew.slabby.exception.SlabbyException;
+
+import java.util.UUID;
+
 public interface ExceptionService {
 
-    void log(final Exception exception);
+    void logToConsole(final String message, final Exception exception);
+
+    void logToPlayer(final UUID uniqueId, final SlabbyException exception);
 
 }

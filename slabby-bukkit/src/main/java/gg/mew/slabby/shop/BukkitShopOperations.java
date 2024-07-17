@@ -1,6 +1,8 @@
 package gg.mew.slabby.shop;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.*;
+import gg.mew.slabby.exception.UnsupportedOperationException;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.log.Transaction;
 import gg.mew.slabby.shop.log.ValueChanged;
@@ -11,6 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -66,30 +69,30 @@ public final class BukkitShopOperations implements ShopOperations {
     }
 
     @Override
-    public ShopOperationResult buy(final UUID uniqueId, final Shop shop) {
+    public void buy(final UUID uniqueId, final Shop shop) throws SlabbyException {
         if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
-            return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
+            throw new NoPermissionException();
 
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
         if (shop.buyPrice() == null)
-            return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
+            throw new UnsupportedOperationException("Unable to buy from shop: shop is not selling");
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (!shop.hasStock(shop.quantity()))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
+            throw new ShopOutOfStockException();
 
         //TODO: check for space
 
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_BUY);
+            throw new InsufficientBalanceToBuyException();
 
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
@@ -106,7 +109,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
             shop.logs().add(log);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
         final var cost = splitCost(result.amount(), shop);
@@ -117,36 +120,32 @@ public final class BukkitShopOperations implements ShopOperations {
         }
 
         addItemToInventory(shop, player);
-
-        return new ShopOperationResult(true, Cause.NONE);
     }
 
     @Override
-    public ShopOperationResult sell(final UUID uniqueId, final Shop shop) {
+    public void sell(final UUID uniqueId, final Shop shop) throws SlabbyException {
         if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
-            return new ShopOperationResult(false, Cause.OPERATION_NO_PERMISSION);
+            throw new NoPermissionException();
 
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
         if (shop.sellPrice() == null)
-            return new ShopOperationResult(false, Cause.OPERATION_NOT_ALLOWED);
+            throw new UnsupportedOperationException("Unable to sell to shop: shop is not buying");
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
         if (!player.getInventory().containsAtLeast(itemStack, shop.quantity()))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
+            throw new PlayerOutOfStockException();
 
         final var cost = splitCost(shop.sellPrice(), shop);
 
-        for (final var entry : cost.entrySet()) {
-            if (!api.economy().hasAmount(entry.getKey(), entry.getValue()))
-                return new ShopOperationResult(false, Cause.INSUFFICIENT_BALANCE_TO_SELL);
-        }
+        if (cost.entrySet().stream().anyMatch(it -> !api.economy().hasAmount(it.getKey(), it.getValue())))
+            throw new InsufficientBalanceToSellException();
 
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
@@ -162,8 +161,8 @@ public final class BukkitShopOperations implements ShopOperations {
                     .build();
 
             shop.logs().add(log);
-        } catch (Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+        } catch (final Exception e) {
+            throw new UnrecoverableException(e);
         }
 
         for (final var entry : cost.entrySet()) {
@@ -175,28 +174,24 @@ public final class BukkitShopOperations implements ShopOperations {
         itemStack.setAmount(shop.quantity());
 
         player.getInventory().removeItem(itemStack);
-
-        return new ShopOperationResult(true, Cause.NONE);
     }
 
     @Override
-    public ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount) {
+    public void withdraw(final UUID uniqueId, final Shop shop, final int amount) throws SlabbyException {
         if (amount < 1)
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
+            throw new IllegalArgumentException("Amount has to be higher than zero");
 
-        //TODO: do not allow if stock is null
+        if (shop.stock() == null)
+            throw new UnsupportedOperationException("Cannot withdraw from admin shop");
 
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
-        final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
-
-        //TODO: stock == 0?
-        if (shop.stock() < amount)
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_WITHDRAW);
+        if (!shop.hasStock(amount))
+            throw new ShopOutOfStockException();
 
         //TODO: check for space
 
@@ -216,33 +211,30 @@ public final class BukkitShopOperations implements ShopOperations {
 
             shop.logs().add(log);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
-        addItemToInventory(shop, player);
-
-        return new ShopOperationResult(true, Cause.NONE);
+        addItemToInventory(shop, Objects.requireNonNull(Bukkit.getPlayer(uniqueId)));
     }
 
     @Override
-    public ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount) {
+    public void deposit(final UUID uniqueId, final Shop shop, final int amount) throws SlabbyException {
         if (amount < 1)
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
+            throw new IllegalArgumentException("Amount has to be higher than zero");
 
         //TODO: do not allow if stock is null
 
         try {
             api.repository().refresh(shop);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException(e);
         }
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
-        //TODO: doesn't contain at least 1?
         if (!player.getInventory().containsAtLeast(itemStack, amount))
-            return new ShopOperationResult(false, Cause.INSUFFICIENT_STOCK_TO_DEPOSIT);
+            throw new PlayerOutOfStockException();
 
         final var stock = shop.stock();
 
@@ -260,88 +252,94 @@ public final class BukkitShopOperations implements ShopOperations {
 
             shop.logs().add(log);
         } catch (final Exception e) {
-            return new ShopOperationResult(false, Cause.OPERATION_FAILED);
+            throw new UnrecoverableException();
         }
 
         itemStack.setAmount(amount);
 
         //TODO: what does the hashmap do?
         player.getInventory().removeItem(itemStack);
-
-        return new ShopOperationResult(true, Cause.NONE);
     }
 
     @Override
-    public void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws Exception {
-        final var success = api.repository().transaction(() -> {
-            final var shopOpt = api.repository().shopById(wizard.id());
+    public void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws SlabbyException {
+        try {
+            final var success = api.repository().transaction(() -> {
+                final var shopOpt = api.repository().shopById(wizard.id());
 
-            if (shopOpt.isPresent()) {
-                final var shop = shopOpt.get();
+                if (shopOpt.isPresent()) {
+                    final var shop = shopOpt.get();
 
-                shop.buyPrice(wizard.buyPrice());
-                shop.sellPrice(wizard.sellPrice());
-                shop.quantity(wizard.quantity());
-                shop.note(wizard.note());
-                shop.state(wizard.state());
+                    shop.buyPrice(wizard.buyPrice());
+                    shop.sellPrice(wizard.sellPrice());
+                    shop.quantity(wizard.quantity());
+                    shop.note(wizard.note());
+                    shop.state(wizard.state());
 
-                shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+                    shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                for (final var entry : wizard.valueChanges().entrySet()) {
-                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                            .action(entry.getKey())
-                            .uniqueId(uniqueId)
-                            .serialized(entry.getValue())
+                    for (final var entry : wizard.valueChanges().entrySet()) {
+                        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                                .action(entry.getKey())
+                                .uniqueId(uniqueId)
+                                .serialized(entry.getValue())
+                                .build();
+
+                        shop.logs().add(log);
+                    }
+
+                    api.repository().update(shop);
+                } else {
+                    final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
+                            .x(wizard.x())
+                            .y(wizard.y())
+                            .z(wizard.z())
+                            .world(wizard.world())
+                            .item(wizard.item())
+                            .buyPrice(wizard.buyPrice())
+                            .sellPrice(wizard.sellPrice())
+                            .quantity(wizard.quantity())
+                            .note(wizard.note())
+                            .stock(api.isAdminMode(uniqueId) ? null : 0)
                             .build();
 
-                    shop.logs().add(log);
+                    api.repository().createOrUpdate(shop);
+
+                    shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                            .uniqueId(uniqueId)
+                            .share(100)
+                            .build());
                 }
 
-                api.repository().update(shop);
-            } else {
-                final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
-                        .x(wizard.x())
-                        .y(wizard.y())
-                        .z(wizard.z())
-                        .world(wizard.world())
-                        .item(wizard.item())
-                        .buyPrice(wizard.buyPrice())
-                        .sellPrice(wizard.sellPrice())
-                        .quantity(wizard.quantity())
-                        .note(wizard.note())
-                        .stock(api.isAdminMode(uniqueId) ? null : 0)
-                        .build();
+                return true;
+            });
 
-                api.repository().createOrUpdate(shop);
+            if (success) {
+                final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
-                        .uniqueId(uniqueId)
-                        .share(100)
-                        .build());
+                if (shopOpt.isPresent()) {
+                    final var shop = shopOpt.get();
+
+                    removeAndSpawnDisplayItem(shop);
+
+                    api.repository().update(shop);
+                }
             }
-
-            return true;
-        });
-
-        if (success) {
-            final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
-
-            if (shopOpt.isPresent()) {
-                final var shop = shopOpt.get();
-
-                removeAndSpawnDisplayItem(shop);
-
-                api.repository().update(shop);
-            }
+        } catch (final Exception e) {
+            throw new UnrecoverableException(e);
         }
     }
 
     @Override
-    public void removeShop(final Shop shop) throws Exception {
+    public void removeShop(final Shop shop) throws SlabbyException {
         if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)
             e.remove();
 
-        api.repository().markAsDeleted(shop);
+        try {
+            api.repository().markAsDeleted(shop);
+        } catch (final Exception e) {
+            throw new UnrecoverableException(e);
+        }
     }
 
     @Override

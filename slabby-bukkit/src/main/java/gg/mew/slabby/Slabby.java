@@ -9,6 +9,7 @@ import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.listener.SlabbyListener;
 import gg.mew.slabby.permission.SlabbyPermissions;
+import gg.mew.slabby.service.BukkitExceptionService;
 import gg.mew.slabby.service.ExceptionService;
 import gg.mew.slabby.shop.BukkitShopOperations;
 import gg.mew.slabby.shop.SQLiteShopRepository;
@@ -49,6 +50,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.logging.Logger;
 
 @Plugin(name = "Slabby", version = "1.0-SNAPSHOT")
 @ApiVersion(ApiVersion.Target.v1_20)
@@ -102,8 +104,8 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private BukkitSlabbyMessages messages;
 
-    @Getter //TODO: Implement better.
-    private final ExceptionService exceptionService = Throwable::printStackTrace;
+    @Getter
+    private final ExceptionService exceptionService = new BukkitExceptionService(this);
 
     @Getter
     private final ShopOperations operations = new BukkitShopOperations(this);
@@ -179,7 +181,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             this.repository = new SQLiteShopRepository(this);
             this.repository.initialize();
         } catch (SQLException e) {
-            exceptionService().log(e);
+            exceptionService().logToConsole("Error while trying to initialize database repository", e);
             throw new RuntimeException(e);
         }
 
@@ -197,7 +199,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             final var messagesRoot = messagesLoader.load();
             this.messages = messagesRoot.get(BukkitSlabbyMessages.class);
         } catch (ConfigurateException e) {
-            exceptionService().log(e);
+            exceptionService().logToConsole("Error while trying to load configurations", e);
             throw new RuntimeException(e);
         }
 
@@ -231,6 +233,11 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public File directory() {
         return getDataFolder();
+    }
+
+    @Override
+    public Logger logger() {
+        return getLogger();
     }
 
     @Override

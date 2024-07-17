@@ -1,6 +1,7 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
@@ -119,10 +120,11 @@ public final class SlabbyListener implements Listener {
                                     .sum()
                                     : shop.quantity();
 
-                            final var result = api.operations().deposit(uniqueId, shop, toDeposit);
-
-                            if (result.success()) {
+                            try {
+                                api.operations().deposit(uniqueId, shop, toDeposit);
                                 api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
+                            } catch (final SlabbyException ignored) {
+                                //TODO: Correctly handle exceptions
                             }
                         }
                     }

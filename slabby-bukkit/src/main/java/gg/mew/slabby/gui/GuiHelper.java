@@ -36,21 +36,6 @@ public final class GuiHelper {
         };
     }
 
-    //TODO: Cleanup
-    public Component localize(final ShopOperations.ShopOperationResult result) {
-        return switch (result.cause()) {
-            case INSUFFICIENT_BALANCE_TO_BUY -> SlabbyHelper.api().messages().client().buy().insufficientBalance();
-            case INSUFFICIENT_BALANCE_TO_SELL -> SlabbyHelper.api().messages().client().sell().insufficientBalance();
-            case INSUFFICIENT_STOCK_TO_WITHDRAW -> SlabbyHelper.api().messages().owner().withdraw().insufficientStock();
-            case INSUFFICIENT_STOCK_TO_DEPOSIT -> SlabbyHelper.api().messages().owner().deposit().insufficientStock();
-            case OPERATION_NO_PERMISSION -> Bukkit.permissionMessage();
-            //TODO: Technically never happens, edge case.
-            case OPERATION_FAILED, NONE -> Component.text("Something went wrong!", NamedTextColor.RED);
-            //TODO: Technically never happens, edge case.
-            case OPERATION_NOT_ALLOWED -> Bukkit.permissionMessage();
-        };
-    }
-
     public SimpleItem commandBlock(final SlabbyAPI api, final Shop shop, final ItemStack itemStack) {
         return new SimpleItem(itemStack(Material.COMMAND_BLOCK, (it, meta) -> {
             meta.displayName(api.messages().commandBlock().title());

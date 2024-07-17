@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -37,9 +38,8 @@ public final class DestroyShopUI {
                 api.operations().removeShop(shop);
                 api.sound().play(shopOwner.getUniqueId(), shop, Sounds.DESTROY);
                 gui.closeForAllViewers();
-            } catch (final Exception e) {
-                //TODO: explain to uniqueId what happened
-                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
+            } catch (final SlabbyException e) {
+                api.exceptionService().logToPlayer(shopOwner.getUniqueId(), e);
             }
         }));
 

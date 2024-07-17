@@ -1,5 +1,7 @@
 package gg.mew.slabby.shop;
 
+import gg.mew.slabby.exception.SlabbyException;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -14,35 +16,19 @@ public interface ShopOperations {
     void ifWizard(final UUID uniqueId, final Consumer<ShopWizard> action);
     void ifWizardOrElse(final UUID uniqueId, final Consumer<ShopWizard> action, final Runnable orElse);
 
-    ShopOperationResult buy(final UUID uniqueId, final Shop shop);
-    ShopOperationResult sell(final UUID uniqueId, final Shop shop);
+    void buy(final UUID uniqueId, final Shop shop) throws SlabbyException;
+    void sell(final UUID uniqueId, final Shop shop) throws SlabbyException;
 
-    ShopOperationResult withdraw(final UUID uniqueId, final Shop shop, final int amount);
-    ShopOperationResult deposit(final UUID uniqueId, final Shop shop, final int amount);
+    void withdraw(final UUID uniqueId, final Shop shop, final int amount) throws SlabbyException;
+    void deposit(final UUID uniqueId, final Shop shop, final int amount) throws SlabbyException;
 
     Map<UUID, Double> splitCost(final double amount, final Shop shop);
 
-    void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws Exception;
+    void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws SlabbyException;
 
-    void removeShop(final Shop shop) throws Exception;
+    void removeShop(final Shop shop) throws SlabbyException;
 
     void removeAndSpawnDisplayItem(final Shop shop);
 
-    //TODO: We need something better than this. Custom exception?
-    record ShopOperationResult(boolean success, Cause cause) {}
-
-    enum Cause {
-        INSUFFICIENT_BALANCE_TO_BUY,
-        INSUFFICIENT_BALANCE_TO_SELL,
-
-        INSUFFICIENT_STOCK_TO_WITHDRAW,
-        INSUFFICIENT_STOCK_TO_DEPOSIT,
-
-        OPERATION_NOT_ALLOWED,
-        OPERATION_FAILED,
-        OPERATION_NO_PERMISSION,
-
-        NONE
-    }
 
 }

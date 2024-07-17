@@ -3,7 +3,6 @@ package gg.mew.slabby.shop;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
-import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -13,7 +12,6 @@ import java.io.Closeable;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
@@ -52,7 +50,6 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.connectionSource.close();
         } catch (final Exception e) {
-            api.exceptionService().log(e);
             throw new RuntimeException(e);
         }
     }
@@ -79,7 +76,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
             //NOTE: Required because the owners collection is not eagerly loaded
             this.shopDao.refresh((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while inserting or updating shop", e);
             throw e;
         }
     }
@@ -89,17 +86,17 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopDao.delete((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while deleting shop", e);
             throw e;
         }
     }
 
     @Override
-    public void delete(ShopOwner shopOwner) throws Exception {
+    public void delete(final ShopOwner shopOwner) throws Exception {
         try {
             this.shopOwnerDao.delete((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while deleting shop owner", e);
             throw e;
         }
     }
@@ -109,7 +106,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopOwnerDao.createOrUpdate((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while inserting or updating shop owner", e);
             throw e;
         }
     }
@@ -119,7 +116,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopDao.update((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while updating shop", e);
             throw e;
         }
     }
@@ -129,7 +126,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopOwnerDao.update((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while updating shop owner", e);
             throw e;
         }
     }
@@ -139,7 +136,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopDao.refresh((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while refreshing shop", e);
             throw e;
         }
     }
@@ -149,7 +146,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             this.shopOwnerDao.refresh((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while refreshing shop owner", e);
             throw e;
         }
     }
@@ -162,7 +159,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
             this.shopDao.update((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while marking shop as deleted", e);
             throw e;
         }
     }
@@ -184,7 +181,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while retrieving shop by location", e);
             throw e;
         }
     }
@@ -206,7 +203,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while retrieving shop by inventory location", e);
             throw e;
         }
     }
@@ -219,7 +216,7 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             return Optional.ofNullable(this.shopDao.queryForId((int)id));
         } catch (SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while retrieving shop by id", e);
             throw e;
         }
     }
@@ -237,17 +234,17 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .toList();
             return (Collection<Shop>) (Collection<? extends Shop>) result;
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while retrieving shops for owner", e);
             throw e;
         }
     }
 
     @Override
-    public <T> T transaction(final Callable<T> transaction) throws Exception {
+    public <T> T transaction(final Callable<T> transaction) throws SQLException {
         try {
             return TransactionManager.callInTransaction(this.connectionSource, transaction);
         } catch (final SQLException e) {
-            api.exceptionService().log(e);
+            api.exceptionService().logToConsole("Error while running transaction", e);
             throw e;
         }
     }

@@ -2,6 +2,7 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -108,9 +109,8 @@ public final class ModifyShopUI {
                 api.operations().wizards().remove(shopOwner.getUniqueId());
                 gui.closeForAllViewers();
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
-            } catch (final Exception e) {
-                api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
-                //TODO: notify uniqueId
+            } catch (final SlabbyException e) {
+                api.exceptionService().logToPlayer(shopOwner.getUniqueId(), e);
             }
         }));
 
@@ -130,7 +130,5 @@ public final class ModifyShopUI {
 
         Bukkit.getScheduler().runTask((Slabby)api, window::open);
     }
-
-
 
 }
