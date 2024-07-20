@@ -40,6 +40,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String messageOwner;
             private String insufficientBalance;
 
             @Override
@@ -71,6 +72,15 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
 
             @Override
+            public Component messageOwner(final Component client, final int quantity, final Component item, final double total) {
+                return MiniMessage.miniMessage().deserialize(this.messageOwner,
+                        Placeholder.component("client", client),
+                        Formatter.number("quantity", quantity),
+                        Placeholder.component("item", item),
+                        Formatter.number("total", total));
+            }
+
+            @Override
             public Component insufficientBalance() {
                 return MiniMessage.miniMessage().deserialize(this.insufficientBalance);
             }
@@ -84,6 +94,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String messageOwner;
             private String insufficientBalance;
 
             @Override
@@ -112,6 +123,15 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
                         Placeholder.component("item", displayName),
                         Formatter.number("quantity", quantity),
                         Formatter.number("price", sellPrice));
+            }
+
+            @Override
+            public Component messageOwner(final Component client, final int quantity, final Component item, final double total) {
+                return MiniMessage.miniMessage().deserialize(this.messageOwner,
+                        Placeholder.component("client", client),
+                        Formatter.number("quantity", quantity),
+                        Placeholder.component("item", item),
+                        Formatter.number("total", total));
             }
 
             @Override

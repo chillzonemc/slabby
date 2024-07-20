@@ -222,7 +222,8 @@ public final class BukkitShopOperations implements ShopOperations {
         if (amount < 1)
             throw new IllegalArgumentException("Amount has to be higher than zero");
 
-        //TODO: do not allow if stock is null
+        if (shop.stock() == null)
+            throw new UnsupportedOperationException("Cannot deposit to admin shop");
 
         try {
             api.repository().refresh(shop);

@@ -26,6 +26,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double buyPrice);
+            Component messageOwner(final Component client, final int quantity, final Component item, final double total);
             Component insufficientBalance();
         }
 
@@ -35,6 +36,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double sellPrice);
+            Component messageOwner(final Component client, final int quantity, final Component item, final double total);
             Component insufficientBalance();
         }
 

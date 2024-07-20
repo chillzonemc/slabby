@@ -14,6 +14,7 @@ client:
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Bought <quantity> <item> for a total of $<price:''#.##''></green>'
+    message-owner: '<green><client> bought <quantity> <item> for a total of $<total:''#.##''> at your shop.'
     insufficient-balance: '<red>You don''t have enough funds!</red>'
   sell:
     title: '<gold>Sell ''<item>'' * <quantity></gold>'
@@ -21,6 +22,7 @@ client:
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
+    message-owner: '<green><client> sold <quantity> <item> for a total of $<total:''#.##''> at your shop.'
     insufficient-balance: '<red>The shop doesn''t have enough funds!</red>'
 create:
   title: '[Slabby] Create Shop'

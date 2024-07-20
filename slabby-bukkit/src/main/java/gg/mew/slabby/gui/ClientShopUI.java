@@ -45,7 +45,14 @@ public final class ClientShopUI {
                     api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
 
                     client.sendMessage(api.messages().client().buy().message(item.displayName(), shop.quantity(), shop.buyPrice()));
-                    //TODO: notify sellers
+
+                    for (final var shopOwner : shop.owners()) {
+                        final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+
+                        if (playerOwner != null) {
+                            playerOwner.sendMessage(api.messages().client().buy().messageOwner(client.displayName(), shop.quantity(), item.displayName(), shop.buyPrice()));
+                        }
+                    }
                 } catch (final SlabbyException e) {
                     api.exceptionService().logToPlayer(client.getUniqueId(), e);
                 }
@@ -67,7 +74,14 @@ public final class ClientShopUI {
                 try {
                     api.operations().sell(client.getUniqueId(), shop);
                     client.sendMessage(api.messages().client().sell().message(item.displayName(), shop.quantity(), shop.sellPrice()));
-                    //TODO: notify sellers
+
+                    for (final var shopOwner : shop.owners()) {
+                        final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+
+                        if (playerOwner != null) {
+                            playerOwner.sendMessage(api.messages().client().sell().messageOwner(client.displayName(), shop.quantity(), item.displayName(), shop.buyPrice()));
+                        }
+                    }
                 } catch (final SlabbyException e) {
                     api.exceptionService().logToPlayer(client.getUniqueId(), e);
                 }
