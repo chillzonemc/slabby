@@ -26,6 +26,7 @@ public final class ClientShopUI {
 
     public void open(final SlabbyAPI api, final Player client, final Shop shop) {
         final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var uniqueId = client.getUniqueId();
 
         final var gui = Gui.empty(9, 1);
 
@@ -39,25 +40,7 @@ public final class ClientShopUI {
                         add(api.messages().client().buy().stacks(shop.stock() / item.getMaxStackSize()));
                     }
                 }});
-            }), c -> {
-                try {
-                    api.operations().buy(client.getUniqueId(), shop);
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
-
-                    client.sendMessage(api.messages().client().buy().message(item.displayName(), shop.quantity(), shop.buyPrice()));
-
-                    for (final var shopOwner : shop.owners()) {
-                        final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
-
-                        if (playerOwner != null) {
-                            playerOwner.sendMessage(api.messages().client().buy().messageOwner(client.displayName(), shop.quantity(), item.displayName(), shop.buyPrice()));
-                        }
-                    }
-                } catch (final SlabbyException e) {
-                    api.exceptionService().logToPlayer(client.getUniqueId(), e);
-                }
-                return true;
-            }));
+            }), c -> api.exceptionService().tryCatch(client.getUniqueId(), () -> api.operations().buy(client.getUniqueId(), shop))));
         }
 
         if (shop.sellPrice() != null) {
@@ -70,23 +53,7 @@ public final class ClientShopUI {
                         add(api.messages().client().sell().stacks(shop.stock() / item.getMaxStackSize()));
                     }
                 }});
-            }), c -> {
-                try {
-                    api.operations().sell(client.getUniqueId(), shop);
-                    client.sendMessage(api.messages().client().sell().message(item.displayName(), shop.quantity(), shop.sellPrice()));
-
-                    for (final var shopOwner : shop.owners()) {
-                        final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
-
-                        if (playerOwner != null) {
-                            playerOwner.sendMessage(api.messages().client().sell().messageOwner(client.displayName(), shop.quantity(), item.displayName(), shop.buyPrice()));
-                        }
-                    }
-                } catch (final SlabbyException e) {
-                    api.exceptionService().logToPlayer(client.getUniqueId(), e);
-                }
-                return true;
-            }));
+            }), c -> api.exceptionService().tryCatch(uniqueId, () -> api.operations().sell(client.getUniqueId(), shop))));
         }
 
         gui.setItem(4, 0, new SimpleItem(item));

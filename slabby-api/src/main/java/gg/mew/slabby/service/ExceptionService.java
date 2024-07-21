@@ -10,4 +10,6 @@ public interface ExceptionService {
 
     void logToPlayer(final UUID uniqueId, final SlabbyException exception);
 
+    boolean tryCatch(final UUID uniqueId, final Runnable action);
+
 }

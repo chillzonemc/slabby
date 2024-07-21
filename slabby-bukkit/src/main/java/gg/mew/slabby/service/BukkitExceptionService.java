@@ -42,4 +42,15 @@ public final class BukkitExceptionService implements ExceptionService {
                 player.getLocation().getWorld().getName(),
                 Sounds.BLOCKED);
     }
+
+    @Override
+    public boolean tryCatch(final UUID uniqueId, final Runnable action) {
+        try {
+            action.run();
+            return true;
+        } catch (final SlabbyException e) {
+            this.logToPlayer(uniqueId, e);
+            return false;
+        }
+    }
 }

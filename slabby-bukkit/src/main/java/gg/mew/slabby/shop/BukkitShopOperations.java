@@ -6,18 +6,16 @@ import gg.mew.slabby.exception.UnsupportedOperationException;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.log.Transaction;
 import gg.mew.slabby.shop.log.ValueChanged;
+import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -82,7 +80,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.buyPrice() == null)
             throw new UnsupportedOperationException("Unable to buy from shop: shop is not selling");
 
-        final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
+        final var client = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         if (!shop.hasStock(shop.quantity()))
             throw new ShopOutOfStockException();
@@ -96,6 +94,13 @@ public final class BukkitShopOperations implements ShopOperations {
 
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
+
+        final var cost = splitCost(result.amount(), shop);
+
+        for (final var entry : cost.entrySet()) {
+            //TODO: verify success?
+            api.economy().deposit(entry.getKey(), entry.getValue());
+        }
 
         try {
             api.repository().update(shop);
@@ -112,14 +117,23 @@ public final class BukkitShopOperations implements ShopOperations {
             throw new UnrecoverableException(e);
         }
 
-        final var cost = splitCost(result.amount(), shop);
+        final var itemStack = addItemToInventory(shop, client);
 
-        for (final var entry : cost.entrySet()) {
-            //TODO: verify success?
-            api.economy().deposit(entry.getKey(), entry.getValue());
+        notifyBuy(uniqueId, shop, client, itemStack);
+    }
+
+    private void notifyBuy(final UUID uniqueId, final Shop shop, final Player client, final ItemStack itemStack) {
+        api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
+
+        client.sendMessage(api.messages().client().buy().message(itemStack.displayName(), shop.quantity(), shop.buyPrice()));
+
+        for (final var shopOwner : shop.owners()) {
+            final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+
+            if (playerOwner != null) {
+                playerOwner.sendMessage(api.messages().client().buy().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+            }
         }
-
-        addItemToInventory(shop, player);
     }
 
     @Override
@@ -136,10 +150,10 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.sellPrice() == null)
             throw new UnsupportedOperationException("Unable to sell to shop: shop is not buying");
 
-        final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
+        final var client = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
-        if (!player.getInventory().containsAtLeast(itemStack, shop.quantity()))
+        if (!client.getInventory().containsAtLeast(itemStack, shop.quantity()))
             throw new PlayerOutOfStockException();
 
         final var cost = splitCost(shop.sellPrice(), shop);
@@ -173,7 +187,23 @@ public final class BukkitShopOperations implements ShopOperations {
 
         itemStack.setAmount(shop.quantity());
 
-        player.getInventory().removeItem(itemStack);
+        client.getInventory().removeItem(itemStack);
+
+        notifySell(shop, client, itemStack);
+    }
+
+    private void notifySell(final Shop shop, final Player client, final ItemStack itemStack) {
+        api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+
+        client.sendMessage(api.messages().client().sell().message(itemStack.displayName(), shop.quantity(), shop.sellPrice()));
+
+        for (final var shopOwner : shop.owners()) {
+            final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+
+            if (playerOwner != null) {
+                playerOwner.sendMessage(api.messages().client().sell().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+            }
+        }
     }
 
     @Override
@@ -363,12 +393,27 @@ public final class BukkitShopOperations implements ShopOperations {
         shop.displayEntityId(itemDisplay.getUniqueId());
     }
 
-    private static void addItemToInventory(final Shop shop, final Player player) {
+    private static ItemStack addItemToInventory(final Shop shop, final Player player) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
 
-        itemStack.setAmount(shop.quantity());
+        final var itemStacks = new ArrayList<ItemStack>();
 
-        player.getInventory().addItem(itemStack);
+        var quantity = shop.quantity();
+
+        while (quantity > 0) {
+            final var cloneStack = itemStack.clone();
+            final var maxStackSize = Math.min(quantity, cloneStack.getMaxStackSize());
+
+            cloneStack.setAmount(maxStackSize);
+
+            itemStacks.add(cloneStack);
+
+            quantity -= maxStackSize;
+        }
+
+        player.getInventory().addItem(itemStacks.toArray(ItemStack[]::new));
+
+        return itemStack;
     }
 
 }
