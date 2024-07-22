@@ -24,6 +24,8 @@ public interface ShopOperations {
 
     Map<UUID, Double> splitCost(final double amount, final Shop shop);
 
+    void linkShop(final UUID uniqueId, final ShopWizard wizard, final int x, final int y, final int z, final String world) throws SlabbyException;
+
     void unlinkShop(final UUID uniqueId, final Shop shop) throws SlabbyException;
 
     void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws SlabbyException;

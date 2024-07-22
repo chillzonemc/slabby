@@ -103,16 +103,19 @@ public final class BukkitShopOperations implements ShopOperations {
             final var success = api.economy().deposit(entry.getKey(), entry.getValue());
         }
 
-        api.repository().update(shop);
+        api.repository().transaction(() -> {
+            api.repository().update(shop);
 
-        final var log = api.repository()
-                .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                .action(ShopLog.Action.BUY)
-                .uniqueId(uniqueId)
-                .serialized(new Transaction(shop.buyPrice(), shop.quantity()))
-                .build();
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.BUY)
+                    .uniqueId(uniqueId)
+                    .serialized(new Transaction(shop.buyPrice(), shop.quantity()))
+                    .build();
 
-        shop.logs().add(log);
+            shop.logs().add(log);
+            return null;
+        });
 
         final var itemStack = addItemToInventory(shop, client);
 
@@ -157,16 +160,19 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
 
-        api.repository().update(shop);
+        api.repository().transaction(() -> {
+            api.repository().update(shop);
 
-        final var log = api.repository()
-                .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                .action(ShopLog.Action.SELL)
-                .uniqueId(uniqueId)
-                .serialized(new Transaction(shop.sellPrice(), shop.quantity()))
-                .build();
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.SELL)
+                    .uniqueId(uniqueId)
+                    .serialized(new Transaction(shop.sellPrice(), shop.quantity()))
+                    .build();
 
-        shop.logs().add(log);
+            shop.logs().add(log);
+            return null;
+        });
 
         for (final var entry : cost.entrySet()) {
             api.economy().withdraw(entry.getKey(), entry.getValue());
@@ -218,16 +224,19 @@ public final class BukkitShopOperations implements ShopOperations {
 
         shop.stock(stock - amount);
 
-        api.repository().update(shop);
+        api.repository().transaction(() -> {
+            api.repository().update(shop);
 
-        final var log = api.repository()
-                .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                .action(ShopLog.Action.WITHDRAW)
-                .uniqueId(uniqueId)
-                .serialized(new ValueChanged.Int(stock, shop.stock()))
-                .build();
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.WITHDRAW)
+                    .uniqueId(uniqueId)
+                    .serialized(new ValueChanged.Int(stock, shop.stock()))
+                    .build();
 
-        shop.logs().add(log);
+            shop.logs().add(log);
+            return null;
+        });
 
         addItemToInventory(shop, Objects.requireNonNull(Bukkit.getPlayer(uniqueId)));
 
@@ -254,16 +263,19 @@ public final class BukkitShopOperations implements ShopOperations {
 
         shop.stock(stock + amount);
 
-        api.repository().update(shop);
+        api.repository().transaction(() -> {
+            api.repository().update(shop);
 
-        final var log = api.repository()
-                .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                .action(ShopLog.Action.DEPOSIT)
-                .uniqueId(uniqueId)
-                .serialized(new ValueChanged.Int(stock, shop.stock()))
-                .build();
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.DEPOSIT)
+                    .uniqueId(uniqueId)
+                    .serialized(new ValueChanged.Int(stock, shop.stock()))
+                    .build();
 
-        shop.logs().add(log);
+            shop.logs().add(log);
+            return null;
+        });
 
         itemStack.setAmount(amount);
 
@@ -290,17 +302,19 @@ public final class BukkitShopOperations implements ShopOperations {
 
                 shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                for (final var entry : wizard.valueChanges().entrySet()) {
-                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                            .action(entry.getKey())
-                            .uniqueId(uniqueId)
-                            .serialized(entry.getValue())
-                            .build();
+                api.repository().transaction(() -> {
+                    for (final var entry : wizard.valueChanges().entrySet()) {
+                        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                                .action(entry.getKey())
+                                .uniqueId(uniqueId)
+                                .serialized(entry.getValue())
+                                .build();
 
-                    shop.logs().add(log);
-                }
-
-                api.repository().update(shop);
+                        shop.logs().add(log);
+                    }
+                    api.repository().update(shop);
+                    return null;
+                });
             } else {
                 final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
                         .x(wizard.x())
@@ -315,12 +329,15 @@ public final class BukkitShopOperations implements ShopOperations {
                         .stock(api.isAdminMode(uniqueId) ? null : 0)
                         .build();
 
-                api.repository().createOrUpdate(shop);
+                api.repository().transaction(() -> {
+                    api.repository().createOrUpdate(shop);
 
-                shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
-                        .uniqueId(uniqueId)
-                        .share(100)
-                        .build());
+                    shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                            .uniqueId(uniqueId)
+                            .share(100)
+                            .build());
+                    return null;
+                });
             }
 
             return true;
@@ -370,18 +387,51 @@ public final class BukkitShopOperations implements ShopOperations {
     }
 
     @Override
+    public void linkShop(final UUID uniqueId, final ShopWizard wizard, final int x, final int y, final int z, final String world) throws SlabbyException {
+        final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+
+        if (linkShopOpt.isPresent()) {
+            final var shop = linkShopOpt.get();
+
+            shop.inventory(x, y, z, world);
+
+            api.repository().transaction(() -> {
+                api.repository().update(shop);
+
+                final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                        .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
+                        .uniqueId(uniqueId)
+                        .serialized(new LocationChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
+                        .build();
+
+                shop.logs().add(log);
+
+                return null;
+            });
+
+            api.sound().play(uniqueId, shop, Sounds.SUCCESS);
+        }
+
+        api.operations().wizards().remove(uniqueId);
+    }
+
+    @Override
     public void unlinkShop(final UUID uniqueId, final Shop shop) throws SlabbyException {
         shop.inventory(null, null, null, null);
 
-        api.repository().update(shop);
+        api.repository().transaction(() -> {
+            api.repository().update(shop);
 
-        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
-                .uniqueId(uniqueId)
-                .serialized(new LocationChanged(null, null, null, null))
-                .build();
+            final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
+                    .uniqueId(uniqueId)
+                    .serialized(new LocationChanged(null, null, null, null))
+                    .build();
 
-        shop.logs().add(log);
+            shop.logs().add(log);
+
+            return null;
+        });
 
         api.sound().play(uniqueId, shop, Sounds.MODIFY_SUCCESS);
 

@@ -1,7 +1,6 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
-import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
@@ -28,6 +27,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 public final class SlabbyListener implements Listener {
@@ -53,23 +53,17 @@ public final class SlabbyListener implements Listener {
         final int blockZ = block.getZ();
         final String blockWorld = block.getWorld().getName();
 
-        final Optional<Shop> shopOpt;
+        final var shopOpt = new AtomicReference<Optional<Shop>>();
 
-        try {
-            shopOpt = api.repository().shopAt(blockX, blockY, blockZ, blockWorld);
-        } catch (final Exception e) {
-            final var location = player.getLocation();
-            api.sound().play(uniqueId, location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName(), Sounds.BLOCKED);
-            //TODO: notify uniqueId
+        if (!api.exceptionService().tryCatch(uniqueId, () -> shopOpt.set(api.repository().shopAt(blockX, blockY, blockZ, blockWorld))))
             return;
-        }
 
         final var configurationItem = Bukkit.getItemFactory().createItemStack(api.configuration().item());
         final var hasConfigurationItem = event.getItem() != null && event.getItem().isSimilar(configurationItem);
 
         switch (event.getAction()) {
             case RIGHT_CLICK_BLOCK -> {
-                shopOpt.ifPresentOrElse(shop -> {
+                shopOpt.get().ifPresentOrElse(shop -> {
                     if (shop.isOwner(uniqueId) || api.isAdminMode(uniqueId)) {
                         if (hasConfigurationItem) {
                             DestroyShopUI.open(api, player, shop);
@@ -100,7 +94,7 @@ public final class SlabbyListener implements Listener {
                 });
             }
             case LEFT_CLICK_BLOCK -> {
-                shopOpt.ifPresent(shop -> {
+                shopOpt.get().ifPresent(shop -> {
                     if (!shop.isOwner(uniqueId) && !api.isAdminMode(uniqueId) || shop.stock() == null)
                         return;
 
@@ -110,7 +104,7 @@ public final class SlabbyListener implements Listener {
                         } else if (api.configuration().restock().punch().bulk())  {
                             final var item = Bukkit.getItemFactory().createItemStack(shop.item());
 
-                            final var toDeposit = player.isSneaking()
+                            final var quantity = player.isSneaking()
                                     ? Arrays.stream(player.getInventory().getContents())
                                     .filter(Objects::nonNull)
                                     .filter(item::isSimilar)
@@ -118,8 +112,8 @@ public final class SlabbyListener implements Listener {
                                     .sum()
                                     : shop.quantity();
 
-                            if (toDeposit > 0)
-                                api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, toDeposit));
+                            if (quantity > 0)
+                                api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, quantity));
                         }
                     }
                 });
@@ -127,31 +121,7 @@ public final class SlabbyListener implements Listener {
                 api.operations().ifWizard(uniqueId, wizard -> {
                     if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
                         if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
-                            try {
-                                final var linkShopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
-
-                                if (linkShopOpt.isPresent()) {
-                                    final var shop = linkShopOpt.get();
-
-                                    shop.inventory(block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
-                                    api.repository().update(shop);
-
-                                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                            .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
-                                            .uniqueId(uniqueId)
-                                            .serialized(new LocationChanged(shop.inventoryX(), shop.inventoryY(), shop.inventoryZ(), shop.world()))
-                                            .build();
-
-                                    shop.logs().add(log);
-
-                                    api.sound().play(uniqueId, shop, Sounds.SUCCESS);
-                                    //TODO: message player
-                                }
-                            } catch (final Exception e) {
-                                //TODO: notify uniqueId
-                                //TODO: if an inventory is already being used, it'll cause an exception here. we need to check an inventory isn't already linked.
-                            }
-                            api.operations().wizards().remove(uniqueId);
+                            api.operations().linkShop(uniqueId, wizard, block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
                         }
                     }
                 });
