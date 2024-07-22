@@ -1,5 +1,7 @@
 package gg.mew.slabby.shop;
 
+import gg.mew.slabby.exception.SlabbyException;
+
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
@@ -10,29 +12,29 @@ public interface ShopRepository {
 
     <T> T builder(final Class<?> builderType);
 
-    void createOrUpdate(final Shop shop) throws Exception;
-    void createOrUpdate(final ShopOwner shopOwner) throws Exception;
+    void createOrUpdate(final Shop shop) throws SlabbyException;
+    void createOrUpdate(final ShopOwner shopOwner) throws SlabbyException;
 
-    void delete(final Shop shop) throws Exception;
-    void delete(final ShopOwner shopOwner) throws Exception;
+    void delete(final Shop shop) throws SlabbyException;
+    void delete(final ShopOwner shopOwner) throws SlabbyException;
 
-    void update(final Shop shop) throws Exception;
-    void update(final ShopOwner shopOwner) throws Exception;
+    void update(final Shop shop) throws SlabbyException;
+    void update(final ShopOwner shopOwner) throws SlabbyException;
 
-    void refresh(final Shop shop) throws Exception;
-    void refresh(final ShopOwner shopOwner) throws Exception;
+    void refresh(final Shop shop) throws SlabbyException;
+    void refresh(final ShopOwner shopOwner) throws SlabbyException;
 
-    void markAsDeleted(final Shop shop) throws Exception;
+    void markAsDeleted(final Shop shop) throws SlabbyException;
 
-    <T> Optional<Shop> shopById(final T id) throws Exception;
+    <T> Optional<Shop> shopById(final T id) throws SlabbyException;
 
-    Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception;
+    Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws SlabbyException;
 
-    Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception;
+    Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws SlabbyException;
 
-    Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception;
+    Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws SlabbyException;
 
     @SuppressWarnings("UnusedReturnValue")
-    <T> T transaction(final Callable<T> transaction) throws SQLException;
+    <T> T transaction(final Callable<T> transaction) throws SlabbyException;
 
 }

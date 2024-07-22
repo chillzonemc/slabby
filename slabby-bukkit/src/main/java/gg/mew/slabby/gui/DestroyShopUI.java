@@ -25,6 +25,7 @@ public final class DestroyShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var uniqueId = shopOwner.getUniqueId();
 
         final var gui = Gui.empty(9, 1);
 
@@ -33,15 +34,10 @@ public final class DestroyShopUI {
             meta.lore(new ArrayList<>() {{
                 add(api.messages().destroy().confirm().description());
             }});
-        }).get(), c -> {
-            try {
-                api.operations().removeShop(shop);
-                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.DESTROY);
-                gui.closeForAllViewers();
-            } catch (final SlabbyException e) {
-                api.exceptionService().logToPlayer(shopOwner.getUniqueId(), e);
-            }
-        }));
+        }).get(), c -> api.exceptionService().tryCatch(uniqueId, () -> {
+            api.operations().removeShop(uniqueId, shop);
+            gui.closeForAllViewers();
+        })));
 
         gui.setItem(4, 0, commandBlock(api, shop, itemStack));
 

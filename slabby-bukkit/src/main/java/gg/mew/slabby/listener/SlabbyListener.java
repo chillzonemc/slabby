@@ -118,14 +118,8 @@ public final class SlabbyListener implements Listener {
                                     .sum()
                                     : shop.quantity();
 
-                            if (toDeposit > 0) {
-                                try {
-                                    api.operations().deposit(uniqueId, shop, toDeposit);
-                                    api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
-                                } catch (final SlabbyException e) {
-                                    api.exceptionService().logToPlayer(uniqueId, e);
-                                }
-                            }
+                            if (toDeposit > 0)
+                                api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, toDeposit));
                         }
                     }
                 });

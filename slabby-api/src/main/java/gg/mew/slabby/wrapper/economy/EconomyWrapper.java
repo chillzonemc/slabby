@@ -1,5 +1,6 @@
 package gg.mew.slabby.wrapper.economy;
 
+import java.util.Map;
 import java.util.UUID;
 
 public interface EconomyWrapper {
@@ -15,5 +16,8 @@ public interface EconomyWrapper {
     ActionResult deposit(final UUID uniqueId, final double amount);
 
     record ActionResult(double amount, double balance, boolean success) {}
+
+    Map<UUID, ActionResult> withdraw(final Map<UUID, Double> toWithdraw);
+    Map<UUID, ActionResult> deposit(final Map<UUID, Double> toDeposit);
 
 }

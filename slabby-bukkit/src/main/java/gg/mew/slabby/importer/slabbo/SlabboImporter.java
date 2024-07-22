@@ -1,6 +1,7 @@
 package gg.mew.slabby.importer.slabbo;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.importer.Importer;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopOwner;
@@ -57,7 +58,7 @@ public final class SlabboImporter implements Importer {
 
                     return null;
                 });
-            } catch (final SQLException e) {
+            } catch (final SlabbyException e) {
                 api.exceptionService().logToConsole("Error while importing slabbo shop", e);
             }
 

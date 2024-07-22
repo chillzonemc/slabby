@@ -7,6 +7,8 @@ import com.j256.ormlite.misc.TransactionManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
+import gg.mew.slabby.exception.UnrecoverableException;
 
 import java.io.Closeable;
 import java.sql.SQLException;
@@ -70,102 +72,92 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void createOrUpdate(final Shop shop) throws Exception {
+    public void createOrUpdate(final Shop shop) throws SlabbyException {
         try {
             this.shopDao.createOrUpdate((SQLiteShop) shop);
-            //NOTE: Required because the owners collection is not eagerly loaded
-            this.shopDao.refresh((SQLiteShop) shop);
+            this.shopDao.refresh((SQLiteShop) shop); //NOTE: Required because the owners collection is not eagerly loaded
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while inserting or updating shop", e);
-            throw e;
+            throw new UnrecoverableException("Error while inserting or updating shop", e);
         }
     }
 
     @Override
-    public void delete(final Shop shop) throws Exception {
+    public void delete(final Shop shop) throws SlabbyException {
         try {
             this.shopDao.delete((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while deleting shop", e);
-            throw e;
+            throw new UnrecoverableException("Error while deleting shop", e);
         }
     }
 
     @Override
-    public void delete(final ShopOwner shopOwner) throws Exception {
+    public void delete(final ShopOwner shopOwner) throws SlabbyException {
         try {
             this.shopOwnerDao.delete((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while deleting shop owner", e);
-            throw e;
+            throw new UnrecoverableException("Error while deleting shop owner", e);
         }
     }
 
     @Override
-    public void createOrUpdate(final ShopOwner shopOwner) throws Exception {
+    public void createOrUpdate(final ShopOwner shopOwner) throws SlabbyException {
         try {
             this.shopOwnerDao.createOrUpdate((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while inserting or updating shop owner", e);
-            throw e;
+            throw new UnrecoverableException("Error while inserting or updating shop owner", e);
         }
     }
 
     @Override
-    public void update(final Shop shop) throws Exception {
+    public void update(final Shop shop) throws SlabbyException {
         try {
             this.shopDao.update((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while updating shop", e);
-            throw e;
+            throw new UnrecoverableException("Error while updating shop", e);
         }
     }
 
     @Override
-    public void update(final ShopOwner shopOwner) throws Exception {
+    public void update(final ShopOwner shopOwner) throws SlabbyException {
         try {
             this.shopOwnerDao.update((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while updating shop owner", e);
-            throw e;
+            throw new UnrecoverableException("Error while updating shop owner", e);
         }
     }
 
     @Override
-    public void refresh(final Shop shop) throws Exception {
+    public void refresh(final Shop shop) throws SlabbyException {
         try {
             this.shopDao.refresh((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while refreshing shop", e);
-            throw e;
+            throw new UnrecoverableException("Error while refreshing shop", e);
         }
     }
 
     @Override
-    public void refresh(final ShopOwner shopOwner) throws Exception {
+    public void refresh(final ShopOwner shopOwner) throws SlabbyException {
         try {
             this.shopOwnerDao.refresh((SQLiteShopOwner) shopOwner);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while refreshing shop owner", e);
-            throw e;
+            throw new UnrecoverableException("Error while refreshing shop owner", e);
         }
     }
 
     @Override
-    public void markAsDeleted(final Shop shop) throws Exception {
+    public void markAsDeleted(final Shop shop) throws SlabbyException {
         try {
             shop.state(Shop.State.DELETED);
             shop.location(null, null, null, null);
 
             this.shopDao.update((SQLiteShop) shop);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while marking shop as deleted", e);
-            throw e;
+            throw new UnrecoverableException("Error while marking shop as deleted", e);
         }
     }
 
     @Override
-    public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws Exception {
+    public Optional<Shop> shopAt(final int x, final int y, final int z, final String world) throws SlabbyException {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
@@ -181,13 +173,12 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while retrieving shop by location", e);
-            throw e;
+            throw new UnrecoverableException("Error while retrieving shop by location", e);
         }
     }
 
     @Override
-    public Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws Exception {
+    public Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws SlabbyException {
         try {
             final var result = this.shopDao.queryBuilder()
                     .where()
@@ -203,27 +194,25 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .queryForFirst();
             return Optional.ofNullable(result);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while retrieving shop by inventory location", e);
-            throw e;
+            throw new UnrecoverableException("Error while retrieving shop by inventory location", e);
         }
     }
 
     @Override
-    public <T> Optional<Shop> shopById(final T id) throws Exception {
+    public <T> Optional<Shop> shopById(final T id) throws SlabbyException {
         if (id == null)
             return Optional.empty();
 
         try {
             return Optional.ofNullable(this.shopDao.queryForId((int)id));
         } catch (SQLException e) {
-            api.exceptionService().logToConsole("Error while retrieving shop by id", e);
-            throw e;
+            throw new UnrecoverableException("Error while retrieving shop by id");
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws Exception {
+    public Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws SlabbyException {
         try {
             final var result = this.shopOwnerDao.queryBuilder()
                     .join(this.shopDao.queryBuilder().where().eq(Shop.Names.STATE, state).queryBuilder())
@@ -234,18 +223,16 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .toList();
             return (Collection<Shop>) (Collection<? extends Shop>) result;
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while retrieving shops for owner", e);
-            throw e;
+            throw new UnrecoverableException("Error while retrieving shops for owner");
         }
     }
 
     @Override
-    public <T> T transaction(final Callable<T> transaction) throws SQLException {
+    public <T> T transaction(final Callable<T> transaction) throws SlabbyException {
         try {
             return TransactionManager.callInTransaction(this.connectionSource, transaction);
         } catch (final SQLException e) {
-            api.exceptionService().logToConsole("Error while running transaction", e);
-            throw e;
+            throw new UnrecoverableException("Error while running transaction", e);
         }
     }
 }

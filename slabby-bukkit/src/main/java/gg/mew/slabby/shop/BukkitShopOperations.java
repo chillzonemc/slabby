@@ -4,6 +4,7 @@ import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.*;
 import gg.mew.slabby.exception.UnsupportedOperationException;
 import gg.mew.slabby.permission.SlabbyPermissions;
+import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.shop.log.Transaction;
 import gg.mew.slabby.shop.log.ValueChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
@@ -98,24 +99,20 @@ public final class BukkitShopOperations implements ShopOperations {
         final var cost = splitCost(result.amount(), shop);
 
         for (final var entry : cost.entrySet()) {
-            //TODO: verify success?
-            api.economy().deposit(entry.getKey(), entry.getValue());
+            //TODO: verify
+            final var success = api.economy().deposit(entry.getKey(), entry.getValue());
         }
 
-        try {
-            api.repository().update(shop);
+        api.repository().update(shop);
 
-            final var log = api.repository()
-                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .action(ShopLog.Action.BUY)
-                    .uniqueId(uniqueId)
-                    .serialized(new Transaction(shop.buyPrice(), shop.quantity()))
-                    .build();
+        final var log = api.repository()
+                .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                .action(ShopLog.Action.BUY)
+                .uniqueId(uniqueId)
+                .serialized(new Transaction(shop.buyPrice(), shop.quantity()))
+                .build();
 
-            shop.logs().add(log);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        shop.logs().add(log);
 
         final var itemStack = addItemToInventory(shop, client);
 
@@ -141,11 +138,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
             throw new NoPermissionException();
 
-        try {
-            api.repository().refresh(shop);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        api.repository().refresh(shop);
 
         if (shop.sellPrice() == null)
             throw new UnsupportedOperationException("Unable to sell to shop: shop is not buying");
@@ -164,20 +157,16 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
 
-        try {
-            api.repository().update(shop);
+        api.repository().update(shop);
 
-            final var log = api.repository()
-                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .action(ShopLog.Action.SELL)
-                    .uniqueId(uniqueId)
-                    .serialized(new Transaction(shop.sellPrice(), shop.quantity()))
-                    .build();
+        final var log = api.repository()
+                .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                .action(ShopLog.Action.SELL)
+                .uniqueId(uniqueId)
+                .serialized(new Transaction(shop.sellPrice(), shop.quantity()))
+                .build();
 
-            shop.logs().add(log);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        shop.logs().add(log);
 
         for (final var entry : cost.entrySet()) {
             api.economy().withdraw(entry.getKey(), entry.getValue());
@@ -229,22 +218,20 @@ public final class BukkitShopOperations implements ShopOperations {
 
         shop.stock(stock - amount);
 
-        try {
-            api.repository().update(shop);
+        api.repository().update(shop);
 
-            final var log = api.repository()
-                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .action(ShopLog.Action.WITHDRAW)
-                    .uniqueId(uniqueId)
-                    .serialized(new ValueChanged.Int(stock, shop.stock()))
-                    .build();
+        final var log = api.repository()
+                .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                .action(ShopLog.Action.WITHDRAW)
+                .uniqueId(uniqueId)
+                .serialized(new ValueChanged.Int(stock, shop.stock()))
+                .build();
 
-            shop.logs().add(log);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        shop.logs().add(log);
 
         addItemToInventory(shop, Objects.requireNonNull(Bukkit.getPlayer(uniqueId)));
+
+        api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
     }
 
     @Override
@@ -255,11 +242,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.stock() == null)
             throw new UnsupportedOperationException("Cannot deposit to admin shop");
 
-        try {
-            api.repository().refresh(shop);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        api.repository().refresh(shop);
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
@@ -271,106 +254,99 @@ public final class BukkitShopOperations implements ShopOperations {
 
         shop.stock(stock + amount);
 
-        try {
-            api.repository().update(shop);
+        api.repository().update(shop);
 
-            final var log = api.repository()
-                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
-                    .action(ShopLog.Action.DEPOSIT)
-                    .uniqueId(uniqueId)
-                    .serialized(new ValueChanged.Int(stock, shop.stock()))
-                    .build();
+        final var log = api.repository()
+                .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                .action(ShopLog.Action.DEPOSIT)
+                .uniqueId(uniqueId)
+                .serialized(new ValueChanged.Int(stock, shop.stock()))
+                .build();
 
-            shop.logs().add(log);
-        } catch (final Exception e) {
-            throw new UnrecoverableException();
-        }
+        shop.logs().add(log);
 
         itemStack.setAmount(amount);
 
         //TODO: what does the hashmap do?
         player.getInventory().removeItem(itemStack);
+
+
+        api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
     }
 
     @Override
     public void createOrUpdateShop(final UUID uniqueId, final ShopWizard wizard) throws SlabbyException {
-        try {
-            final var success = api.repository().transaction(() -> {
-                final var shopOpt = api.repository().shopById(wizard.id());
+        final var success = api.repository().transaction(() -> {
+            final var shopOpt = api.repository().shopById(wizard.id());
 
-                if (shopOpt.isPresent()) {
-                    final var shop = shopOpt.get();
+            if (shopOpt.isPresent()) {
+                final var shop = shopOpt.get();
 
-                    shop.buyPrice(wizard.buyPrice());
-                    shop.sellPrice(wizard.sellPrice());
-                    shop.quantity(wizard.quantity());
-                    shop.note(wizard.note());
-                    shop.state(wizard.state());
+                shop.buyPrice(wizard.buyPrice());
+                shop.sellPrice(wizard.sellPrice());
+                shop.quantity(wizard.quantity());
+                shop.note(wizard.note());
+                shop.state(wizard.state());
 
-                    shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+                shop.location(wizard.x(), wizard.y(), wizard.z(), wizard.world());
 
-                    for (final var entry : wizard.valueChanges().entrySet()) {
-                        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                .action(entry.getKey())
-                                .uniqueId(uniqueId)
-                                .serialized(entry.getValue())
-                                .build();
-
-                        shop.logs().add(log);
-                    }
-
-                    api.repository().update(shop);
-                } else {
-                    final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
-                            .x(wizard.x())
-                            .y(wizard.y())
-                            .z(wizard.z())
-                            .world(wizard.world())
-                            .item(wizard.item())
-                            .buyPrice(wizard.buyPrice())
-                            .sellPrice(wizard.sellPrice())
-                            .quantity(wizard.quantity())
-                            .note(wizard.note())
-                            .stock(api.isAdminMode(uniqueId) ? null : 0)
+                for (final var entry : wizard.valueChanges().entrySet()) {
+                    final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                            .action(entry.getKey())
+                            .uniqueId(uniqueId)
+                            .serialized(entry.getValue())
                             .build();
 
-                    api.repository().createOrUpdate(shop);
-
-                    shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
-                            .uniqueId(uniqueId)
-                            .share(100)
-                            .build());
+                    shop.logs().add(log);
                 }
 
-                return true;
-            });
+                api.repository().update(shop);
+            } else {
+                final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
+                        .x(wizard.x())
+                        .y(wizard.y())
+                        .z(wizard.z())
+                        .world(wizard.world())
+                        .item(wizard.item())
+                        .buyPrice(wizard.buyPrice())
+                        .sellPrice(wizard.sellPrice())
+                        .quantity(wizard.quantity())
+                        .note(wizard.note())
+                        .stock(api.isAdminMode(uniqueId) ? null : 0)
+                        .build();
 
-            if (success) {
-                final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+                api.repository().createOrUpdate(shop);
 
-                if (shopOpt.isPresent()) {
-                    final var shop = shopOpt.get();
-
-                    removeAndSpawnDisplayItem(shop);
-
-                    api.repository().update(shop);
-                }
+                shop.owners().add(api.repository().<ShopOwner.Builder>builder(ShopOwner.Builder.class)
+                        .uniqueId(uniqueId)
+                        .share(100)
+                        .build());
             }
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
+
+            return true;
+        });
+
+        if (success) {
+            final var shopOpt = api.repository().shopAt(wizard.x(), wizard.y(), wizard.z(), wizard.world());
+
+            if (shopOpt.isPresent()) {
+                final var shop = shopOpt.get();
+
+                removeAndSpawnDisplayItem(shop);
+
+                api.repository().update(shop);
+            }
         }
     }
 
     @Override
-    public void removeShop(final Shop shop) throws SlabbyException {
+    public void removeShop(final UUID uniqueId, final Shop shop) throws SlabbyException {
         if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)
             e.remove();
 
-        try {
-            api.repository().markAsDeleted(shop);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        api.repository().markAsDeleted(shop);
+
+        api.sound().play(uniqueId, shop, Sounds.DESTROY);
     }
 
     @Override
@@ -391,6 +367,26 @@ public final class BukkitShopOperations implements ShopOperations {
         itemDisplay.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.GROUND);
 
         shop.displayEntityId(itemDisplay.getUniqueId());
+    }
+
+    @Override
+    public void unlinkShop(final UUID uniqueId, final Shop shop) throws SlabbyException {
+        shop.inventory(null, null, null, null);
+
+        api.repository().update(shop);
+
+        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
+                .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
+                .uniqueId(uniqueId)
+                .serialized(new LocationChanged(null, null, null, null))
+                .build();
+
+        shop.logs().add(log);
+
+        api.sound().play(uniqueId, shop, Sounds.MODIFY_SUCCESS);
+
+        Objects.requireNonNull(Bukkit.getPlayer(uniqueId))
+                .sendMessage(api.messages().owner().inventoryLink().cancel().message());
     }
 
     private static ItemStack addItemToInventory(final Shop shop, final Player player) {
