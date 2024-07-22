@@ -1,6 +1,7 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
@@ -24,6 +25,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -165,29 +167,44 @@ public final class SlabbyListener implements Listener {
             final var serializer = PlainTextComponentSerializer.plainText();
             final var text = serializer.serialize(event.message());
 
-            //TODO: limit precision to 2 decimals
-            //TODO: min/max constraints
-
             try {
                 switch (wizard.wizardState()) {
                     case AWAITING_NOTE -> wizard.note(text);
                     case AWAITING_BUY_PRICE -> {
                         final var buyPrice = Double.parseDouble(text);
+                        final var check = BigDecimal.valueOf(buyPrice);
+
+                        if (check.scale() > 2 || (buyPrice < 0 && buyPrice != -1))
+                            throw new SlabbyException("bad number");
+
                         wizard.buyPrice(buyPrice == -1 ? null : buyPrice);
                     }
                     case AWAITING_SELL_PRICE -> {
                         final var sellPrice = Double.parseDouble(text);
+                        final var check = BigDecimal.valueOf(sellPrice);
+
+                        if (check.scale() > 2 || (sellPrice < 0 && sellPrice != -1))
+                            throw new SlabbyException("bad number");
+
                         wizard.sellPrice(sellPrice == -1 ? null : sellPrice);
                     }
                     case AWAITING_QUANTITY -> {
                         final var quantity = Integer.parseInt(text);
+
+                        //TODO: max quantity should be all available slots checked with the item's max stack size
+                        if (quantity < 1)
+                            throw new SlabbyException("bad number");
+
                         wizard.quantity(quantity);
                     }
                 }
 
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
             } catch (final NumberFormatException e) {
+                //TODO: translate
                 event.getPlayer().sendMessage(Component.text("That's not a valid number!", NamedTextColor.RED));
+            } catch (final SlabbyException e) {
+                //TODO: handle
             }
 
             wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
@@ -218,7 +235,7 @@ public final class SlabbyListener implements Listener {
 
         try {
             shopOpt = api.repository().shopWithInventoryAt(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
-        } catch (final Exception ignored) {}
+        } catch (final SlabbyException ignored) {}
 
         shopOpt.ifPresent(shop -> {
             final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());

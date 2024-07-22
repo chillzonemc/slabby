@@ -98,10 +98,8 @@ public final class BukkitShopOperations implements ShopOperations {
 
         final var cost = splitCost(result.amount(), shop);
 
-        for (final var entry : cost.entrySet()) {
-            //TODO: verify
-            final var success = api.economy().deposit(entry.getKey(), entry.getValue());
-        }
+        //NOTE: We don't really have a way to guarantee multiple deposits in a transaction like manner.
+        cost.forEach((key, value) -> api.economy().deposit(key, value));
 
         api.repository().transaction(() -> {
             api.repository().update(shop);
@@ -174,9 +172,8 @@ public final class BukkitShopOperations implements ShopOperations {
             return null;
         });
 
-        for (final var entry : cost.entrySet()) {
-            api.economy().withdraw(entry.getKey(), entry.getValue());
-        }
+        //NOTE: We don't really have a way to guarantee multiple deposits in a transaction like manner.
+        cost.forEach((key, value) -> api.economy().withdraw(key, value));
 
         api.economy().deposit(uniqueId, shop.sellPrice());
 
@@ -281,7 +278,6 @@ public final class BukkitShopOperations implements ShopOperations {
 
         //TODO: what does the hashmap do?
         player.getInventory().removeItem(itemStack);
-
 
         api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
     }

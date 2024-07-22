@@ -33,9 +33,6 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         this.shopDao = DaoManager.createDao(this.connectionSource, SQLiteShop.class);
         this.shopOwnerDao = DaoManager.createDao(this.connectionSource, SQLiteShopOwner.class);
         this.shopLogDao = DaoManager.createDao(this.connectionSource, SQLiteShopLog.class);
-
-        //TODO: when rendering client side items, this will be very useful
-        // this.shopDao.setObjectCache(true);
     }
 
     public void initialize() throws SQLException {
@@ -43,9 +40,6 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopOwner.class);
         TableUtils.createTableIfNotExists(this.connectionSource, SQLiteShopLog.class);
     }
-
-    //TODO: Verify data that goes to the database. Using SQL when possible, otherwise Dao.
-    //TODO: Any DB action needs a result that I can act on.
 
     @Override
     public void close() {

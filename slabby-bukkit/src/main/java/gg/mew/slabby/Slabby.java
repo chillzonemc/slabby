@@ -190,7 +190,6 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     private boolean setupConfig() {
         try {
-            //TODO: Temp
             saveDefaultConfig();
             final var configRoot = configLoader.load();
             this.configuration = configRoot.get(BukkitSlabbyConfig.class);
@@ -198,7 +197,7 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             saveResource("messages.yml", false);
             final var messagesRoot = messagesLoader.load();
             this.messages = messagesRoot.get(BukkitSlabbyMessages.class);
-        } catch (ConfigurateException e) {
+        } catch (final ConfigurateException e) {
             exceptionService().logToConsole("Error while trying to load configurations", e);
             throw new RuntimeException(e);
         }

@@ -17,7 +17,4 @@ public interface EconomyWrapper {
 
     record ActionResult(double amount, double balance, boolean success) {}
 
-    Map<UUID, ActionResult> withdraw(final Map<UUID, Double> toWithdraw);
-    Map<UUID, ActionResult> deposit(final Map<UUID, Double> toDeposit);
-
 }

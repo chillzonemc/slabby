@@ -19,8 +19,6 @@ public final class LandsClaimWrapper implements ClaimWrapper {
         final var bukkitWorld = Bukkit.getWorld(world);
         final var landWorld = lands.getWorld(Objects.requireNonNull(bukkitWorld));
 
-        //TODO: Natural spawn protection? This is an issue beside just lands.
-
         if (landWorld == null)
             return true;
 
