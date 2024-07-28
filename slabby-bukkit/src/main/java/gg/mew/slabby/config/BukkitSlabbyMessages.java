@@ -778,6 +778,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         private String title;
         private String clickToSet;
+        private String invalidNumber;
         private BukkitNote note;
         private BukkitBuy buy;
         private BukkitSell sell;
@@ -794,6 +795,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component clickToSet() {
             return MiniMessage.miniMessage().deserialize(this.clickToSet);
+        }
+
+        @Override
+        public Component invalidNumber() {
+            return MiniMessage.miniMessage().deserialize(this.invalidNumber);
         }
     }
 

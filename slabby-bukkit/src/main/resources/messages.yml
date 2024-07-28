@@ -1,6 +1,7 @@
 general:
   next-page: 'Next Page'
   previous-page: 'Previous Page'
+
 client:
   title: '[Slabby] Client'
   note:
@@ -87,6 +88,8 @@ log:
 modify:
   title: '[Slabby] Editing Shop'
   click-to-set: '<dark_purple>Click to set</dark_purple>'
+  invalid-number: '<red>That''s not a valid number!</red>'
+
   note:
     title: '<green>Sellers note</green>'
     request: 'Please enter your note.'

@@ -219,6 +219,7 @@ public interface SlabbyMessages {
 
         Component title();
         Component clickToSet();
+        Component invalidNumber();
 
         Note note();
         Buy buy();

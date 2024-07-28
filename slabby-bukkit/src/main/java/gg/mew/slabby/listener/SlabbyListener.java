@@ -1,6 +1,7 @@
 package gg.mew.slabby.listener;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.FaultException;
 import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
@@ -201,10 +202,9 @@ public final class SlabbyListener implements Listener {
 
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
             } catch (final NumberFormatException e) {
-                //TODO: translate
-                event.getPlayer().sendMessage(Component.text("That's not a valid number!", NamedTextColor.RED));
-            } catch (final SlabbyException e) {
-                //TODO: handle
+                event.getPlayer().sendMessage(api.messages().modify().invalidNumber());
+            } catch (final FaultException e) {
+                event.getPlayer().sendMessage(e.component());
             }
 
             wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);

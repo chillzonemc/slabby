@@ -27,6 +27,7 @@ public final class BukkitExceptionService implements ExceptionService {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
 
         player.sendMessage(switch (exception) {
+            case FaultException e -> e.component();
             case InsufficientBalanceToBuyException ignored -> api.messages().client().buy().insufficientBalance();
             case InsufficientBalanceToSellException ignored -> api.messages().client().sell().insufficientBalance();
             case NoPermissionException ignored -> Bukkit.permissionMessage();
