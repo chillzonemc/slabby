@@ -4,6 +4,7 @@ import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.FaultException;
 import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopWizard;
@@ -100,16 +101,12 @@ public final class SlabbyListener implements Listener {
 
                     if (api.configuration().restock().punch().enabled()) {
                         if (api.configuration().restock().punch().shulker() && event.getItem() != null && event.getItem().getType() == Material.SHULKER_BOX) {
-                            //TODO: shulker, deposit operation only supports uniqueId inventory atm
+                            api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, 1));
                         } else if (api.configuration().restock().punch().bulk())  {
                             final var item = Bukkit.getItemFactory().createItemStack(shop.item());
 
                             final var quantity = player.isSneaking()
-                                    ? Arrays.stream(player.getInventory().getContents())
-                                    .filter(Objects::nonNull)
-                                    .filter(item::isSimilar)
-                                    .mapToInt(ItemStack::getAmount)
-                                    .sum()
+                                    ? ItemHelper.countSimilar(player.getInventory(), item)
                                     : shop.quantity();
 
                             if (quantity > 0)

@@ -3,6 +3,7 @@ package gg.mew.slabby.shop;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.*;
 import gg.mew.slabby.exception.UnsupportedOperationException;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.shop.log.Transaction;
@@ -13,8 +14,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -241,7 +246,7 @@ public final class BukkitShopOperations implements ShopOperations {
     }
 
     @Override
-    public void deposit(final UUID uniqueId, final Shop shop, final int amount) throws SlabbyException {
+    public void deposit(final UUID uniqueId, final Shop shop, int amount) throws SlabbyException {
         if (amount < 1)
             throw new IllegalArgumentException("Amount has to be higher than zero");
 
@@ -252,9 +257,28 @@ public final class BukkitShopOperations implements ShopOperations {
 
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemInHand = player.getInventory().getItemInMainHand();
 
-        if (!player.getInventory().containsAtLeast(itemStack, amount))
-            throw new PlayerOutOfStockException();
+        Runnable removeItem;
+
+        //TODO: what does the hashmap do?
+        if (itemInHand.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
+            amount = ItemHelper.countSimilar(shulker.getInventory(), itemStack);
+
+            if (amount == 0)
+                throw new PlayerOutOfStockException();
+
+            removeItem = () -> {
+                shulker.getInventory().removeItem(itemStack);
+                meta.setBlockState(shulker);
+                itemInHand.setItemMeta(meta);
+            };
+        } else {
+            if (!player.getInventory().containsAtLeast(itemStack, amount))
+                throw new PlayerOutOfStockException();
+
+            removeItem = () -> player.getInventory().removeItem(itemStack);
+        }
 
         final var stock = shop.stock();
 
@@ -276,8 +300,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
         itemStack.setAmount(amount);
 
-        //TODO: what does the hashmap do?
-        player.getInventory().removeItem(itemStack);
+        removeItem.run();
 
         api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
     }

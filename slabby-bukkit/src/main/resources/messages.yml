@@ -91,7 +91,6 @@ modify:
   invalid-number: '<red>That''s not a valid number!</red>'
   decimal-places: '<red>Please enter a price with up to two decimal places.</red>'
   minimum-price: '<red>Please enter a price that is no less than -1.</red>'
-
   note:
     title: '<green>Sellers note</green>'
     request: 'Please enter your note.'
