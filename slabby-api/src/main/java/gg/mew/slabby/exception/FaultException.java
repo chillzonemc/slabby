@@ -16,4 +16,8 @@ public final class FaultException extends SlabbyException {
         this.component = component;
     }
 
+    public FaultException(final Component component) {
+        this.component = component;
+    }
+
 }

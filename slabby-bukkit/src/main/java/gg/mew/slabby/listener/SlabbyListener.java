@@ -6,14 +6,11 @@ import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
-import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -172,29 +169,21 @@ public final class SlabbyListener implements Listener {
                 switch (wizard.wizardState()) {
                     case AWAITING_NOTE -> wizard.note(text);
                     case AWAITING_BUY_PRICE -> {
-                        final var buyPrice = Double.parseDouble(text);
-                        final var check = BigDecimal.valueOf(buyPrice);
-
-                        if (check.scale() > 2 || (buyPrice < 0 && buyPrice != -1))
-                            throw new SlabbyException("bad number");
-
+                        final var buyPrice = getAndCheckPrice(Double.parseDouble(text));
                         wizard.buyPrice(buyPrice == -1 ? null : buyPrice);
                     }
                     case AWAITING_SELL_PRICE -> {
-                        final var sellPrice = Double.parseDouble(text);
-                        final var check = BigDecimal.valueOf(sellPrice);
-
-                        if (check.scale() > 2 || (sellPrice < 0 && sellPrice != -1))
-                            throw new SlabbyException("bad number");
-
+                        final var sellPrice = getAndCheckPrice(Double.parseDouble(text));
                         wizard.sellPrice(sellPrice == -1 ? null : sellPrice);
                     }
                     case AWAITING_QUANTITY -> {
                         final var quantity = Integer.parseInt(text);
+                        final var item = Bukkit.getItemFactory().createItemStack(wizard.item());
 
-                        //TODO: max quantity should be all available slots checked with the item's max stack size
-                        if (quantity < 1)
-                            throw new SlabbyException("bad number");
+                        final var maxQuantity = 36 * item.getMaxStackSize();
+
+                        if (quantity < 1 || quantity > maxQuantity)
+                            throw new FaultException(api.messages().modify().quantity().minMax(maxQuantity));
 
                         wizard.quantity(quantity);
                     }
@@ -203,8 +192,10 @@ public final class SlabbyListener implements Listener {
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
             } catch (final NumberFormatException e) {
                 event.getPlayer().sendMessage(api.messages().modify().invalidNumber());
+                api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
             } catch (final FaultException e) {
                 event.getPlayer().sendMessage(e.component());
+                api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
             }
 
             wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
@@ -213,6 +204,18 @@ public final class SlabbyListener implements Listener {
 
             event.setCancelled(true);
         });
+    }
+
+    private double getAndCheckPrice(final double price) {
+        final var check = BigDecimal.valueOf(price);
+
+        if (check.scale() > 2)
+            throw new FaultException(api.messages().modify().decimalPlaces());
+
+        if (price < 0 && price != -1)
+            throw new FaultException(api.messages().modify().minimumPrice());
+
+        return price;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

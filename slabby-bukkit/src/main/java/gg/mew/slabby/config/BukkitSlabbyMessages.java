@@ -688,6 +688,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String amount;
             private String description;
             private String request;
+            private String minMax;
 
             @Override
             public Component title() {
@@ -707,6 +708,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             @Override
             public Component request() {
                 return MiniMessage.miniMessage().deserialize(this.request);
+            }
+
+            @Override
+            public Component minMax(final int max) {
+                return MiniMessage.miniMessage().deserialize(this.minMax, Formatter.number("max", max));
             }
         }
 
@@ -779,6 +785,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private String title;
         private String clickToSet;
         private String invalidNumber;
+        private String decimalPlaces;
+        private String minimumPrice;
         private BukkitNote note;
         private BukkitBuy buy;
         private BukkitSell sell;
@@ -800,6 +808,16 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component invalidNumber() {
             return MiniMessage.miniMessage().deserialize(this.invalidNumber);
+        }
+
+        @Override
+        public Component decimalPlaces() {
+            return MiniMessage.miniMessage().deserialize(this.decimalPlaces);
+        }
+
+        @Override
+        public Component minimumPrice() {
+            return MiniMessage.miniMessage().deserialize(this.minimumPrice);
         }
     }
 

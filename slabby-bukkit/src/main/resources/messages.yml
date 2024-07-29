@@ -89,6 +89,8 @@ modify:
   title: '[Slabby] Editing Shop'
   click-to-set: '<dark_purple>Click to set</dark_purple>'
   invalid-number: '<red>That''s not a valid number!</red>'
+  decimal-places: '<red>Please enter a price with up to two decimal places.</red>'
+  minimum-price: '<red>Please enter a price that is no less than -1.</red>'
 
   note:
     title: '<green>Sellers note</green>'
@@ -108,6 +110,7 @@ modify:
     amount: '<dark_purple>Amount per transaction: <quantity></dark_purple>'
     description: '<dark_purple>(Amount of items per buy/sell)</dark_purple>'
     request: 'Please enter your quantity.'
+    min-max: '<red>Quantity has to be between 1 and <max></red>'
   confirm:
     title: '<green>Confirm</green>'
     description: '<dark_purple>Save Shop</dark_purple>'

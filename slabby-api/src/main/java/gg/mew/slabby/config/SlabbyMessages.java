@@ -199,6 +199,7 @@ public interface SlabbyMessages {
             Component amount(final int quantity);
             Component description();
             Component request();
+            Component minMax(final int max);
         }
 
         interface Confirm {
@@ -220,6 +221,8 @@ public interface SlabbyMessages {
         Component title();
         Component clickToSet();
         Component invalidNumber();
+        Component decimalPlaces();
+        Component minimumPrice();
 
         Note note();
         Buy buy();
