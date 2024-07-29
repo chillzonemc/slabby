@@ -24,7 +24,6 @@ public final class BukkitSoundWrapper implements SoundWrapper {
 
     @Override
     public void play(final UUID uniqueId, final int x, final int y, final int z, final String world, final Sounds sound) {
-        //TODO: allow these to be configured
         Objects.requireNonNull(Bukkit.getPlayer(uniqueId))
                 .playSound(new Location(Bukkit.getWorld(world), x, y, z), switch (sound) {
                     case SUCCESS -> Sound.ENTITY_PLAYER_LEVELUP;

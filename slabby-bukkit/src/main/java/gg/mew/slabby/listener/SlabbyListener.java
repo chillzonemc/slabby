@@ -227,10 +227,6 @@ public final class SlabbyListener implements Listener {
         if (location == null)
             return;
 
-        //TODO: do this per stack in order to reduce database calls
-        //TODO: caching would be very useful for this
-        //TODO: disabling chest linking while items are being transferred can cause a loss of items
-
         Optional<Shop> shopOpt = Optional.empty();
 
         try {
@@ -249,7 +245,9 @@ public final class SlabbyListener implements Listener {
                 api.repository().update(shop);
 
                 event.setItem(ItemStack.empty());
-            } catch (final Exception ignored) {}
+            } catch (final Exception e) {
+                api.exceptionService().logToConsole("Error while attempting to update shop from linked inventory", e);
+            }
         });
     }
 

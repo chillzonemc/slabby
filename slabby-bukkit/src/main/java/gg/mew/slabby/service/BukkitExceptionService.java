@@ -33,6 +33,8 @@ public final class BukkitExceptionService implements ExceptionService {
             case NoPermissionException ignored -> Bukkit.permissionMessage();
             case PlayerOutOfStockException ignored -> api.messages().owner().deposit().insufficientStock();
             case ShopOutOfStockException ignored -> api.messages().owner().withdraw().insufficientStock();
+            //TODO: translate
+            case PlayerOutOfInventorySpaceException ignored -> Component.text("You don't have enough inventory space!");
             case UnrecoverableException ignored -> Component.text("TODO(translate): A problem occurred while performing this action", NamedTextColor.RED);
             default -> Component.text("TODO(translate): Default");
         });

@@ -5,7 +5,6 @@ import gg.mew.slabby.audit.Auditable;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopWizard;
 import lombok.experimental.UtilityClass;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -58,7 +57,7 @@ public final class RestoreShopUI {
 
                     return (Item) new SimpleItem(itemStack, c -> {
                         api.operations()
-                                .wizardFrom(viewer.getUniqueId(), it)
+                                .wizardOf(viewer.getUniqueId(), it)
                                 .state(Shop.State.ACTIVE)
                                 .wizardState(ShopWizard.WizardState.AWAITING_LOCATION);
 

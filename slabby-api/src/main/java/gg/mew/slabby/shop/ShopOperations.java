@@ -11,7 +11,7 @@ public interface ShopOperations {
     Map<UUID, ShopWizard> wizards();
 
     ShopWizard wizard(final UUID uniqueId);
-    ShopWizard wizardFrom(final UUID uniqueId, final Shop shop);
+    ShopWizard wizardOf(final UUID uniqueId, final Shop shop);
 
     void ifWizard(final UUID uniqueId, final Consumer<ShopWizard> action);
     void ifWizardOrElse(final UUID uniqueId, final Consumer<ShopWizard> action, final Runnable orElse);

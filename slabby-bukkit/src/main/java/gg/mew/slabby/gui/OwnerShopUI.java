@@ -1,6 +1,10 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.PlayerOutOfInventorySpaceException;
+import gg.mew.slabby.exception.PlayerOutOfStockException;
+import gg.mew.slabby.exception.ShopOutOfStockException;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopWizard;
@@ -31,8 +35,6 @@ public final class OwnerShopUI {
         
         final var gui = Gui.empty(9, 2);
 
-        //TODO: allow bulk withdraw/deposit
-
         if (shop.stock() != null) {
             gui.setItem(0, 0, new SuppliedItem(itemStack(Material.CHEST_MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().deposit().title(itemStack.displayName()));
@@ -41,7 +43,20 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stock(shop.stock()));
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
-            }), c -> api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, shop.quantity()))));
+            }), c -> {
+                if (c.getEvent().isShiftClick()) {
+                    final var amount = ItemHelper.countSimilar(shopOwner.getInventory(), itemStack);
+
+                    if (amount <= 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                            throw new PlayerOutOfStockException();
+                        });
+
+                    return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, amount));
+                }
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, shop.quantity()));
+            }));
 
             gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().withdraw().title(itemStack.displayName()));
@@ -50,7 +65,26 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stock(shop.stock()));
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
-            }), c -> api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, shop.quantity()))));
+            }), c -> {
+                if (c.getEvent().isShiftClick()) {
+                    final var spaceLeft = ItemHelper.getSpace(shopOwner.getInventory(), itemStack);
+                    final var amount = Math.min(spaceLeft, shop.stock());
+
+                    if (spaceLeft <= 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                            throw new PlayerOutOfInventorySpaceException();
+                        });
+
+                    if (shop.stock() == 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                           throw new ShopOutOfStockException();
+                        });
+
+                    return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, amount));
+                }
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, shop.quantity()));
+            }));
 
             gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().changeRate().title());
@@ -96,7 +130,7 @@ public final class OwnerShopUI {
                 }
 
                 api.operations()
-                        .wizardFrom(uniqueId, shop)
+                        .wizardOf(uniqueId, shop)
                         .wizardState(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
 
                 api.sound().play(uniqueId, shop, Sounds.AWAITING_INPUT);
@@ -112,7 +146,7 @@ public final class OwnerShopUI {
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
             meta.displayName(api.messages().owner().modify().title());
         }).get(), c -> {
-            ModifyShopUI.open(api, shopOwner, api.operations().wizardFrom(uniqueId, shop));
+            ModifyShopUI.open(api, shopOwner, api.operations().wizardOf(uniqueId, shop));
             api.sound().play(uniqueId, shop, Sounds.NAVIGATION);
         }));
 

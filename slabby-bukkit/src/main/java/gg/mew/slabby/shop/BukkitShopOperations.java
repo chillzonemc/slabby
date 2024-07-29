@@ -14,10 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
 
@@ -35,12 +33,12 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public ShopWizard wizard(final UUID uniqueId) {
-        return this.wizards.computeIfAbsent(uniqueId, u -> new BukkitShopWizard(api));
+        return this.wizards.compute(uniqueId, (k, v) -> new BukkitShopWizard(api));
     }
 
     @Override
-    public ShopWizard wizardFrom(final UUID uniqueId, final Shop shop) {
-        return this.wizards.computeIfAbsent(uniqueId, u -> new BukkitShopWizard(api, shop));
+    public ShopWizard wizardOf(final UUID uniqueId, final Shop shop) {
+        return this.wizards.compute(uniqueId, (k, v) -> new BukkitShopWizard(api, shop));
     }
 
     @Override
@@ -77,11 +75,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!api.permission().hasPermission(uniqueId, SlabbyPermissions.SHOP_INTERACT))
             throw new NoPermissionException();
 
-        try {
-            api.repository().refresh(shop);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        api.repository().refresh(shop);
 
         if (shop.buyPrice() == null)
             throw new UnsupportedOperationException("Unable to buy from shop: shop is not selling");
@@ -91,12 +85,15 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!shop.hasStock(shop.quantity()))
             throw new ShopOutOfStockException();
 
-        //TODO: check for space
-
         final var result = api.economy().withdraw(uniqueId, shop.buyPrice());
 
         if (!result.success())
             throw new InsufficientBalanceToBuyException();
+
+        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+
+        if (!ItemHelper.hasSpace(client.getInventory(), itemStack, shop.quantity()))
+            throw new PlayerOutOfInventorySpaceException();
 
         if (shop.stock() != null)
             shop.stock(shop.stock() - shop.quantity());
@@ -120,7 +117,7 @@ public final class BukkitShopOperations implements ShopOperations {
             return null;
         });
 
-        final var itemStack = addItemToInventory(shop, client);
+        addItemToInventory(itemStack, client, shop.quantity());
 
         notifyBuy(uniqueId, shop, client, itemStack);
     }
@@ -211,16 +208,16 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.stock() == null)
             throw new UnsupportedOperationException("Cannot withdraw from admin shop");
 
-        try {
-            api.repository().refresh(shop);
-        } catch (final Exception e) {
-            throw new UnrecoverableException(e);
-        }
+        api.repository().refresh(shop);
 
         if (!shop.hasStock(amount))
             throw new ShopOutOfStockException();
 
-        //TODO: check for space
+        final var shopOwner = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
+        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+
+        if (!ItemHelper.hasSpace(shopOwner.getInventory(), itemStack, amount))
+            throw new PlayerOutOfInventorySpaceException();
 
         final var stock = shop.stock();
 
@@ -240,7 +237,7 @@ public final class BukkitShopOperations implements ShopOperations {
             return null;
         });
 
-        addItemToInventory(shop, Objects.requireNonNull(Bukkit.getPlayer(uniqueId)));
+        addItemToInventory(itemStack, shopOwner, amount);
 
         api.sound().play(uniqueId, shop, Sounds.BUY_SELL_SUCCESS);
     }
@@ -255,13 +252,12 @@ public final class BukkitShopOperations implements ShopOperations {
 
         api.repository().refresh(shop);
 
-        final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
+        final var shopOwner = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
-        final var itemInHand = player.getInventory().getItemInMainHand();
+        final var itemInHand = shopOwner.getInventory().getItemInMainHand();
 
         Runnable removeItem;
 
-        //TODO: what does the hashmap do?
         if (itemInHand.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
             amount = ItemHelper.countSimilar(shulker.getInventory(), itemStack);
 
@@ -274,10 +270,10 @@ public final class BukkitShopOperations implements ShopOperations {
                 itemInHand.setItemMeta(meta);
             };
         } else {
-            if (!player.getInventory().containsAtLeast(itemStack, amount))
+            if (!shopOwner.getInventory().containsAtLeast(itemStack, amount))
                 throw new PlayerOutOfStockException();
 
-            removeItem = () -> player.getInventory().removeItem(itemStack);
+            removeItem = () -> shopOwner.getInventory().removeItem(itemStack);
         }
 
         final var stock = shop.stock();
@@ -458,12 +454,10 @@ public final class BukkitShopOperations implements ShopOperations {
                 .sendMessage(api.messages().owner().inventoryLink().cancel().message());
     }
 
-    private static ItemStack addItemToInventory(final Shop shop, final Player player) {
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
-
+    private static void addItemToInventory(final ItemStack itemStack, final Player player, final int amount) {
         final var itemStacks = new ArrayList<ItemStack>();
 
-        var quantity = shop.quantity();
+        var quantity = amount;
 
         while (quantity > 0) {
             final var cloneStack = itemStack.clone();
@@ -477,8 +471,6 @@ public final class BukkitShopOperations implements ShopOperations {
         }
 
         player.getInventory().addItem(itemStacks.toArray(ItemStack[]::new));
-
-        return itemStack;
     }
 
 }

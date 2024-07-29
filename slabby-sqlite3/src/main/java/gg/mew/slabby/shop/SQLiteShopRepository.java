@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 
 public final class SQLiteShopRepository implements ShopRepository, Closeable {
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final SlabbyAPI api;
 
     private final ConnectionSource connectionSource;
@@ -34,9 +35,10 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         this.shopOwnerDao = DaoManager.createDao(this.connectionSource, SQLiteShopOwner.class);
         this.shopLogDao = DaoManager.createDao(this.connectionSource, SQLiteShopLog.class);
 
-        //TODO: any action needs to get the object from the cache and not keep it around in order for it to stay up to date
-//        this.shopDao.setObjectCache(true);
-//        this.shopOwnerDao.setObjectCache(true);
+        //NOTE: weakly referenced cache, any operation where a shop object is long-lived should force a refresh beforehand
+        //TODO(TEST): may not work with QueryBuilder
+        this.shopDao.setObjectCache(true);
+        this.shopOwnerDao.setObjectCache(true);
     }
 
     public void initialize() throws SQLException {
@@ -147,6 +149,10 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         try {
             shop.state(Shop.State.DELETED);
             shop.location(null, null, null, null);
+
+            //NOTE: We remove the inventory link because otherwise a new shop cannot be linked to this location
+            //NOTE: We also cannot add the shop state to the index because then a shop cannot be restored if another shop uses that inventory location
+            shop.inventory(null, null, null, null);
 
             this.shopDao.update((SQLiteShop) shop);
         } catch (final SQLException e) {

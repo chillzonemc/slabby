@@ -18,4 +18,34 @@ public final class ItemHelper {
                 .sum();
     }
 
+    public boolean hasSpace(final Inventory inventory, final ItemStack itemStack, final int amount) {
+        var result = amount;
+
+        for (final var i : inventory.getStorageContents()) {
+            if (result <= 0)
+                break;
+
+            if (i == null)
+                result -= itemStack.getMaxStackSize();
+            else if (i.isSimilar(itemStack) && i.getAmount() < itemStack.getMaxStackSize())
+                result -= itemStack.getMaxStackSize() - i.getAmount();
+        }
+
+        return result <= 0;
+    }
+
+
+    public int getSpace(final Inventory inventory, final ItemStack itemStack) {
+        var result = 0;
+
+        for (final var i : inventory.getStorageContents()) {
+            if (i == null)
+                result += itemStack.getMaxStackSize();
+            else if (i.isSimilar(itemStack) && i.getAmount() < itemStack.getMaxStackSize())
+                result += itemStack.getMaxStackSize() - i.getAmount();
+        }
+
+        return result;
+    }
+
 }
