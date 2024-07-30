@@ -4,6 +4,7 @@ import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.FaultException;
 import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.gui.*;
+import gg.mew.slabby.helper.BlockHelper;
 import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
@@ -82,7 +83,7 @@ public final class SlabbyListener implements Listener {
                                     blockZ,
                                     event.getClickedBlock().getWorld().getName());
 
-                    if (canAccessClaim && hasConfigurationItem) {
+                    if (canAccessClaim && hasConfigurationItem && BlockHelper.isSlabOrStair(event.getClickedBlock())) {
                         api.operations().ifWizardOrElse(uniqueId, w -> {
                             if (w.wizardState() == ShopWizard.WizardState.AWAITING_LOCATION) {
                                 w.location(blockX, blockY, blockZ, blockWorld);
