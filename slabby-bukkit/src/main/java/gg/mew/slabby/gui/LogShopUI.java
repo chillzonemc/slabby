@@ -134,7 +134,9 @@ public final class LogShopUI {
                         add(api.messages().log().buyPriceChanged().from(data.from()));
                         add(api.messages().log().buyPriceChanged().to(data.to()));
                     }
-                    default -> add(Component.text(it.data()));
+                    case SHOP_DESTROYED -> {
+                        meta.displayName(api.messages().log().shopDestroyed().title());
+                    }
                 }
 
                 add(api.messages().log().date(it.createdOn()));

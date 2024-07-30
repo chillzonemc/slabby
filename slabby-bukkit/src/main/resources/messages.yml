@@ -1,6 +1,8 @@
 general:
   next-page: 'Next Page'
   previous-page: 'Previous Page'
+  no-inventory-space: '<red>You don''t have enough inventory space!</red>'
+  unrecoverable-exception: '<red>An unexpected problem occurred while performing this action</red>'
 client:
   title: '[Slabby] Client'
   note:
@@ -14,6 +16,7 @@ client:
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Bought <quantity> <item> for a total of $<price:''#.##''></green>'
+    message-owner: '<green><client> bought <quantity> <item> for a total of $<total:''#.##''> at your shop.'
     insufficient-balance: '<red>You don''t have enough funds!</red>'
   sell:
     title: '<gold>Sell ''<item>'' * <quantity></gold>'
@@ -21,6 +24,7 @@ client:
     stock: '<dark_purple>In stock: <stock></dark_purple>'
     stacks: '<dark_purple>(<stacks> stacks)</dark_purple>'
     message: '<green>Sold <quantity> <item> for a total of $<price:''#.##''></green>'
+    message-owner: '<green><client> sold <quantity> <item> for a total of $<total:''#.##''> at your shop.'
     insufficient-balance: '<red>The shop doesn''t have enough funds!</red>'
 create:
   title: '[Slabby] Create Shop'
@@ -82,9 +86,14 @@ log:
     title: '<green>Name Changed</green>'
     from: '<dark_purple>From: <name></dark_purple>'
     to: '<dark_purple>To: <name></dark_purple>'
+  shop-destroyed:
+    title: '<green>Shop Destroyed</green>'
 modify:
   title: '[Slabby] Editing Shop'
   click-to-set: '<dark_purple>Click to set</dark_purple>'
+  invalid-number: '<red>That''s not a valid number!</red>'
+  decimal-places: '<red>Please enter a price with up to two decimal places.</red>'
+  minimum-price: '<red>Please enter a price that is no less than -1.</red>'
   note:
     title: '<green>Sellers note</green>'
     request: 'Please enter your note.'
@@ -103,6 +112,7 @@ modify:
     amount: '<dark_purple>Amount per transaction: <quantity></dark_purple>'
     description: '<dark_purple>(Amount of items per buy/sell)</dark_purple>'
     request: 'Please enter your quantity.'
+    min-max: '<red>Quantity has to be between 1 and <max></red>'
   confirm:
     title: '<green>Confirm</green>'
     description: '<dark_purple>Save Shop</dark_purple>'

@@ -1,7 +1,6 @@
 package gg.mew.slabby.wrapper.sound;
 
 public enum Sounds {
-    //TODO: rename
     SUCCESS,
     MODIFY_SUCCESS,
     DESTROY,

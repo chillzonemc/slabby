@@ -1,11 +1,14 @@
 package gg.mew.slabby.gui;
 
+import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.PlayerOutOfInventorySpaceException;
+import gg.mew.slabby.exception.PlayerOutOfStockException;
+import gg.mew.slabby.exception.ShopOutOfStockException;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.shop.Shop;
-import gg.mew.slabby.shop.ShopLog;
 import gg.mew.slabby.shop.ShopWizard;
-import gg.mew.slabby.shop.log.LocationChanged;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
@@ -13,14 +16,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
-import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
-import xyz.xenondevs.invui.item.impl.CycleItem;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.item.impl.SuppliedItem;
 import xyz.xenondevs.invui.window.Window;
@@ -34,7 +32,8 @@ public final class OwnerShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
-
+        final var uniqueId = shopOwner.getUniqueId();
+        
         final var gui = Gui.empty(9, 2);
 
         if (shop.stock() != null) {
@@ -46,16 +45,21 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
             }), c -> {
-                final var result = api.operations().deposit(shopOwner.getUniqueId(), shop, shop.quantity());
+                if (c.getEvent().isShiftClick()) {
+                    final var amount = ItemHelper.countSimilar(shopOwner.getInventory(), itemStack);
 
-                if (!result.success()) {
-                    shopOwner.sendMessage(localize(result));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                    if (amount <= 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                            throw new PlayerOutOfStockException();
+                        });
+
+                    return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, amount));
                 }
 
-                return true;
+                final var wizard = api.operations().wizards().get(uniqueId);
+                final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, amount));
             }));
 
             gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
@@ -66,32 +70,49 @@ public final class OwnerShopUI {
                     add(api.messages().owner().stacks(shop.stock() / itemStack.getMaxStackSize()));
                 }});
             }), c -> {
-                final var result = api.operations().withdraw(shopOwner.getUniqueId(), shop, shop.quantity());
+                if (c.getEvent().isShiftClick()) {
+                    final var spaceLeft = ItemHelper.getSpace(shopOwner.getInventory(), itemStack);
+                    final var amount = Math.min(spaceLeft, shop.stock());
 
-                if (!result.success()) {
-                    shopOwner.sendMessage(localize(result));
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
+                    if (spaceLeft <= 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                            throw new PlayerOutOfInventorySpaceException();
+                        });
+
+                    if (shop.stock() == 0)
+                        return api.exceptionService().tryCatch(uniqueId, () -> {
+                           throw new ShopOutOfStockException();
+                        });
+
+                    return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, amount));
                 }
 
-                return true;
+                final var wizard = api.operations().wizards().get(uniqueId);
+                final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, amount));
             }));
 
             gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().changeRate().title());
                 meta.lore(new ArrayList<>() {{
-                    add(api.messages().owner().changeRate().amount(shop.quantity()));
+                    final var wizard = api.operations().wizards().get(uniqueId);
+                    final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+                    add(api.messages().owner().changeRate().amount(amount));
                 }});
             }), c -> {
-                //TODO: I could just use the wizard for this
-                shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
+                final var wizard = api.operations().wizardOf(uniqueId, shop)
+                        .wizardState(ShopWizard.WizardState.AWAITING_TEMP_QUANTITY);
+
+                gui.closeForAllViewers();
+                shopOwner.sendMessage(api.messages().modify().quantity().request());
+                api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
 
                 return false;
             }));
         }
 
-        api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LOGS, () -> {
+        api.permission().ifPermission(uniqueId, SlabbyPermissions.SHOP_LOGS, () -> {
             gui.setItem(0, 1, new SimpleItem(GuiHelper.itemStack(Material.BOOK, (it, meta) -> {
                 meta.displayName(api.messages().owner().logs().title());
             }).get(), c -> LogShopUI.open(api, shopOwner, shop)));
@@ -99,7 +120,7 @@ public final class OwnerShopUI {
 
         gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
 
-        api.permission().ifPermission(shopOwner.getUniqueId(), SlabbyPermissions.SHOP_LINK, () -> {
+        api.permission().ifPermission(uniqueId, SlabbyPermissions.SHOP_LINK, () -> {
             if (shop.stock() == null)
                 return;
 
@@ -118,32 +139,16 @@ public final class OwnerShopUI {
                 }
             }, c -> {
                 if (shop.hasInventory()) {
-                    try {
-                        shop.inventory(null, null, null, null);
-                        api.repository().update(shop);
-
-                        final var log = api.repository().<ShopLog.Builder>builder(ShopLog.Builder.class)
-                                .action(ShopLog.Action.INVENTORY_LINK_CHANGED)
-                                .uniqueId(shopOwner.getUniqueId())
-                                .serialized(new LocationChanged(null, null, null, null))
-                                .build();
-
-                        shop.logs().add(log);
-
-                        api.sound().play(shopOwner.getUniqueId(), shop, Sounds.MODIFY_SUCCESS);
-                        shopOwner.sendMessage(api.messages().owner().inventoryLink().cancel().message());
-                    } catch (final Exception ignored) {
-                        //TODO: notify uniqueId
-                    }
-                } else {
-                    api.operations()
-                            .wizardFrom(shopOwner.getUniqueId(), shop)
-                            .wizardState(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
-
-                    api.sound().play(shopOwner.getUniqueId(), shop, Sounds.AWAITING_INPUT);
-                    shopOwner.sendMessage(api.messages().owner().inventoryLink().message());
-                    gui.closeForAllViewers();
+                    return api.exceptionService().tryCatch(uniqueId, () -> api.operations().unlinkShop(uniqueId, shop));
                 }
+
+                api.operations()
+                        .wizardOf(uniqueId, shop)
+                        .wizardState(ShopWizard.WizardState.AWAITING_INVENTORY_LINK);
+
+                api.sound().play(uniqueId, shop, Sounds.AWAITING_INPUT);
+                shopOwner.sendMessage(api.messages().owner().inventoryLink().message());
+                gui.closeForAllViewers();
 
                 return true;
             }));
@@ -154,15 +159,15 @@ public final class OwnerShopUI {
         gui.setItem(7, 0, new SimpleItem(itemStack(Material.COMPARATOR, (it, meta) -> {
             meta.displayName(api.messages().owner().modify().title());
         }).get(), c -> {
-            ModifyShopUI.open(api, shopOwner, api.operations().wizardFrom(shopOwner.getUniqueId(), shop));
-            api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
+            ModifyShopUI.open(api, shopOwner, api.operations().wizardOf(uniqueId, shop));
+            api.sound().play(uniqueId, shop, Sounds.NAVIGATION);
         }));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.OAK_SIGN, (it, meta) -> {
             meta.displayName(api.messages().owner().customer().title());
         }).get(), c -> {
             ClientShopUI.open(api, shopOwner, shop);
-            api.sound().play(shopOwner.getUniqueId(), shop, Sounds.NAVIGATION);
+            api.sound().play(uniqueId, shop, Sounds.NAVIGATION);
         }));
 
         final var window = Window.single()
@@ -171,7 +176,7 @@ public final class OwnerShopUI {
                 .setGui(gui)
                 .build();
 
-        window.open();
+        Bukkit.getScheduler().runTask((Slabby)api, window::open);
     }
 
 }

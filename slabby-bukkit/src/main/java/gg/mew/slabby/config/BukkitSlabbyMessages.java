@@ -40,6 +40,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String messageOwner;
             private String insufficientBalance;
 
             @Override
@@ -71,6 +72,15 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
 
             @Override
+            public Component messageOwner(final Component client, final int quantity, final Component item, final double total) {
+                return MiniMessage.miniMessage().deserialize(this.messageOwner,
+                        Placeholder.component("client", client),
+                        Formatter.number("quantity", quantity),
+                        Placeholder.component("item", item),
+                        Formatter.number("total", total));
+            }
+
+            @Override
             public Component insufficientBalance() {
                 return MiniMessage.miniMessage().deserialize(this.insufficientBalance);
             }
@@ -84,6 +94,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String stock;
             private String stacks;
             private String message;
+            private String messageOwner;
             private String insufficientBalance;
 
             @Override
@@ -112,6 +123,15 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
                         Placeholder.component("item", displayName),
                         Formatter.number("quantity", quantity),
                         Formatter.number("price", sellPrice));
+            }
+
+            @Override
+            public Component messageOwner(final Component client, final int quantity, final Component item, final double total) {
+                return MiniMessage.miniMessage().deserialize(this.messageOwner,
+                        Placeholder.component("client", client),
+                        Formatter.number("quantity", quantity),
+                        Placeholder.component("item", item),
+                        Formatter.number("total", total));
             }
 
             @Override
@@ -548,6 +568,17 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
+        @ConfigSerializable
+        final static class BukkitShopDestroyed implements ShopDestroyed {
+
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
+
         private BukkitBuy buy;
         private BukkitSell sell;
         private BukkitDeposit deposit;
@@ -559,6 +590,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitQuantityChanged quantityChanged;
         private BukkitNoteChanged noteChanged;
         private BukkitNameChanged nameChanged;
+        private BukkitShopDestroyed shopDestroyed;
 
         private String title;
         private String player;
@@ -668,6 +700,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             private String amount;
             private String description;
             private String request;
+            private String minMax;
 
             @Override
             public Component title() {
@@ -687,6 +720,11 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             @Override
             public Component request() {
                 return MiniMessage.miniMessage().deserialize(this.request);
+            }
+
+            @Override
+            public Component minMax(final int max) {
+                return MiniMessage.miniMessage().deserialize(this.minMax, Formatter.number("max", max));
             }
         }
 
@@ -758,6 +796,9 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         private String title;
         private String clickToSet;
+        private String invalidNumber;
+        private String decimalPlaces;
+        private String minimumPrice;
         private BukkitNote note;
         private BukkitBuy buy;
         private BukkitSell sell;
@@ -774,6 +815,21 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component clickToSet() {
             return MiniMessage.miniMessage().deserialize(this.clickToSet);
+        }
+
+        @Override
+        public Component invalidNumber() {
+            return MiniMessage.miniMessage().deserialize(this.invalidNumber);
+        }
+
+        @Override
+        public Component decimalPlaces() {
+            return MiniMessage.miniMessage().deserialize(this.decimalPlaces);
+        }
+
+        @Override
+        public Component minimumPrice() {
+            return MiniMessage.miniMessage().deserialize(this.minimumPrice);
         }
     }
 
@@ -1057,6 +1113,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         private String nextPage;
         private String previousPage;
+        private String noInventorySpace;
+        private String unrecoverableException;
 
         @Override
         public Component nextPage() {
@@ -1066,6 +1124,16 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component previousPage() {
             return MiniMessage.miniMessage().deserialize(this.previousPage);
+        }
+
+        @Override
+        public Component noInventorySpace() {
+            return MiniMessage.miniMessage().deserialize(this.noInventorySpace);
+        }
+
+        @Override
+        public Component unrecoverableException() {
+            return MiniMessage.miniMessage().deserialize(this.unrecoverableException);
         }
     }
 

@@ -28,10 +28,6 @@ public final class BukkitSlabbyConfig implements SlabbyConfig {
     @Comment("Options for restocking shops.")
     private BukkitRestock restock;
 
-    //TODO: Custom item models?
-
-    //TODO: checkUpdates, stairs, barriershops, sellOversized, withdrawOversized, disableShops, allowCents
-
     @Accessors(fluent = true)
     @Getter
     @ConfigSerializable

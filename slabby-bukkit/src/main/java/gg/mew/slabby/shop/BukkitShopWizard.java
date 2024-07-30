@@ -23,6 +23,9 @@ public final class BukkitShopWizard implements ShopWizard {
     @Getter
     private final Integer id;
 
+    @Getter
+    private final Shop shop;
+
     @Setter
     private WizardState wizardState;
 
@@ -44,6 +47,7 @@ public final class BukkitShopWizard implements ShopWizard {
     public BukkitShopWizard(final SlabbyAPI api) {
         this.api = api;
 
+        this.shop = null;
         this.id = null;
 
         this.note = this.api.configuration().defaults().note();
@@ -54,6 +58,8 @@ public final class BukkitShopWizard implements ShopWizard {
 
     public BukkitShopWizard(final SlabbyAPI api, final Shop shop) {
         this.api = api;
+
+        this.shop = shop;
 
         this.id = shop.id();
 

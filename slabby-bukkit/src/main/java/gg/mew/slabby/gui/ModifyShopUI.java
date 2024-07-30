@@ -2,6 +2,7 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 public final class ModifyShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final ShopWizard wizard) {
+        final var uniqueId = shopOwner.getUniqueId();
         final var gui = Gui.empty(9, 1);
 
         gui.setItem(0, 0, new SimpleItem(Bukkit.getItemFactory().createItemStack(wizard.item())));
@@ -100,19 +102,12 @@ public final class ModifyShopUI {
                 add(api.messages().modify().confirm().description());
                 add(api.messages().modify().confirm().location(wizard.world(), wizard.x(), wizard.y(), wizard.z()));
             }});
-        }).get(), c -> {
-            try {
-
-                api.operations().createOrUpdateShop(shopOwner.getUniqueId(), wizard);
-
-                api.operations().wizards().remove(shopOwner.getUniqueId());
-                gui.closeForAllViewers();
-                api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
-            } catch (final Exception e) {
-                api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
-                //TODO: notify uniqueId
-            }
-        }));
+        }).get(), c -> api.exceptionService().tryCatch(uniqueId, () -> {
+            api.operations().createOrUpdateShop(shopOwner.getUniqueId(), wizard);
+            api.operations().wizards().remove(shopOwner.getUniqueId());
+            gui.closeForAllViewers();
+            api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.MODIFY_SUCCESS);
+        })));
 
         gui.setItem(8, 0, new SimpleItem(itemStack(Material.BARRIER, (it, meta) -> {
             meta.displayName(api.messages().modify().cancel().title());
@@ -130,7 +125,5 @@ public final class ModifyShopUI {
 
         Bukkit.getScheduler().runTask((Slabby)api, window::open);
     }
-
-
 
 }

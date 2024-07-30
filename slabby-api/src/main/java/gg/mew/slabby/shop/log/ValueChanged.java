@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-//TODO: We can't use generics with serialization
 @Accessors(fluent = true, chain = false)
 @Getter
 @Setter

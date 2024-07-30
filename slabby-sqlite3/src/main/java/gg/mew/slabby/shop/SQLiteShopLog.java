@@ -30,7 +30,7 @@ public final class SQLiteShopLog implements ShopLog {
     @DatabaseField(canBeNull = false)
     private Action action;
 
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = true)
     private String data;
 
     @DatabaseField(canBeNull = false)

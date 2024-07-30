@@ -26,6 +26,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double buyPrice);
+            Component messageOwner(final Component client, final int quantity, final Component item, final double total);
             Component insufficientBalance();
         }
 
@@ -35,6 +36,7 @@ public interface SlabbyMessages {
             Component stock(final int stock);
             Component stacks(final int stacks);
             Component message(final Component displayName, final int quantity, final double sellPrice);
+            Component messageOwner(final Component client, final int quantity, final Component item, final double total);
             Component insufficientBalance();
         }
 
@@ -153,6 +155,10 @@ public interface SlabbyMessages {
             Component to(final String name);
         }
 
+        interface ShopDestroyed {
+            Component title();
+        }
+
         Component title();
 
         Buy buy();
@@ -166,6 +172,7 @@ public interface SlabbyMessages {
         QuantityChanged quantityChanged();
         NoteChanged noteChanged();
         NameChanged nameChanged();
+        ShopDestroyed shopDestroyed();
 
         Component player(final Component displayName);
         Component date(final Date date);
@@ -197,6 +204,7 @@ public interface SlabbyMessages {
             Component amount(final int quantity);
             Component description();
             Component request();
+            Component minMax(final int max);
         }
 
         interface Confirm {
@@ -217,6 +225,9 @@ public interface SlabbyMessages {
 
         Component title();
         Component clickToSet();
+        Component invalidNumber();
+        Component decimalPlaces();
+        Component minimumPrice();
 
         Note note();
         Buy buy();
@@ -320,6 +331,8 @@ public interface SlabbyMessages {
     interface General {
         Component nextPage();
         Component previousPage();
+        Component noInventorySpace();
+        Component unrecoverableException();
     }
 
 }

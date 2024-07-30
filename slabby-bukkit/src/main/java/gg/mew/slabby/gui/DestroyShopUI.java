@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -24,6 +25,7 @@ public final class DestroyShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
         final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var uniqueId = shopOwner.getUniqueId();
 
         final var gui = Gui.empty(9, 1);
 
@@ -32,16 +34,10 @@ public final class DestroyShopUI {
             meta.lore(new ArrayList<>() {{
                 add(api.messages().destroy().confirm().description());
             }});
-        }).get(), c -> {
-            try {
-                api.operations().removeShop(shop);
-                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.DESTROY);
-                gui.closeForAllViewers();
-            } catch (final Exception e) {
-                //TODO: explain to uniqueId what happened
-                api.sound().play(shopOwner.getUniqueId(), shop, Sounds.BLOCKED);
-            }
-        }));
+        }).get(), c -> api.exceptionService().tryCatch(uniqueId, () -> {
+            api.operations().removeShop(uniqueId, shop);
+            gui.closeForAllViewers();
+        })));
 
         gui.setItem(4, 0, commandBlock(api, shop, itemStack));
 

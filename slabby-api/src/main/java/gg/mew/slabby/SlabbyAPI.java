@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public interface SlabbyAPI {
 
@@ -47,6 +48,8 @@ public interface SlabbyAPI {
     Gson gson();
 
     SlabbyMessages messages();
+
+    Logger logger();
 
     void reload();
 

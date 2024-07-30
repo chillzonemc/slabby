@@ -1,6 +1,7 @@
 package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
+import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -25,6 +26,7 @@ public final class ClientShopUI {
 
     public void open(final SlabbyAPI api, final Player client, final Shop shop) {
         final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var uniqueId = client.getUniqueId();
 
         final var gui = Gui.empty(9, 1);
 
@@ -38,20 +40,7 @@ public final class ClientShopUI {
                         add(api.messages().client().buy().stacks(shop.stock() / item.getMaxStackSize()));
                     }
                 }});
-            }), c -> {
-                final var result = api.operations().buy(client.getUniqueId(), shop);
-
-                if (!result.success()) {
-                    client.sendMessage(localize(result));
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BUY_SELL_SUCCESS);
-
-                    client.sendMessage(api.messages().client().buy().message(item.displayName(), shop.quantity(), shop.buyPrice()));
-                    //TODO: notify sellers
-                }
-                return true;
-            }));
+            }), c -> api.exceptionService().tryCatch(client.getUniqueId(), () -> api.operations().buy(client.getUniqueId(), shop))));
         }
 
         if (shop.sellPrice() != null) {
@@ -64,18 +53,7 @@ public final class ClientShopUI {
                         add(api.messages().client().sell().stacks(shop.stock() / item.getMaxStackSize()));
                     }
                 }});
-            }), c -> {
-                final var result = api.operations().sell(client.getUniqueId(), shop);
-
-                if (!result.success()) {
-                    client.sendMessage(localize(result));
-                    api.sound().play(client.getUniqueId(), shop, Sounds.BLOCKED);
-                } else {
-                    client.sendMessage(api.messages().client().sell().message(item.displayName(), shop.quantity(), shop.sellPrice()));
-                    //TODO: notify sellers
-                }
-                return true;
-            }));
+            }), c -> api.exceptionService().tryCatch(uniqueId, () -> api.operations().sell(client.getUniqueId(), shop))));
         }
 
         gui.setItem(4, 0, new SimpleItem(item));
