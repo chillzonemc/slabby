@@ -35,11 +35,6 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
         this.shopDao = DaoManager.createDao(this.connectionSource, SQLiteShop.class);
         this.shopOwnerDao = DaoManager.createDao(this.connectionSource, SQLiteShopOwner.class);
         this.shopLogDao = DaoManager.createDao(this.connectionSource, SQLiteShopLog.class);
-
-        //NOTE: weakly referenced cache, any operation where a shop object is long-lived should force a refresh beforehand
-        //TODO(TEST): may not work with QueryBuilder
-        this.shopDao.setObjectCache(true);
-        this.shopOwnerDao.setObjectCache(true);
     }
 
     public void initialize() throws SQLException {

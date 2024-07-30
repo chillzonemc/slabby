@@ -105,7 +105,6 @@ public final class OwnerShopUI {
                         .wizardState(ShopWizard.WizardState.AWAITING_TEMP_QUANTITY);
 
                 gui.closeForAllViewers();
-                //TODO: custom translation?
                 shopOwner.sendMessage(api.messages().modify().quantity().request());
                 api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
 
