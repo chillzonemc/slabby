@@ -85,6 +85,8 @@ log:
     title: '<green>Name Changed</green>'
     from: '<dark_purple>From: <name></dark_purple>'
     to: '<dark_purple>To: <name></dark_purple>'
+  shop-destroyed:
+    title: '<green>Shop Destroyed</green>'
 modify:
   title: '[Slabby] Editing Shop'
   click-to-set: '<dark_purple>Click to set</dark_purple>'

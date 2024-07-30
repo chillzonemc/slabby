@@ -24,7 +24,7 @@ public interface ShopRepository {
     void refresh(final Shop shop) throws SlabbyException;
     void refresh(final ShopOwner shopOwner) throws SlabbyException;
 
-    void markAsDeleted(final Shop shop) throws SlabbyException;
+    void markAsDeleted(final UUID uniqueId, final Shop shop) throws SlabbyException;
 
     <T> Optional<Shop> shopById(final T id) throws SlabbyException;
 

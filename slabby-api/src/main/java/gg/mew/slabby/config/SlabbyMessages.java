@@ -155,6 +155,10 @@ public interface SlabbyMessages {
             Component to(final String name);
         }
 
+        interface ShopDestroyed {
+            Component title();
+        }
+
         Component title();
 
         Buy buy();
@@ -168,6 +172,7 @@ public interface SlabbyMessages {
         QuantityChanged quantityChanged();
         NoteChanged noteChanged();
         NameChanged nameChanged();
+        ShopDestroyed shopDestroyed();
 
         Component player(final Component displayName);
         Component date(final Date date);

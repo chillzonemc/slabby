@@ -9,6 +9,7 @@ import com.j256.ormlite.table.TableUtils;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.SlabbyException;
 import gg.mew.slabby.exception.UnrecoverableException;
+import gg.mew.slabby.shop.log.ValueChanged;
 
 import java.io.Closeable;
 import java.sql.SQLException;
@@ -145,19 +146,27 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
-    public void markAsDeleted(final Shop shop) throws SlabbyException {
-        try {
-            shop.state(Shop.State.DELETED);
-            shop.location(null, null, null, null);
+    public void markAsDeleted(final UUID uniqueId, final Shop shop) throws SlabbyException {
+        shop.state(Shop.State.DELETED);
+        shop.location(null, null, null, null);
 
-            //NOTE: We remove the inventory link because otherwise a new shop cannot be linked to this location
-            //NOTE: We also cannot add the shop state to the index because then a shop cannot be restored if another shop uses that inventory location
-            shop.inventory(null, null, null, null);
+        //NOTE: We remove the inventory link because otherwise a new shop cannot be linked to this location
+        //NOTE: We also cannot add the shop state to the index because then a shop cannot be restored if another shop uses that inventory location
+        shop.inventory(null, null, null, null);
 
+        this.transaction(() -> {
             this.shopDao.update((SQLiteShop) shop);
-        } catch (final SQLException e) {
-            throw new UnrecoverableException("Error while marking shop as deleted", e);
-        }
+
+            final var log = api.repository()
+                    .<ShopLog.Builder>builder(ShopLog.Builder.class)
+                    .action(ShopLog.Action.SHOP_DESTROYED)
+                    .uniqueId(uniqueId)
+                    .build();
+
+            shop.logs().add(log);
+
+            return null;
+        });
     }
 
     @Override

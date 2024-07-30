@@ -376,7 +376,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)
             e.remove();
 
-        api.repository().markAsDeleted(shop);
+        api.repository().markAsDeleted(uniqueId, shop);
 
         api.sound().play(uniqueId, shop, Sounds.DESTROY);
     }

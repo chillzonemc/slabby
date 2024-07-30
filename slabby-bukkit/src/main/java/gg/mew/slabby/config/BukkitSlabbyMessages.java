@@ -568,6 +568,17 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
             }
         }
 
+        @ConfigSerializable
+        final static class BukkitShopDestroyed implements ShopDestroyed {
+
+            private String title;
+
+            @Override
+            public Component title() {
+                return MiniMessage.miniMessage().deserialize(this.title);
+            }
+        }
+
         private BukkitBuy buy;
         private BukkitSell sell;
         private BukkitDeposit deposit;
@@ -579,6 +590,7 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         private BukkitQuantityChanged quantityChanged;
         private BukkitNoteChanged noteChanged;
         private BukkitNameChanged nameChanged;
+        private BukkitShopDestroyed shopDestroyed;
 
         private String title;
         private String player;
