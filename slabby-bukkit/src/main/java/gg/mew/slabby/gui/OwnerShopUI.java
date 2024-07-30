@@ -1,5 +1,6 @@
 package gg.mew.slabby.gui;
 
+import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.PlayerOutOfInventorySpaceException;
 import gg.mew.slabby.exception.PlayerOutOfStockException;
@@ -55,7 +56,10 @@ public final class OwnerShopUI {
                     return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, amount));
                 }
 
-                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, shop.quantity()));
+                final var wizard = api.operations().wizards().get(uniqueId);
+                final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, amount));
             }));
 
             gui.setItem(1, 0, new SuppliedItem(itemStack(Material.HOPPER_MINECART, (it, meta) -> {
@@ -83,17 +87,27 @@ public final class OwnerShopUI {
                     return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, amount));
                 }
 
-                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, shop.quantity()));
+                final var wizard = api.operations().wizards().get(uniqueId);
+                final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+
+                return api.exceptionService().tryCatch(uniqueId, () -> api.operations().withdraw(uniqueId, shop, amount));
             }));
 
             gui.setItem(2, 0, new SuppliedItem(itemStack(Material.MINECART, (it, meta) -> {
                 meta.displayName(api.messages().owner().changeRate().title());
                 meta.lore(new ArrayList<>() {{
-                    add(api.messages().owner().changeRate().amount(shop.quantity()));
+                    final var wizard = api.operations().wizards().get(uniqueId);
+                    final var amount = wizard != null ? wizard.quantity() : shop.quantity();
+                    add(api.messages().owner().changeRate().amount(amount));
                 }});
             }), c -> {
-                //TODO: I could just use the wizard for this
-                shopOwner.sendMessage(Component.text("This feature is not available", NamedTextColor.RED));
+                final var wizard = api.operations().wizardOf(uniqueId, shop)
+                        .wizardState(ShopWizard.WizardState.AWAITING_TEMP_QUANTITY);
+
+                gui.closeForAllViewers();
+                //TODO: custom translation?
+                shopOwner.sendMessage(api.messages().modify().quantity().request());
+                api.sound().play(shopOwner.getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.AWAITING_INPUT);
 
                 return false;
             }));
@@ -163,7 +177,7 @@ public final class OwnerShopUI {
                 .setGui(gui)
                 .build();
 
-        window.open();
+        Bukkit.getScheduler().runTask((Slabby)api, window::open);
     }
 
 }

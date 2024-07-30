@@ -173,7 +173,7 @@ public final class SlabbyListener implements Listener {
                         final var sellPrice = getAndCheckPrice(Double.parseDouble(text));
                         wizard.sellPrice(sellPrice == -1 ? null : sellPrice);
                     }
-                    case AWAITING_QUANTITY -> {
+                    case AWAITING_QUANTITY, AWAITING_TEMP_QUANTITY -> {
                         final var quantity = Integer.parseInt(text);
                         final var item = Bukkit.getItemFactory().createItemStack(wizard.item());
 
@@ -195,9 +195,12 @@ public final class SlabbyListener implements Listener {
                 api.sound().play(event.getPlayer().getUniqueId(), wizard.x(), wizard.y(), wizard.z(), wizard.world(), Sounds.BLOCKED);
             }
 
-            wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
+            if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_TEMP_QUANTITY)
+                OwnerShopUI.open(api, event.getPlayer(), wizard.shop());
+            else
+                ModifyShopUI.open(api, event.getPlayer(), wizard);
 
-            ModifyShopUI.open(api, event.getPlayer(), wizard);
+            wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION);
 
             event.setCancelled(true);
         });

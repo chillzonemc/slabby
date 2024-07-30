@@ -7,6 +7,7 @@ public interface ShopWizard {
 
     <T> T id();
 
+    Shop shop();
     WizardState wizardState();
     Shop.State state();
     Integer x();
@@ -40,13 +41,15 @@ public interface ShopWizard {
         AWAITING_QUANTITY,
         AWAITING_INVENTORY_LINK,
         AWAITING_LOCATION,
-        AWAITING_CONFIRMATION;
+        AWAITING_CONFIRMATION,
+        AWAITING_TEMP_QUANTITY;
 
         public boolean awaitingTextInput() {
             return this == AWAITING_NOTE
                     || this == AWAITING_BUY_PRICE
                     || this == AWAITING_SELL_PRICE
-                    || this == AWAITING_QUANTITY;
+                    || this == AWAITING_QUANTITY
+                    || this == AWAITING_TEMP_QUANTITY;
         }
 
     }
