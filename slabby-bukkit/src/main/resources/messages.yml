@@ -1,7 +1,8 @@
 general:
   next-page: 'Next Page'
   previous-page: 'Previous Page'
-
+  no-inventory-space: '<red>You don''t have enough inventory space!</red>'
+  unrecoverable-exception: '<red>An unexpected problem occurred while performing this action</red>'
 client:
   title: '[Slabby] Client'
   note:

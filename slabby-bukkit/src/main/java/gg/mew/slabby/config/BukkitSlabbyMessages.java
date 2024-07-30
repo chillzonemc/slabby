@@ -1113,6 +1113,8 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
 
         private String nextPage;
         private String previousPage;
+        private String noInventorySpace;
+        private String unrecoverableException;
 
         @Override
         public Component nextPage() {
@@ -1122,6 +1124,16 @@ public final class BukkitSlabbyMessages implements SlabbyMessages {
         @Override
         public Component previousPage() {
             return MiniMessage.miniMessage().deserialize(this.previousPage);
+        }
+
+        @Override
+        public Component noInventorySpace() {
+            return MiniMessage.miniMessage().deserialize(this.noInventorySpace);
+        }
+
+        @Override
+        public Component unrecoverableException() {
+            return MiniMessage.miniMessage().deserialize(this.unrecoverableException);
         }
     }
 

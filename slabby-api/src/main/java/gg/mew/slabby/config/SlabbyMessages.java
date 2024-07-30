@@ -331,6 +331,8 @@ public interface SlabbyMessages {
     interface General {
         Component nextPage();
         Component previousPage();
+        Component noInventorySpace();
+        Component unrecoverableException();
     }
 
 }

@@ -5,7 +5,6 @@ import gg.mew.slabby.exception.*;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 
 import java.util.Objects;
@@ -33,13 +32,10 @@ public final class BukkitExceptionService implements ExceptionService {
             case NoPermissionException ignored -> Bukkit.permissionMessage();
             case PlayerOutOfStockException ignored -> api.messages().owner().deposit().insufficientStock();
             case ShopOutOfStockException ignored -> api.messages().owner().withdraw().insufficientStock();
-            //TODO: translate
-            case PlayerOutOfInventorySpaceException ignored -> Component.text("You don't have enough inventory space!");
-            case UnrecoverableException e -> {
-                logToConsole("Uncaught UnrecoverableException", e);
-                yield Component.text("TODO(translate): A problem occurred while performing this action", NamedTextColor.RED);
-            }
-            default -> Component.text("TODO(translate): Default");
+            case PlayerOutOfInventorySpaceException ignored -> api.messages().general().noInventorySpace();
+            case UnrecoverableException ignored -> api.messages().general().unrecoverableException();
+            //NOTE: A SlabbyException is never thrown on its own, so technically this won't ever happen, but I have to put it here to satisfy the compiler
+            case SlabbyException ignored -> api.messages().general().unrecoverableException();
         });
 
         api.sound().play(uniqueId, player.getLocation().getBlockX(),
@@ -56,6 +52,10 @@ public final class BukkitExceptionService implements ExceptionService {
             return true;
         } catch (final SlabbyException e) {
             this.logToPlayer(uniqueId, e);
+
+            if (e instanceof UnrecoverableException)
+                this.logToConsole("UnrecoverableException", e);
+
             return false;
         }
     }
