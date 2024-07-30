@@ -2,7 +2,6 @@ package gg.mew.slabby.shop;
 
 import gg.mew.slabby.exception.SlabbyException;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +32,8 @@ public interface ShopRepository {
     Optional<Shop> shopWithInventoryAt(final int x, final int y, final int z, final String world) throws SlabbyException;
 
     Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws SlabbyException;
+
+    boolean isShopOrInventory(final int x, final int y, final int z, final String world) throws SlabbyException;
 
     @SuppressWarnings("UnusedReturnValue")
     <T> T transaction(final Callable<T> transaction) throws SlabbyException;

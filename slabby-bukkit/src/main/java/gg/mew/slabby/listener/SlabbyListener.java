@@ -12,7 +12,6 @@ import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -20,13 +19,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -83,7 +84,7 @@ public final class SlabbyListener implements Listener {
                                     blockZ,
                                     event.getClickedBlock().getWorld().getName());
 
-                    if (canAccessClaim && hasConfigurationItem && BlockHelper.isSlabOrStair(event.getClickedBlock())) {
+                    if (canAccessClaim && hasConfigurationItem && BlockHelper.isShopAllowed(event.getClickedBlock())) {
                         api.operations().ifWizardOrElse(uniqueId, w -> {
                             if (w.wizardState() == ShopWizard.WizardState.AWAITING_LOCATION) {
                                 w.location(blockX, blockY, blockZ, blockWorld);
@@ -118,7 +119,7 @@ public final class SlabbyListener implements Listener {
 
                 api.operations().ifWizard(uniqueId, wizard -> {
                     if (wizard.wizardState() == ShopWizard.WizardState.AWAITING_INVENTORY_LINK) {
-                        if (player.isSneaking() && event.getClickedBlock().getType() == Material.CHEST) {
+                        if (player.isSneaking() && BlockHelper.isInventoryAllowed(event.getClickedBlock())) {
                             api.operations().linkShop(uniqueId, wizard, block.getX(), block.getY(), block.getZ(), block.getWorld().getName());
                         }
                     }
@@ -253,6 +254,102 @@ public final class SlabbyListener implements Listener {
                 api.exceptionService().logToConsole("Error while attempting to update shop from linked inventory", e);
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onEntityChangeBlock(final EntityChangeBlockEvent event) {
+        if (!BlockHelper.isSlabbyBlock(event.getBlock()))
+            return;
+
+        final var x = event.getBlock().getX();
+        final var y = event.getBlock().getY();
+        final var z = event.getBlock().getZ();
+        final var world = event.getBlock().getWorld().getName();
+
+        if (api.repository().isShopOrInventory(x, y, z, world))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onBlockBreak(final BlockBreakEvent event) {
+        if (!BlockHelper.isSlabbyBlock(event.getBlock()))
+            return;
+
+        final var x = event.getBlock().getX();
+        final var y = event.getBlock().getY();
+        final var z = event.getBlock().getZ();
+        final var world = event.getBlock().getWorld().getName();
+
+        if (api.repository().isShopOrInventory(x, y, z, world))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onBlockBurn(final BlockBurnEvent event) {
+        if (!BlockHelper.isSlabbyBlock(event.getBlock()))
+            return;
+
+        final var x = event.getBlock().getX();
+        final var y = event.getBlock().getY();
+        final var z = event.getBlock().getZ();
+        final var world = event.getBlock().getWorld().getName();
+
+        if (api.repository().isShopOrInventory(x, y, z, world))
+            event.setCancelled(true);
+    }
+
+    //TODO: N+1 problem. I should just use a query here
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onBlockExplode(final BlockExplodeEvent event) {
+        event.blockList().removeIf(block -> {
+            final var x = block.getX();
+            final var y = block.getY();
+            final var z = block.getZ();
+            final var world = block.getWorld().getName();
+
+            return BlockHelper.isSlabbyBlock(block) && api.repository().isShopOrInventory(x, y, z, world);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onEntityExplode(final EntityExplodeEvent event) {
+        event.blockList().removeIf(block -> {
+            final var x = block.getX();
+            final var y = block.getY();
+            final var z = block.getZ();
+            final var world = block.getWorld().getName();
+
+            return BlockHelper.isSlabbyBlock(block) && api.repository().isShopOrInventory(x, y, z, world);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onBlockPistonExtend(final BlockPistonExtendEvent event) {
+        if (event.getBlocks().stream().anyMatch(block -> {
+            final var x = block.getX();
+            final var y = block.getY();
+            final var z = block.getZ();
+            final var world = block.getWorld().getName();
+
+            return BlockHelper.isSlabbyBlock(block) && api.repository().isShopOrInventory(x, y, z, world);
+        })) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    private void onBlockPistonRetract(final BlockPistonRetractEvent event) {
+        if (event.getBlocks().stream().anyMatch(block -> {
+            final var x = block.getX();
+            final var y = block.getY();
+            final var z = block.getZ();
+            final var world = block.getWorld().getName();
+
+            return BlockHelper.isSlabbyBlock(block) && api.repository().isShopOrInventory(x, y, z, world);
+        })) {
+            event.setCancelled(true);
+        }
     }
 
 }
