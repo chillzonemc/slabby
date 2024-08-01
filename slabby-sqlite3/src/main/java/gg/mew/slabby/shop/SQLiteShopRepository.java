@@ -236,6 +236,23 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
     }
 
     @Override
+    public boolean isShopOrInventory(final int x, final int y, final int z, final String world) throws SlabbyException {
+        try {
+            final var where = this.shopDao.queryBuilder().where();
+
+            final var result = where
+                    .and(where.eq(Shop.Names.STATE, Shop.State.ACTIVE), where.or(
+                            where.and(where.eq(Shop.Names.INVENTORY_X, x), where.eq(Shop.Names.INVENTORY_Y, y), where.eq(Shop.Names.INVENTORY_Z, z), where.eq(Shop.Names.INVENTORY_WORLD, world)),
+                            where.and(where.eq(Shop.Names.X, x), where.eq(Shop.Names.Y, y), where.eq(Shop.Names.Z, z), where.eq(Shop.Names.WORLD, world))))
+                    .countOf();
+
+            return result > 0;
+        } catch (final SQLException e) {
+            throw new UnrecoverableException("Error while checking if location is a shop or inventory", e);
+        }
+    }
+
+    @Override
     public <T> T transaction(final Callable<T> transaction) throws SlabbyException {
         try {
             return TransactionManager.callInTransaction(this.connectionSource, transaction);
