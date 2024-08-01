@@ -1,8 +1,5 @@
-# Rendering mode of items on shops. Can be: QUANTITY, STACK, SINGLE or NONE
-display-mode: QUANTITY
-
-# Maximum amount of items a shop can keep in stock at one time.
-max-stock: 99999
+# Maximum amount of items a shop can keep in stock at one time. Default is the maximum value that fits inside a 32-bit integer, and should not be set higher.
+max-stock: 2147483647
 
 # Item used for creating or deleting shops.
 item: minecraft:stick

@@ -2,8 +2,6 @@ package gg.mew.slabby.config;
 
 public interface SlabbyConfig {
 
-    DisplayMode displayMode();
-
     int maxStock();
 
     String item();
@@ -62,9 +60,4 @@ public interface SlabbyConfig {
 
     }
 
-    enum DisplayMode {
-
-        QUANTITY, STACK, SINGLE, NONE
-
-    }
 }
