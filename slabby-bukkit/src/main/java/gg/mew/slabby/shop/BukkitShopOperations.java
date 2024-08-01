@@ -157,8 +157,18 @@ public final class BukkitShopOperations implements ShopOperations {
         if (cost.entrySet().stream().anyMatch(it -> !api.economy().hasAmount(it.getKey(), it.getValue())))
             throw new InsufficientBalanceToSellException();
 
-        if (shop.stock() != null)
-            shop.stock(shop.stock() - shop.quantity());
+        if (shop.stock() != null) {
+            try {
+                final var stock = Math.addExact(shop.stock(), shop.quantity());
+
+                if (stock > api.configuration().maxStock())
+                    throw new ShopOutOfSpaceException();
+
+                shop.stock(stock);
+            } catch (final ArithmeticException e) {
+                throw new ShopOutOfSpaceException(e);
+            }
+        }
 
         api.repository().transaction(() -> {
             api.repository().update(shop);
@@ -276,9 +286,20 @@ public final class BukkitShopOperations implements ShopOperations {
             removeItem = () -> shopOwner.getInventory().removeItem(itemStack);
         }
 
-        final var stock = shop.stock();
+        final var oldStock = shop.stock();
 
-        shop.stock(stock + amount);
+        if (shop.stock() != null) {
+            try {
+                final var stock = Math.addExact(oldStock, amount);
+
+                if (stock > api.configuration().maxStock())
+                    throw new ShopOutOfSpaceException();
+
+                shop.stock(stock);
+            } catch (final ArithmeticException e) {
+                throw new ShopOutOfSpaceException(e);
+            }
+        }
 
         api.repository().transaction(() -> {
             api.repository().update(shop);
@@ -287,7 +308,7 @@ public final class BukkitShopOperations implements ShopOperations {
                     .<ShopLog.Builder>builder(ShopLog.Builder.class)
                     .action(ShopLog.Action.DEPOSIT)
                     .uniqueId(uniqueId)
-                    .serialized(new ValueChanged.Int(stock, shop.stock()))
+                    .serialized(new ValueChanged.Int(oldStock, shop.stock()))
                     .build();
 
             shop.logs().add(log);
