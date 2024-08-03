@@ -33,6 +33,8 @@ public interface ShopRepository {
 
     Collection<Shop> shopsOf(final UUID uniqueId, final Shop.State state) throws SlabbyException;
 
+    Collection<Shop> shopsByItem(final String item) throws SlabbyException;
+
     boolean isShopOrInventory(final int x, final int y, final int z, final String world) throws SlabbyException;
 
     @SuppressWarnings("UnusedReturnValue")

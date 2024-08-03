@@ -1,5 +1,6 @@
 package gg.mew.slabby.wrapper.claim;
 
+import gg.mew.slabby.shop.Shop;
 import lombok.RequiredArgsConstructor;
 import me.angeschossen.lands.api.LandsIntegration;
 import me.angeschossen.lands.api.flags.type.Flags;
@@ -23,6 +24,21 @@ public final class LandsClaimWrapper implements ClaimWrapper {
             return true;
 
         return landWorld.hasRoleFlag(uniqueId, new Location(bukkitWorld, x, y, z), Flags.BLOCK_PLACE);
+    }
+
+    @Override
+    public boolean isInShoppingDistrict(final Shop shop) {
+        if (this.lands == null)
+            return true;
+
+        final var location = new Location(Bukkit.getWorld(shop.world()), shop.x(), shop.y(), shop.z());
+        final var chunk = location.getChunk();
+
+        //NOTE: getLandByChunk is preferred according to the api, but there is no guarantee the chunk is loaded, thus this.
+        final var land = this.lands.getLandByUnloadedChunk(location.getWorld(), chunk.getX(), chunk.getZ());
+
+        //TODO: Support shops outside of shopping district, different dimensions, etc...
+        return land != null && land.getName().equalsIgnoreCase("spawn");
     }
 
 }

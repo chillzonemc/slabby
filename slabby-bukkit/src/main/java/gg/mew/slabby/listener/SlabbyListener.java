@@ -135,7 +135,7 @@ public final class SlabbyListener implements Listener {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
                 wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION)
-                        .item(item.getType().getKey().asString() + item.getItemMeta().getAsString());
+                        .item(ItemHelper.toName(item));
 
                 ModifyShopUI.open(api, (Player) event.getWhoClicked(), wizard);
 
