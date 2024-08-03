@@ -1,12 +1,15 @@
 package gg.mew.slabby;
 
+import co.aikar.commands.InvalidCommandArgument;
 import co.aikar.commands.PaperCommandManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import gg.mew.slabby.command.SlabboMapsCommand;
 import gg.mew.slabby.command.SlabbyCommand;
 import gg.mew.slabby.config.BukkitSlabbyMessages;
 import gg.mew.slabby.config.BukkitSlabbyConfig;
 import gg.mew.slabby.config.SlabbyConfig;
+import gg.mew.slabby.listener.SlabboMapsListener;
 import gg.mew.slabby.listener.SlabbyListener;
 import gg.mew.slabby.permission.SlabbyPermissions;
 import gg.mew.slabby.service.BukkitExceptionService;
@@ -26,8 +29,12 @@ import lombok.Getter;
 import lombok.experimental.Accessors;
 import me.angeschossen.lands.api.LandsIntegration;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
@@ -72,9 +79,12 @@ import java.util.logging.Logger;
         @Permission(name = SlabbyPermissions.ADMIN_TOGGLE, desc = "Allows admins to interact with any shop as if it was their own"),
         @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own"),
         @Permission(name = SlabbyPermissions.ADMIN_IMPORT, desc = "Allows admins to import shops from other plugins"),
+
+        @Permission(name = SlabbyPermissions.SLABBO_MAPS_LOCATE_ITEM, desc = "Allows players to locate slabby items")
 })
 @Commands(value = {
-        @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby")
+        @Command(name = "slabby", desc = "Slabby's command for everything", permission = "slabby"),
+        @Command(name = "slabbo-maps", desc = "Compatibility maps command for slabby", permission = SlabbyPermissions.SLABBO_MAPS_LOCATE_ITEM)
 })
 @Accessors(fluent = true)
 public final class Slabby extends JavaPlugin implements SlabbyAPI {
@@ -128,6 +138,9 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
     private final Map<UUID, Boolean> adminMode = new HashMap<>();
 
+    @Getter
+    private final NamespacedKey deleteKey = new NamespacedKey(this, "delete");
+
     @Override
     public void reload() {
         setupConfig();
@@ -158,13 +171,29 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
 
         final var commandManager = new PaperCommandManager(this);
 
+        addSlabboMapsCommand(commandManager);
+
         commandManager.registerCommand(new SlabbyCommand(this));
 
         SlabbyHelper.init(this);
 
         getServer().getPluginManager().registerEvents(new SlabbyListener(this), this);
+        getServer().getPluginManager().registerEvents(new SlabboMapsListener(), this);
 
         getServer().getServicesManager().register(SlabbyAPI.class, this, this, ServicePriority.Highest);
+    }
+
+    private void addSlabboMapsCommand(final PaperCommandManager commandManager) {
+        commandManager.getCommandContexts().registerContext(ItemStack.class, c -> {
+            final var item = c.popFirstArg();
+            try {
+                return Bukkit.getItemFactory().createItemStack(item);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidCommandArgument(String.format("Unknown item '%s'", item), false);
+            }
+        });
+        commandManager.getCommandCompletions().registerStaticCompletion("items", Arrays.stream(Material.values()).map(it -> it.getKey().asString()).toArray(String[]::new));
+        commandManager.registerCommand(new SlabboMapsCommand(this));
     }
 
     @Override

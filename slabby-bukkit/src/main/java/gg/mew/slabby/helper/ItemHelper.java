@@ -48,4 +48,8 @@ public final class ItemHelper {
         return result;
     }
 
+    public String toName(final ItemStack itemStack) {
+        return itemStack.getType().getKey().asString() + itemStack.getItemMeta().getAsString();
+    }
+
 }

@@ -231,7 +231,23 @@ public final class SQLiteShopRepository implements ShopRepository, Closeable {
                     .toList();
             return (Collection<Shop>) (Collection<? extends Shop>) result;
         } catch (final SQLException e) {
-            throw new UnrecoverableException("Error while retrieving shops for owner");
+            throw new UnrecoverableException("Error while retrieving shops for owner", e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Collection<Shop> shopsByItem(final String item) throws SlabbyException {
+        try {
+            final var result = this.shopDao.queryBuilder()
+                    .where()
+                    .eq(Shop.Names.STATE, Shop.State.ACTIVE)
+                    .and()
+                    .eq(Shop.Names.ITEM, item)
+                    .query();
+            return (Collection<Shop>) (Collection<? extends Shop>) result;
+        } catch (final SQLException e) {
+            throw new UnrecoverableException("Error while retrieving shops by item", e);
         }
     }
 

@@ -21,4 +21,6 @@ public final class SlabbyPermissions {
     public final String ADMIN_RESTORE = ADMIN_BASE + "restore";
     public final String ADMIN_IMPORT = ADMIN_BASE + "import";
 
+    public final String SLABBO_MAPS_LOCATE_ITEM = "slabby.slabbomaps.locate.shop";
+
 }
