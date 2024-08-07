@@ -1,9 +1,4 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import gg.mew.slabby.SlabbyDependencies
-
-plugins {
-    id("io.github.goooler.shadow") version "8.1.8"
-}
 
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -45,12 +40,4 @@ dependencies {
 tasks.compileJava {
     options.compilerArgs.add("-parameters")
     options.isFork = true
-}
-
-tasks.build {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks.jar {
-    enabled = false
 }
