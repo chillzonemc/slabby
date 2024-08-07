@@ -39,10 +39,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.command.Commands;
-import org.bukkit.plugin.java.annotation.dependency.Dependency;
-import org.bukkit.plugin.java.annotation.dependency.DependsOn;
-import org.bukkit.plugin.java.annotation.dependency.SoftDependency;
-import org.bukkit.plugin.java.annotation.dependency.SoftDependsOn;
+import org.bukkit.plugin.java.annotation.dependency.*;
 import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.permission.Permissions;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
@@ -77,7 +74,6 @@ import java.util.logging.Logger;
 
         @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to reload Slabby"),
         @Permission(name = SlabbyPermissions.ADMIN_TOGGLE, desc = "Allows admins to interact with any shop as if it was their own"),
-        @Permission(name = SlabbyPermissions.ADMIN_RELOAD, desc = "Allows admins to restore any shop as if it was their own"),
         @Permission(name = SlabbyPermissions.ADMIN_IMPORT, desc = "Allows admins to import shops from other plugins"),
 
         @Permission(name = SlabbyPermissions.SLABBO_MAPS_LOCATE_ITEM, desc = "Allows players to locate slabby items")
