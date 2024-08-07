@@ -1,6 +1,6 @@
-dependencies {
-    // Library for handling json
-    implementation("com.google.code.gson:gson:2.11.0")
+import gg.mew.slabby.SlabbyDependencies
 
-    implementation("net.kyori:adventure-api:4.17.0")
+dependencies {
+    // Library for text handling
+    compileOnly("net.kyori:adventure-api:${SlabbyDependencies.ADVENTURE_API}")
 }
