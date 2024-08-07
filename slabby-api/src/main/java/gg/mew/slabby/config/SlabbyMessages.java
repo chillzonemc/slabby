@@ -333,6 +333,7 @@ public interface SlabbyMessages {
         Component previousPage();
         Component noInventorySpace();
         Component unrecoverableException();
+        Component shopOutOfSpace();
     }
 
 }

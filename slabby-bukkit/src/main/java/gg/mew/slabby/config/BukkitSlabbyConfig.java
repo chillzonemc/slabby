@@ -10,9 +10,6 @@ import org.spongepowered.configurate.objectmapping.meta.Comment;
 @ConfigSerializable
 public final class BukkitSlabbyConfig implements SlabbyConfig {
 
-    @Comment("Rendering mode of items on shops. Can be: QUANTITY, STACK, SINGLE or NONE")
-    private DisplayMode displayMode;
-
     @Comment("Maximum amount of items a shop can keep in stock at one time.")
     private int maxStock;
 
