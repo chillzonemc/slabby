@@ -120,9 +120,6 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Getter
     private final ShopOperations operations = new BukkitShopOperations(this);
 
-    @Getter
-    private final DecimalFormat decimalFormat = new DecimalFormat("#.##");
-
     private final YamlConfigurationLoader configLoader = YamlConfigurationLoader.builder()
             .path(Path.of(getDataFolder().getAbsolutePath(), "config.yml"))
             .build();
@@ -131,7 +128,6 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
             .path(Path.of(getDataFolder().getAbsolutePath(), "messages.yml"))
             .build();
 
-    @Getter
     private final Gson gson = new GsonBuilder()
             .serializeNulls()
             .create();
@@ -261,6 +257,16 @@ public final class Slabby extends JavaPlugin implements SlabbyAPI {
     @Override
     public File directory() {
         return getDataFolder();
+    }
+
+    @Override
+    public <T> T fromJson(final String json, final Class<? extends T> theClass) {
+        return gson.fromJson(json, theClass);
+    }
+
+    @Override
+    public String toJson(final Object data) {
+        return gson.toJson(data);
     }
 
     @Override

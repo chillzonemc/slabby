@@ -45,7 +45,7 @@ public final class LogShopUI {
                     case BUY -> {
                         meta.displayName(api.messages().log().buy().title());
 
-                        final var data = api.gson().fromJson(it.data(), Transaction.class);
+                        final var data = api.fromJson(it.data(), Transaction.class);
 
                         add(api.messages().log().buy().amount(data.amount()));
                         add(api.messages().log().buy().quantity(data.quantity()));
@@ -53,27 +53,27 @@ public final class LogShopUI {
                     case SELL -> {
                         meta.displayName(api.messages().log().sell().title());
 
-                        final var data = api.gson().fromJson(it.data(), Transaction.class);
+                        final var data = api.fromJson(it.data(), Transaction.class);
 
                         add(api.messages().log().sell().amount(data.amount()));
                         add(api.messages().log().sell().quantity(data.quantity()));
                     }
                     case DEPOSIT -> {
                         meta.displayName(api.messages().log().deposit().title());
-                        final var data = api.gson().fromJson(it.data(), ValueChanged.Int.class);
+                        final var data = api.fromJson(it.data(), ValueChanged.Int.class);
                         final var deposited = data.to() - data.from();
                         add(api.messages().log().deposit().amount(deposited));
                     }
                     case WITHDRAW -> {
                         meta.displayName(api.messages().log().withdraw().title());
-                        final var data = api.gson().fromJson(it.data(), ValueChanged.Int.class);
+                        final var data = api.fromJson(it.data(), ValueChanged.Int.class);
                         final var deposited = data.from() - data.to();
                         add(api.messages().log().withdraw().amount(deposited));
                     }
                     case INVENTORY_LINK_CHANGED -> {
                         meta.displayName(api.messages().log().inventoryLinkChanged().title());
 
-                        final var data = api.gson().fromJson(it.data(), LocationChanged.class);
+                        final var data = api.fromJson(it.data(), LocationChanged.class);
 
                         if (data.isRemoved()) {
                             add(api.messages().log().inventoryLinkChanged().removed());
@@ -87,7 +87,7 @@ public final class LogShopUI {
                     case LOCATION_CHANGED -> {
                         meta.displayName(api.messages().log().locationChanged().title());
 
-                        final var data = api.gson().fromJson(it.data(), LocationChanged.class);
+                        final var data = api.fromJson(it.data(), LocationChanged.class);
 
                         add(api.messages().log().locationChanged().x(data.x()));
                         add(api.messages().log().locationChanged().y(data.y()));
@@ -97,7 +97,7 @@ public final class LogShopUI {
                     case NAME_CHANGED -> {
                         meta.displayName(api.messages().log().nameChanged().title());
 
-                        final var data = (ValueChanged.String) api.gson().fromJson(it.data(), it.action().dataClass());
+                        final var data = (ValueChanged.String) api.fromJson(it.data(), it.action().dataClass());
 
                         add(api.messages().log().nameChanged().from(data.from()));
                         add(api.messages().log().nameChanged().to(data.to()));
@@ -105,7 +105,7 @@ public final class LogShopUI {
                     case NOTE_CHANGED -> {
                         meta.displayName(api.messages().log().noteChanged().title());
 
-                        final var data = (ValueChanged.String) api.gson().fromJson(it.data(), it.action().dataClass());
+                        final var data = (ValueChanged.String) api.fromJson(it.data(), it.action().dataClass());
 
                         add(api.messages().log().noteChanged().from(data.from()));
                         add(api.messages().log().noteChanged().to(data.to()));
@@ -113,7 +113,7 @@ public final class LogShopUI {
                     case QUANTITY_CHANGED -> {
                         meta.displayName(api.messages().log().quantityChanged().title());
 
-                        final var data = (ValueChanged.Int) api.gson().fromJson(it.data(), it.action().dataClass());
+                        final var data = (ValueChanged.Int) api.fromJson(it.data(), it.action().dataClass());
 
                         add(api.messages().log().quantityChanged().from(data.from()));
                         add(api.messages().log().quantityChanged().to(data.to()));
@@ -121,7 +121,7 @@ public final class LogShopUI {
                     case SELL_PRICE_CHANGED -> {
                         meta.displayName(api.messages().log().sellPriceChanged().title());
 
-                        final var data = (ValueChanged.Double) api.gson().fromJson(it.data(), it.action().dataClass());
+                        final var data = (ValueChanged.Double) api.fromJson(it.data(), it.action().dataClass());
 
                         add(api.messages().log().sellPriceChanged().from(data.from()));
                         add(api.messages().log().sellPriceChanged().to(data.to()));
@@ -129,7 +129,7 @@ public final class LogShopUI {
                     case BUY_PRICE_CHANGED -> {
                         meta.displayName(api.messages().log().buyPriceChanged().title());
 
-                        final var data = (ValueChanged.Double) api.gson().fromJson(it.data(), it.action().dataClass());
+                        final var data = (ValueChanged.Double) api.fromJson(it.data(), it.action().dataClass());
 
                         add(api.messages().log().buyPriceChanged().from(data.from()));
                         add(api.messages().log().buyPriceChanged().to(data.to()));
