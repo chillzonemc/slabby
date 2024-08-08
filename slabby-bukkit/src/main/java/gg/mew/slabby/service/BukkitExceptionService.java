@@ -34,6 +34,7 @@ public final class BukkitExceptionService implements ExceptionService {
             case ShopOutOfStockException ignored -> api.messages().owner().withdraw().insufficientStock();
             case PlayerOutOfInventorySpaceException ignored -> api.messages().general().noInventorySpace();
             case UnrecoverableException ignored -> api.messages().general().unrecoverableException();
+            case ShopOutOfSpaceException ignored -> api.messages().general().shopOutOfSpace();
             //NOTE: A SlabbyException is never thrown on its own, so technically this won't ever happen, but I have to put it here to satisfy the compiler
             case SlabbyException ignored -> api.messages().general().unrecoverableException();
         });

@@ -1,6 +1,5 @@
 package gg.mew.slabby;
 
-import com.google.gson.Gson;
 import gg.mew.slabby.config.SlabbyMessages;
 import gg.mew.slabby.config.SlabbyConfig;
 import gg.mew.slabby.service.ExceptionService;
@@ -38,14 +37,13 @@ public interface SlabbyAPI {
 
     Date legacyNow();
 
-    @Deprecated
-    DecimalFormat decimalFormat();
-
     File directory();
 
     ExceptionService exceptionService();
 
-    Gson gson();
+    <T> T fromJson(final String json, final Class<? extends T> theClass);
+
+    String toJson(final Object data);
 
     SlabbyMessages messages();
 

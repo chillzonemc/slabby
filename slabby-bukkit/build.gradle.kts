@@ -1,50 +1,43 @@
 plugins {
-    id("io.github.goooler.shadow") version "8.1.7"
-}
-
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/")
-    maven("https://repo.xenondevs.xyz/releases")
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-    // Paper API
-    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly(libs.paper)
 
-    // Plugin annotations for plugin.yml
-    compileOnly("org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT")
-    annotationProcessor("org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT")
+    compileOnly(libs.plugin.annotations)
+    annotationProcessor(libs.plugin.annotations)
 
-    // Library for creating commands
-    implementation("co.aikar:acf-paper:0.5.1-SNAPSHOT")
+    implementation(libs.acf.paper)
 
-    // Library for interacting with server economy
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly(libs.vault)
 
-    // Library for handling yaml
-    implementation("org.spongepowered:configurate-yaml:4.1.2")
+    implementation(libs.configurate.yaml)
 
-    // Library for creating item UIs
-    implementation("xyz.xenondevs.invui:invui:1.30")
+    implementation(libs.invui)
 
-    compileOnly("com.github.angeschossen:LandsAPI:6.44.10")
+    compileOnly(libs.lands.api)
+
+    implementation(libs.gson)
 
     implementation(project(":slabby-api"))
     implementation(project(":slabby-sqlite3"))
 }
 
-tasks.compileJava {
-    options.compilerArgs.add("-parameters")
-    options.isFork = true;
-}
-
-//TODO: automatically relocate all shadowed dependencies
 tasks.shadowJar {
-    relocate("co.aikar.commands", "gg.mew.slabby.acf")
-    relocate("co.aikar.locales", "gg.mew.slabby.locales")
+
+    archiveFileName = "slabby-bukkit-mc${providers.gradleProperty("minecraft_version").get()}-${project.version}.jar"
 }
 
 tasks.build {
     dependsOn(tasks.shadowJar)
+}
+
+tasks.jar {
+    enabled = false
+}
+
+tasks.compileJava {
+    options.compilerArgs.add("-parameters")
+    options.isFork = true
 }

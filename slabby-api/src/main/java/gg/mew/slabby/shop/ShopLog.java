@@ -53,7 +53,7 @@ public interface ShopLog extends Auditable {
         ShopLog build();
 
         default Builder serialized(final Object any) {
-            return this.data(SlabbyHelper.api().gson().toJson(any));
+            return this.data(SlabbyHelper.api().toJson(any));
         }
 
     }
