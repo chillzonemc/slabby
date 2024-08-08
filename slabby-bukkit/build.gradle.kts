@@ -1,40 +1,35 @@
-import gg.mew.slabby.SlabbyDependencies
-
-repositories {
-    maven("https://repo.papermc.io/repository/maven-public/")
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/")
-    maven("https://repo.xenondevs.xyz/releases")
-    maven("https://repo.aikar.co/content/groups/aikar/")
+plugins {
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
-    // Paper API
-    compileOnly("io.papermc.paper:paper-api:${SlabbyDependencies.PAPER_API}")
+    compileOnly(libs.paper)
 
-    // Plugin annotations for plugin.yml
-    compileOnly("org.spigotmc:plugin-annotations:${SlabbyDependencies.PLUGIN_ANNOTATIONS}")
-    annotationProcessor("org.spigotmc:plugin-annotations:${SlabbyDependencies.PLUGIN_ANNOTATIONS}")
+    compileOnly(libs.plugin.annotations)
+    annotationProcessor(libs.plugin.annotations)
 
-    // Library for creating commands
-    implementation("co.aikar:acf-paper:${SlabbyDependencies.ACF}")
+    implementation(libs.acf.paper)
 
-    // Library for interacting with server economy
-    compileOnly("com.github.MilkBowl:VaultAPI:${SlabbyDependencies.VAULT}")
+    compileOnly(libs.vault)
 
-    // Library for handling yaml
-    implementation("org.spongepowered:configurate-yaml:${SlabbyDependencies.CONFIGURATE}")
+    implementation(libs.configurate.yaml)
 
-    // Library for creating item UIs
-    implementation("xyz.xenondevs.invui:invui:${SlabbyDependencies.INVUI}")
+    implementation(libs.invui)
 
-    // Library for integrating with the Lands claims plugin
-    compileOnly("com.github.angeschossen:LandsAPI:${SlabbyDependencies.LANDS}")
+    compileOnly(libs.lands.api)
 
-    // Library for handling json
-    implementation("com.google.code.gson:gson:${SlabbyDependencies.GSON}")
+    implementation(libs.gson)
 
     implementation(project(":slabby-api"))
     implementation(project(":slabby-sqlite3"))
+}
+
+tasks.shadowJar {
+    minimize()
+}
+
+tasks.jar {
+    enabled = false
 }
 
 tasks.compileJava {
