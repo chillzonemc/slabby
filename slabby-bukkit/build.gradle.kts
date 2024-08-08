@@ -26,6 +26,12 @@ dependencies {
 
 tasks.shadowJar {
     minimize()
+
+    archiveFileName = "slabby-bukkit-mc${providers.gradleProperty("minecraft_version").get()}-${project.version}.jar"
+}
+
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 tasks.jar {

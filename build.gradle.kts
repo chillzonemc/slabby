@@ -7,7 +7,7 @@ subprojects {
     apply(plugin = "java-library")
 
     group = "gg.mew.slabby"
-    version = "1.0"
+    version = providers.gradleProperty("slabby_version").get()
 
     dependencies {
         compileOnly("org.projectlombok:lombok:1.18.34")
