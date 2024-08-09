@@ -1,9 +1,16 @@
 package gg.mew.slabby.helper;
 
+import gg.mew.slabby.exception.UnrecoverableException;
 import lombok.experimental.UtilityClass;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -46,10 +53,6 @@ public final class ItemHelper {
         }
 
         return result;
-    }
-
-    public String toName(final ItemStack itemStack) {
-        return itemStack.getType().getKey().asString() + itemStack.getItemMeta().getAsString();
     }
 
 }

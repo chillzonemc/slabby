@@ -17,13 +17,16 @@ public final class BukkitExceptionService implements ExceptionService {
     private final SlabbyAPI api;
 
     @Override
-    public void logToConsole(final String message, final Exception exception) {
+    public void logToConsole(final String message, final Throwable exception) {
         api.logger().log(Level.SEVERE, message, exception);
     }
 
     @Override
     public void logToPlayer(final UUID uniqueId, final SlabbyException exception) {
         final var player = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
+
+        if (exception.getCause() != null)
+            logToConsole("SlabbyException had an underlying cause", exception.getCause());
 
         player.sendMessage(switch (exception) {
             case FaultException e -> e.component();

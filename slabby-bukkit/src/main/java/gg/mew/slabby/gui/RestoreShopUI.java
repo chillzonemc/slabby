@@ -2,6 +2,7 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.audit.Auditable;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.shop.ShopWizard;
 import lombok.experimental.UtilityClass;
@@ -9,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.PagedGui;
 import xyz.xenondevs.invui.gui.structure.Markers;
@@ -32,7 +34,7 @@ public final class RestoreShopUI {
                 .stream()
                 .sorted(Comparator.comparing(Auditable::createdOn, Comparator.reverseOrder()))
                 .map(it -> {
-                    final var itemStack = Bukkit.getItemFactory().createItemStack(it.item());
+                    final var itemStack = api.serialization().<ItemStack>deserialize(it.item());
 
                     final var owners = it.owners()
                             .stream()

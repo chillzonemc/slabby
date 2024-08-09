@@ -105,7 +105,7 @@ public final class SlabbyListener implements Listener {
                         if (api.configuration().restock().punch().shulker() && event.getItem() != null && event.getItem().getType() == Material.SHULKER_BOX) {
                             api.exceptionService().tryCatch(uniqueId, () -> api.operations().deposit(uniqueId, shop, 1));
                         } else if (api.configuration().restock().punch().bulk())  {
-                            final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+                            final var item = api.serialization().<ItemStack>deserialize(shop.item());
 
                             final var quantity = player.isSneaking()
                                     ? ItemHelper.countSimilar(player.getInventory(), item)
@@ -135,7 +135,7 @@ public final class SlabbyListener implements Listener {
                 final var item = Objects.requireNonNull(event.getCurrentItem());
 
                 wizard.wizardState(ShopWizard.WizardState.AWAITING_CONFIRMATION)
-                        .item(ItemHelper.toName(item));
+                        .item(api.serialization().serialize(item.clone()));
 
                 ModifyShopUI.open(api, (Player) event.getWhoClicked(), wizard);
 
@@ -177,7 +177,7 @@ public final class SlabbyListener implements Listener {
                     }
                     case AWAITING_QUANTITY, AWAITING_TEMP_QUANTITY -> {
                         final var quantity = Integer.parseInt(text);
-                        final var item = Bukkit.getItemFactory().createItemStack(wizard.item());
+                        final var item = api.serialization().<ItemStack>deserialize(wizard.item());
 
                         final var maxQuantity = 36 * item.getMaxStackSize();
 
@@ -239,7 +239,7 @@ public final class SlabbyListener implements Listener {
         } catch (final SlabbyException ignored) {}
 
         shopOpt.ifPresent(shop -> {
-            final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+            final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
 
             if (!itemStack.isSimilar(event.getItem()))
                 return;

@@ -11,7 +11,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Map;
 
 public final class SlabboImporter implements Importer {
@@ -30,10 +29,8 @@ public final class SlabboImporter implements Importer {
                     final var shop = api.repository()
                             .<Shop.Builder>builder(Shop.Builder.class)
                             .item(oldShop.item())
-                            .x(oldShop.x())
-                            .y(oldShop.y())
-                            .z(oldShop.z())
-                            .world(oldShop.world())
+                            .location(oldShop.x(), oldShop.y(), oldShop.z(), oldShop.world())
+                            .inventory(oldShop.inventoryX(), oldShop.inventoryY(), oldShop.inventoryZ(), oldShop.inventoryWorld())
                             .buyPrice(oldShop.buyPrice())
                             .sellPrice(oldShop.sellPrice())
                             .quantity(oldShop.quantity())
@@ -63,11 +60,13 @@ public final class SlabboImporter implements Importer {
             }
 
             final var keyShopLocation = new NamespacedKey("slabbo", "shoplocation");
+            final var keySlabboShopLocation = new NamespacedKey("slabbo", "slabbo_shop_location");
 
             for (final var world : Bukkit.getWorlds()) {
                 for (final var item : world.getEntitiesByClass(Item.class)) {
                     final var persistentData = item.getItemStack().getItemMeta().getPersistentDataContainer();
-                    if (persistentData.has(keyShopLocation)) {
+
+                    if (persistentData.has(keyShopLocation) || persistentData.has(keySlabboShopLocation)) {
                         item.remove();
                     }
                 }

@@ -16,6 +16,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 public final class OwnerShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
         final var uniqueId = shopOwner.getUniqueId();
         
         final var gui = Gui.empty(9, 2);
@@ -118,7 +119,7 @@ public final class OwnerShopUI {
             }).get(), c -> LogShopUI.open(api, shopOwner, shop)));
         });
 
-        gui.setItem(4, 0, new SimpleItem(new ItemBuilder(Bukkit.getItemFactory().createItemStack(shop.item()))));
+        gui.setItem(4, 0, new SimpleItem(new ItemBuilder(itemStack)));
 
         api.permission().ifPermission(uniqueId, SlabbyPermissions.SHOP_LINK, () -> {
             if (shop.stock() == null)

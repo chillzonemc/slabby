@@ -2,6 +2,7 @@ package gg.mew.slabby.gui;
 
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.SlabbyException;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.shop.Shop;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -10,6 +11,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 public final class DestroyShopUI {
 
     public void open(final SlabbyAPI api, final Player shopOwner, final Shop shop) {
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
         final var uniqueId = shopOwner.getUniqueId();
 
         final var gui = Gui.empty(9, 1);

@@ -126,6 +126,26 @@ public final class SQLiteShop implements Shop {
         return this.owners.stream().anyMatch(it -> it.uniqueId().equals(uniqueId));
     }
 
-    public static final class SQLiteShopBuilder implements Shop.Builder {}
+    public static final class SQLiteShopBuilder implements Shop.Builder {
+
+        @Override
+        public Shop.Builder location(final Integer x, final Integer y, final Integer z, final String world) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.world = world;
+            return this;
+        }
+
+        @Override
+        public Shop.Builder inventory(final Integer x, final Integer y, final Integer z, final String world) {
+            this.inventoryX = x;
+            this.inventoryY = y;
+            this.inventoryZ = z;
+            this.inventoryWorld = world;
+            return this;
+        }
+
+    }
 
 }
