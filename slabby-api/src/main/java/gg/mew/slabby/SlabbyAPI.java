@@ -8,6 +8,7 @@ import gg.mew.slabby.shop.ShopRepository;
 import gg.mew.slabby.wrapper.claim.ClaimWrapper;
 import gg.mew.slabby.wrapper.economy.EconomyWrapper;
 import gg.mew.slabby.wrapper.permission.PermissionWrapper;
+import gg.mew.slabby.wrapper.serialization.SerializationWrapper;
 import gg.mew.slabby.wrapper.sound.SoundWrapper;
 
 import java.io.File;
@@ -26,6 +27,8 @@ public interface SlabbyAPI {
     SoundWrapper sound();
 
     ClaimWrapper claim();
+
+    SerializationWrapper serialization();
 
     ShopRepository repository();
 

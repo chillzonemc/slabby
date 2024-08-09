@@ -3,6 +3,7 @@ package gg.mew.slabby.gui;
 import gg.mew.slabby.Slabby;
 import gg.mew.slabby.SlabbyAPI;
 import gg.mew.slabby.exception.SlabbyException;
+import gg.mew.slabby.helper.ItemHelper;
 import gg.mew.slabby.shop.ShopWizard;
 import gg.mew.slabby.wrapper.sound.Sounds;
 import lombok.experimental.UtilityClass;
@@ -11,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
@@ -27,7 +29,7 @@ public final class ModifyShopUI {
         final var uniqueId = shopOwner.getUniqueId();
         final var gui = Gui.empty(9, 1);
 
-        gui.setItem(0, 0, new SimpleItem(Bukkit.getItemFactory().createItemStack(wizard.item())));
+        gui.setItem(0, 0, new SimpleItem(api.serialization().<ItemStack>deserialize(wizard.item())));
         gui.setItem(1, 0, new SimpleItem(itemStack(Material.NAME_TAG, (it, meta) -> {
             meta.displayName(api.messages().modify().note().title());
             meta.lore(new ArrayList<>() {{

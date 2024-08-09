@@ -35,7 +35,7 @@ public final class SlabboMapsCommand extends BaseCommand {
         final var compass = new ItemStack(Material.COMPASS, 1);
         final var meta = (CompassMeta) compass.getItemMeta();
 
-        final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var item = api.serialization().<ItemStack>deserialize(shop.item());
 
         meta.displayName(translatable(item.translationKey(), NamedTextColor.YELLOW).appendSpace());
 
@@ -63,7 +63,7 @@ public final class SlabboMapsCommand extends BaseCommand {
         @SuppressWarnings("resource")
         final var shop = this.api
                 .repository()
-                .shopsByItem(ItemHelper.toName(itemStack))
+                .shopsByItem(api.serialization().serialize(itemStack))
                 .stream()
                 .filter(orderBy)
                 .filter(it -> this.api.claim() == null || this.api.claim().isInShoppingDistrict(it))

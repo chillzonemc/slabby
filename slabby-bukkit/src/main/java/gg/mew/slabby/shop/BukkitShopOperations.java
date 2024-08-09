@@ -90,7 +90,7 @@ public final class BukkitShopOperations implements ShopOperations {
         if (!result.success())
             throw new InsufficientBalanceToBuyException();
 
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
 
         if (!ItemHelper.hasSpace(client.getInventory(), itemStack, shop.quantity()))
             throw new PlayerOutOfInventorySpaceException();
@@ -127,11 +127,13 @@ public final class BukkitShopOperations implements ShopOperations {
 
         client.sendMessage(api.messages().client().buy().message(itemStack.displayName(), shop.quantity(), shop.buyPrice()));
 
-        for (final var shopOwner : shop.owners()) {
-            final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+        if (shop.stock() != null) {
+            for (final var shopOwner : shop.owners()) {
+                final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
 
-            if (playerOwner != null) {
-                playerOwner.sendMessage(api.messages().client().buy().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+                if (playerOwner != null) {
+                    playerOwner.sendMessage(api.messages().client().buy().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+                }
             }
         }
     }
@@ -147,7 +149,7 @@ public final class BukkitShopOperations implements ShopOperations {
             throw new UnsupportedOperationException("Unable to sell to shop: shop is not buying");
 
         final var client = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
 
         if (!client.getInventory().containsAtLeast(itemStack, shop.quantity()))
             throw new PlayerOutOfStockException();
@@ -201,11 +203,13 @@ public final class BukkitShopOperations implements ShopOperations {
 
         client.sendMessage(api.messages().client().sell().message(itemStack.displayName(), shop.quantity(), shop.sellPrice()));
 
-        for (final var shopOwner : shop.owners()) {
-            final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
+        if (shop.stock() != null) {
+            for (final var shopOwner : shop.owners()) {
+                final var playerOwner = Bukkit.getPlayer(shopOwner.uniqueId());
 
-            if (playerOwner != null) {
-                playerOwner.sendMessage(api.messages().client().sell().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+                if (playerOwner != null) {
+                    playerOwner.sendMessage(api.messages().client().sell().messageOwner(client.displayName(), shop.quantity(), itemStack.displayName(), shop.buyPrice()));
+                }
             }
         }
     }
@@ -224,7 +228,7 @@ public final class BukkitShopOperations implements ShopOperations {
             throw new ShopOutOfStockException();
 
         final var shopOwner = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
 
         if (!ItemHelper.hasSpace(shopOwner.getInventory(), itemStack, amount))
             throw new PlayerOutOfInventorySpaceException();
@@ -263,12 +267,12 @@ public final class BukkitShopOperations implements ShopOperations {
         api.repository().refresh(shop);
 
         final var shopOwner = Objects.requireNonNull(Bukkit.getPlayer(uniqueId));
-        final var itemStack = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var itemStack = api.serialization().<ItemStack>deserialize(shop.item());
         final var itemInHand = shopOwner.getInventory().getItemInMainHand();
 
         Runnable removeItem;
 
-        if (itemInHand.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
+        if (!itemStack.isSimilar(itemInHand) && itemInHand.getItemMeta() instanceof BlockStateMeta meta && meta.getBlockState() instanceof ShulkerBox shulker) {
             amount = ItemHelper.countSimilar(shulker.getInventory(), itemStack);
 
             if (amount == 0)
@@ -353,10 +357,7 @@ public final class BukkitShopOperations implements ShopOperations {
                 });
             } else {
                 final var shop = api.repository().<Shop.Builder>builder(Shop.Builder.class)
-                        .x(wizard.x())
-                        .y(wizard.y())
-                        .z(wizard.z())
-                        .world(wizard.world())
+                        .location(wizard.x(), wizard.y(), wizard.z(), wizard.world())
                         .item(wizard.item())
                         .buyPrice(wizard.buyPrice())
                         .sellPrice(wizard.sellPrice())
@@ -404,7 +405,7 @@ public final class BukkitShopOperations implements ShopOperations {
 
     @Override
     public void removeAndSpawnDisplayItem(final Shop shop) {
-        final var item = Bukkit.getItemFactory().createItemStack(shop.item());
+        final var item = api.serialization().<ItemStack>deserialize(shop.item());
         final var world = Bukkit.getWorld(shop.world());
 
         if (shop.displayEntityId() != null && Bukkit.getEntity(shop.displayEntityId()) instanceof Display e)

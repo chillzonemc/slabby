@@ -104,10 +104,7 @@ public interface Shop extends Auditable {
 
     interface Builder {
          Builder item(final String item);
-         Builder x(final Integer x);
-         Builder y(final Integer y);
-         Builder z(final Integer z);
-         Builder world(final String world);
+         Builder location(final Integer x, final Integer y, final Integer z, final String world);
          Builder buyPrice(final Double buyPrice);
          Builder sellPrice(final Double sellPrice);
          Builder quantity(final int quantity);
@@ -115,6 +112,7 @@ public interface Shop extends Auditable {
          Builder note(final String note);
          Builder name(final String name);
          Builder displayEntityId(final UUID displayEntityId);
+         Builder inventory(final Integer x, final Integer y, final Integer z, final String world);
          Shop build();
 
      }

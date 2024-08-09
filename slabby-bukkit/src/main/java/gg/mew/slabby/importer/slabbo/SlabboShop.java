@@ -1,6 +1,7 @@
 package gg.mew.slabby.importer.slabbo;
 
 import gg.mew.slabby.SlabbyHelper;
+import gg.mew.slabby.helper.ItemHelper;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.Location;
@@ -73,7 +74,7 @@ public final class SlabboShop implements ConfigurationSerializable {
 
         final var item = (ItemStack) args.get("item");
 
-        result.item = item.getType().getKey().asString() + item.getItemMeta().getAsString();
+        result.item = SlabbyHelper.api().serialization().serialize(item);
 
         final var isAdmin = (boolean) args.get("admin");
 
@@ -85,7 +86,7 @@ public final class SlabboShop implements ConfigurationSerializable {
 
         final var linkedChestLocation = (String) args.get("linkedChestLocation");
 
-        if (linkedChestLocation != null) {
+        if (linkedChestLocation != null && !linkedChestLocation.isEmpty()) {
             final var split = linkedChestLocation.split(",");
             result.inventoryWorld = split[0];
             result.inventoryX = Integer.parseInt(split[1]);
