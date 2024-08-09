@@ -13,6 +13,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public final class LandsClaimWrapper implements ClaimWrapper {
 
+    private static final String LANDS_BLOCK_PLACE_BYPASS = "lands.bypass.block_place";
+
     private final LandsIntegration lands;
 
     @Override
@@ -21,6 +23,10 @@ public final class LandsClaimWrapper implements ClaimWrapper {
         final var landWorld = lands.getWorld(Objects.requireNonNull(bukkitWorld));
 
         if (landWorld == null)
+            return true;
+
+
+        if (Objects.requireNonNull(Bukkit.getPlayer(uniqueId)).hasPermission(LANDS_BLOCK_PLACE_BYPASS))
             return true;
 
         return landWorld.hasRoleFlag(uniqueId, new Location(bukkitWorld, x, y, z), Flags.BLOCK_PLACE);
