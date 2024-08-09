@@ -250,7 +250,7 @@ public final class SlabbyListener implements Listener {
                 api.repository().update(shop);
 
                 event.setItem(ItemStack.empty());
-            } catch (final Exception e) {
+            } catch (final SlabbyException e) {
                 api.exceptionService().logToConsole("Error while attempting to update shop from linked inventory", e);
             }
         });
